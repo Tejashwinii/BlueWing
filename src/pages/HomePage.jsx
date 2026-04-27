@@ -158,102 +158,109 @@ const HomePage = () => {
                 </div>
               </div>
               
-              <div className="seperate-div">
-                <div className="form-group">
-                  <label>Passengers</label>
-                  <button
-                    type="button"
-                    className="passenger-dropdown-btn"
-                    onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
-                  >
-                    <span>{totalPassengers} Passenger{totalPassengers !== 1 ? 's' : ''}</span>
-                    <span className="dropdown-arrow">▼</span>
-                  </button>
-                  {showPassengerDropdown && (
-                    <div className="passenger-dropdown-menu">
-                      <div className="passenger-item">
-                        <button
-                          type="button"
-                          className="passenger-btn-minus"
-                          onClick={() => handlePassengerChange('adults', 'subtract')}
-                        >
-                          −
-                        </button>
-                        <div className="passenger-info">
-                          <div className="passenger-count">{formData.adults} Adult</div>
-                          <div className="passenger-age">Ages 12+</div>
-                        </div>
-                        <button
-                          type="button"
-                          className="passenger-btn-plus"
-                          onClick={() => handlePassengerChange('adults', 'add')}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <div className="passenger-item">
-                        <button
-                          type="button"
-                          className="passenger-btn-minus"
-                          onClick={() => handlePassengerChange('children', 'subtract')}
-                        >
-                          −
-                        </button>
-                        <div className="passenger-info">
-                          <div className="passenger-count">{formData.children} Child</div>
-                          <div className="passenger-age">Ages 2-11</div>
-                        </div>
-                        <button
-                          type="button"
-                          className="passenger-btn-plus"
-                          onClick={() => handlePassengerChange('children', 'add')}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <div className="passenger-item">
-                        <button
-                          type="button"
-                          className="passenger-btn-minus"
-                          onClick={() => handlePassengerChange('infants', 'subtract')}
-                        >
-                          −
-                        </button>
-                        <div className="passenger-info">
-                          <div className="passenger-count">{formData.infants} Infant</div>
-                          <div className="passenger-age">Ages under 2, on lap</div>
-                        </div>
-                        <button
-                          type="button"
-                          className="passenger-btn-plus"
-                          onClick={() => handlePassengerChange('infants', 'add')}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <div className="passenger-note">
-                        Please note: You can book for a maximum of 9 passengers.
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+             <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+  {/* Passengers Column */}
+  <div style={{ flex: 1 }}>
+    <div className="form-group">
+      <label>Passengers</label>
+      <button
+        type="button"
+        className="passenger-dropdown-btn"
+        onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
+      >
+        <span>{totalPassengers} Passenger{totalPassengers !== 1 ? 's' : ''}</span>
+        <span className="dropdown-arrow">▼</span>
+      </button>
+      {showPassengerDropdown && (
+        <div className="passenger-dropdown-menu">
+          {/* Adults */}
+          <div className="passenger-item">
+            <button
+              type="button"
+              className="passenger-btn-minus"
+              onClick={() => handlePassengerChange('adults', 'subtract')}
+            >
+              −
+            </button>
+            <div className="passenger-info">
+              <div className="passenger-count">{formData.adults} Adult</div>
+              <div className="passenger-age">Ages 12+</div>
+            </div>
+            <button
+              type="button"
+              className="passenger-btn-plus"
+              onClick={() => handlePassengerChange('adults', 'add')}
+            >
+              +
+            </button>
+          </div>
+          {/* Children */}
+          <div className="passenger-item">
+            <button
+              type="button"
+              className="passenger-btn-minus"
+              onClick={() => handlePassengerChange('children', 'subtract')}
+            >
+              −
+            </button>
+            <div className="passenger-info">
+              <div className="passenger-count">{formData.children} Child</div>
+              <div className="passenger-age">Ages 2-11</div>
+            </div>
+            <button
+              type="button"
+              className="passenger-btn-plus"
+              onClick={() => handlePassengerChange('children', 'add')}
+            >
+              +
+            </button>
+          </div>
+          {/* Infants */}
+          <div className="passenger-item">
+            <button
+              type="button"
+              className="passenger-btn-minus"
+              onClick={() => handlePassengerChange('infants', 'subtract')}
+            >
+              −
+            </button>
+            <div className="passenger-info">
+              <div className="passenger-count">{formData.infants} Infant</div>
+              <div className="passenger-age">Ages under 2, on lap</div>
+            </div>
+            <button
+              type="button"
+              className="passenger-btn-plus"
+              onClick={() => handlePassengerChange('infants', 'add')}
+            >
+              +
+            </button>
+          </div>
+          <div className="passenger-note">
+            Please note: You can book for a maximum of 9 passengers.
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
 
-              <div className="form-row form-row-single">
-                <div className="form-group">
-                  <label htmlFor="class">Class</label>
-                  <select
-                    id="class"
-                    name="class"
-                    value={formData.class}
-                    onChange={handleInputChange}
-                  >
-                    <option value="economy">Economy</option>
-                    <option value="business">Business</option>
-                    <option value="first">First</option>
-                  </select>
-                </div>
-              </div>
+  {/* Class Column */}
+  <div style={{ flex:1 }} className='class-div'>
+    <div className="form-group">
+      <label htmlFor="class">Class</label>
+      <select
+        id="class"
+        name="class"
+        value={formData.class}
+        onChange={handleInputChange}
+      >
+        <option value="economy">Economy</option>
+        <option value="business">Business</option>
+        <option value="first">First</option>
+      </select>
+    </div>
+  </div>
+</div>
 
               <button type="submit" className="btn-search">
                 Search Flights

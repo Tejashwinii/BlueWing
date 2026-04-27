@@ -1,4 +1,4 @@
-/* HomePage Styles */
+
 
 * {
   margin: 0;
@@ -22,13 +22,13 @@ body {
   padding: 0;
 }
 
-/* ===== HERO SECTION ===== */
+
 .hero-section {
   margin-top: 70px;
   position: relative;
   height: 750px;
   overflow: visible;
- /* width: calc(100% + 40px);*/
+ 
   margin-left: 0px;
   margin-right: 0px;
 }
@@ -79,7 +79,6 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* ===== SEARCH CARD ===== */
 .search-card-container {
   position: absolute;
   bottom: -280px;
@@ -195,7 +194,7 @@ body {
   transform: translateY(0);
 }
 
-/* ===== PASSENGER DROPDOWN ===== */
+
 .passenger-dropdown-wrapper {
   position: relative;
   z-index: 25;
@@ -317,7 +316,7 @@ body {
   border-top: 1px solid #f0f0f0;
 }
 
-/* ===== HIGHLIGHTS SECTION ===== */
+
 .highlights-section {
   margin-top: 280px;
   padding: 80px 20px;
@@ -389,7 +388,7 @@ body {
   line-height: 1.6;
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
+
 @media (max-width: 768px) {
   .hero-heading {
     font-size: 36px;
@@ -488,7 +487,7 @@ body {
   }
 }
 
-/* ===== FOOTER ===== */
+
 .footer {
   background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
   color: white;
@@ -509,6 +508,9 @@ body {
   margin-bottom: 30px;
   padding-bottom: 30px;
   border-bottom: 1px solid rgba(0, 102, 204, 0.3);
+}
+.class-div {
+    
 }
 
 .footer-section h4 {
@@ -589,7 +591,7 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* ===== RESPONSIVE FOOTER ===== */
+
 @media (max-width: 768px) {
   .footer{
     padding: 40px 15px 15px;
