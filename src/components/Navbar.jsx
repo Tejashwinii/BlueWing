@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Navbar.css';
 
-const Navbar = ({ onNavClick, hideLogin = false }) => {
+const Navbar = ({ onNavClick = () => {}, hideLogin = false }) => {
   const [hoveredMenu, setHoveredMenu] = useState(null);
 
   const navMenus = {
@@ -170,3 +170,5 @@ const Navbar = ({ onNavClick, hideLogin = false }) => {
 };
 
 export default Navbar;
+
+

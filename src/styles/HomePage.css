@@ -16,9 +16,10 @@ body {
 }
 
 .homepage {
-  width: 100vw;
-  overflow-x: clip;
-  margin: -70px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
   padding: 0;
 }
 
@@ -44,6 +45,7 @@ body {
   background: url('../assets/image.png');
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -137,6 +139,7 @@ body {
 .form-group {
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .form-group label {
@@ -156,6 +159,8 @@ body {
   font-size: 14px;
   font-family: inherit;
   transition: border-color 0.3s, box-shadow 0.3s;
+  background: white;
+  color: #333;
 }
 
 .form-group input:focus,
@@ -167,6 +172,29 @@ body {
 
 .form-group input::placeholder {
   color: #999;
+}
+
+.form-group input[type="date"] {
+  color-scheme: light;
+  background-color: #fff;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+  filter: invert(33%) sepia(58%) saturate(1669%) hue-rotate(194deg) brightness(93%) contrast(98%);
+}
+
+.form-group input:-webkit-autofill,
+.form-group input:-webkit-autofill:hover,
+.form-group input:-webkit-autofill:focus,
+.form-group select:-webkit-autofill,
+.form-group select:-webkit-autofill:hover,
+.form-group select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #333 !important;
+  transition: background-color 9999s ease-out 0s;
 }
 
 .btn-search {
@@ -241,7 +269,7 @@ body {
   border-top: none;
   border-radius: 0 0 6px 6px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  z-index: 30;
+  z-index: 1000;
   padding: 20px;
   min-width: 100%;
   margin-top: -1px;
@@ -510,7 +538,8 @@ body {
   border-bottom: 1px solid rgba(0, 102, 204, 0.3);
 }
 .class-div {
-    
+  position: relative;
+  z-index: 1;
 }
 
 .footer-section h4 {

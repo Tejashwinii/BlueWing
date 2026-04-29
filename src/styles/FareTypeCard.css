@@ -1,0 +1,176 @@
+.flight-fareTypeCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-width: 0;
+  padding: 18px 16px 16px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid #d9e4f2;
+  box-shadow: 0 10px 28px rgba(16, 35, 63, 0.06);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.flight-fareTypeCard:hover {
+  border-color: rgba(26, 115, 232, 0.4);
+  box-shadow: 0 12px 24px rgba(26, 115, 232, 0.12);
+}
+
+.flight-fareTypeCard.is-selected {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.18), 0 12px 24px rgba(26, 115, 232, 0.18);
+  transform: translateY(-1px);
+}
+
+.flight-fareTypeCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.flight-fareTypePrice {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #10233f;
+  line-height: 1.05;
+}
+
+.flight-fareTypeRewards {
+  margin: 4px 0 0;
+  color: #0f9d58;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.flight-fareTypeBadgeWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.flight-fareTypeBadge,
+.flight-fareTypeNewTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.flight-fareTypeBadge {
+  background: rgba(26, 115, 232, 0.1);
+  color: #1a73e8;
+}
+
+.flight-fareTypeNewTag {
+  background: rgba(15, 157, 88, 0.12);
+  color: #0f9d58;
+}
+
+.flight-fareTypeCardDivider {
+  height: 1px;
+  margin: 2px 0;
+  background: linear-gradient(90deg, rgba(217, 228, 242, 0), rgba(217, 228, 242, 1), rgba(217, 228, 242, 0));
+}
+
+.flight-fareTypeSectionDivider {
+  height: 1px;
+  margin: 2px 0;
+  background: linear-gradient(90deg, rgba(217, 228, 242, 0), rgba(217, 228, 242, 1), rgba(217, 228, 242, 0));
+}
+
+.flight-fareTypeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.flight-fareTypeLine {
+  margin: 0;
+  color: #334155;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.flight-fareTypeLine strong {
+  color: #10233f;
+}
+
+.flight-fareTypeUpgradeBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f8fbff 0%, #eff6ff 100%);
+  border: 1px solid rgba(26, 115, 232, 0.12);
+}
+
+.flight-fareTypeUpgradeText,
+.flight-fareTypeUpgradeTitle {
+  margin: 0;
+}
+
+.flight-fareTypeUpgradeText {
+  color: #1a73e8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.flight-fareTypeUpgradeTitle {
+  margin-top: 3px;
+  color: #10233f;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.flight-fareTypeUpgradeButton {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #1a73e8;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.flight-fareTypeUpgradeButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(26, 115, 232, 0.2);
+}
+
+@media (max-width: 640px) {
+  .flight-fareTypeCard {
+    padding: 16px 14px;
+  }
+
+  .flight-fareTypeCardHeader {
+    flex-direction: column;
+  }
+
+  .flight-fareTypeBadgeWrap {
+    justify-content: flex-start;
+  }
+
+  .flight-fareTypeUpgradeBox {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

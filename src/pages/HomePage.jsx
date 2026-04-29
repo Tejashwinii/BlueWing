@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/HomePage.css';
 import Navbar from '../../src/components/Navbar';
 
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeView, setActiveView] = useState('home');
 
   const handleNavClick = (menuItem) => {
@@ -14,15 +17,21 @@ const HomePage = () => {
     setActiveView('home');
   };
 
-  const [formData, setFormData] = useState({
-    departure: '',
-    arrival: '',
-    date: '',
-    adults: 1,
-    children: 0,
-    infants: 0,
-    class: 'economy',
-  });
+  const getInitialFormData = () => {
+    const savedForm = location.state?.searchForm || JSON.parse(sessionStorage.getItem('bluewingSearchForm') || 'null') || {};
+
+    return {
+      departure: savedForm.departure || '',
+      arrival: savedForm.arrival || '',
+      date: savedForm.date || '',
+      adults: Number(savedForm.adults ?? 1),
+      children: Number(savedForm.children ?? 0),
+      infants: Number(savedForm.infants ?? 0),
+      class: savedForm.class || savedForm.cabinClass || 'economy',
+    };
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData);
 
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
 
@@ -43,9 +52,46 @@ const HomePage = () => {
 
   const totalPassengers = formData.adults + formData.children + formData.infants;
 
+  const normalizeCabinClass = (value) => {
+    if (value === 'first') {
+      return 'first-class';
+    }
+
+    return value || 'economy';
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Search initiated with:', formData);
+
+    // Validate that all required fields are filled
+    if (!formData.departure.trim() || !formData.arrival.trim() || !formData.date) {
+      alert('Please enter all required details: departure city, arrival city, and departure date.');
+      return;
+    }
+
+    const normalizedClass = normalizeCabinClass(formData.class);
+    const searchParams = new URLSearchParams({
+      departure: formData.departure.trim(),
+      arrival: formData.arrival.trim(),
+      date: formData.date,
+      class: normalizedClass,
+    });
+
+    const searchForm = {
+      departure: formData.departure.trim(),
+      arrival: formData.arrival.trim(),
+      date: formData.date,
+      class: normalizedClass,
+      adults: formData.adults,
+      children: formData.children,
+      infants: formData.infants,
+    };
+
+    sessionStorage.setItem('bluewingSearchForm', JSON.stringify(searchForm));
+
+    navigate(`/flight-selection?${searchParams.toString()}`, {
+      state: { searchForm },
+    });
   };
 
   // Render active component or home page
@@ -256,7 +302,7 @@ const HomePage = () => {
       >
         <option value="economy">Economy</option>
         <option value="business">Business</option>
-        <option value="first">First</option>
+        <option value="first-class">First Class</option>
       </select>
     </div>
   </div>
@@ -351,3 +397,8 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
+
+
+
+
