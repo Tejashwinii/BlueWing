@@ -1,3 +1,5 @@
+import { createDefaultAircraftLayout } from "../utils/aircraftConfig";
+
 const rawDummyFlights = [
   {
     id: 1,
@@ -400,6 +402,7 @@ const createFareTypes = (flight) => [
 const dummyFlights = rawDummyFlights.map((flight) => ({
   ...flight,
   fareTypes: createFareTypes(flight),
+  aircraft: createDefaultAircraftLayout(),
 }));
 
 export default dummyFlights;

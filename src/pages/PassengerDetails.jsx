@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import '../styles/PassengerDetails.css';
 
 const PassengerDetails = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Get journey and selected fare data from location state
   const journey = location.state?.journey || {};
@@ -120,26 +121,20 @@ const PassengerDetails = () => {
     const formErrors = validateForm();
 
     if (Object.keys(formErrors).length === 0) {
-      console.log('Form Data:', formData);
-      setSuccessMessage('Passenger details submitted successfully!');
-
-      setTimeout(() => {
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          mobileNumber: '',
-          dateOfBirth: '',
-          gender: '',
-          hasChildren: 'No',
-          infantsBelow2: '',
-          childrenBetween2To3: '',
-          specialAssistance: 'No',
-          assistanceType: [],
-          otherSpecialNeeds: '',
-        });
-        setSuccessMessage('');
-      }, 3000);
+      navigate('/seat-selection', {
+        state: {
+          journey,
+          selectedFare,
+          passengerDetails: formData,
+          passengers: journey.passengers || {
+            adults: passengerCount,
+            children: 0,
+            infants: 0,
+          },
+          passengerCount,
+          passengerLabel: passengerCountDisplay,
+        },
+      });
     } else {
       setErrors(formErrors);
     }
@@ -173,6 +168,11 @@ const PassengerDetails = () => {
     if (children > 0) counts.push(`${children} Child${children !== 1 ? 'ren' : ''}`);
     if (infants > 0) counts.push(`${infants} Infant${infants !== 1 ? 's' : ''}`);
     return counts.join(', ');
+  }, [journey.passengers]);
+
+  const passengerCount = useMemo(() => {
+    const { adults = 1, children = 0, infants = 0 } = journey.passengers || {};
+    return Math.max(Number(adults) + Number(children) + Number(infants), 1);
   }, [journey.passengers]);
 
   // Get fare details to display in trip summary
