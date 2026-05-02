@@ -1,0 +1,943 @@
+/*===================================
+    PASSENGER DETAILS PAGE STYLES
+===================================*/
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.passenger-details-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f0f5ff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/*===================================
+    COMPACT ROUTE CARD
+===================================*/
+
+.compact-route-card {
+  width: 100%;
+  padding: 20px;
+  margin-top: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+}
+
+.route-display {
+  background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+  border-radius: 25px;
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  box-shadow: 0 4px 16px rgba(0, 82, 204, 0.2);
+  min-width: 450px;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.route-from,
+.route-to {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  min-width: 60px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.route-arrow {
+  font-size: 20px;
+  color: white;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
+/*===================================
+    HEADER SECTION (HIDDEN)
+===================================*/
+
+.passenger-header {
+  display: none;
+}
+
+.flight-route {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.route-code {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  min-width: 50px;
+  text-align: center;
+}
+
+.route-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  border: 2px solid white;
+}
+
+/*===================================
+    MAIN CONTAINER
+===================================*/
+
+.passenger-container {
+  display: flex;
+  flex: 1;
+  padding: 30px 40px 40px 40px;
+  gap: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/*===================================
+    FORM SECTION - LEFT SIDE
+===================================*/
+
+.form-section-wrapper {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #004a99;
+  margin: 0 0 25px 0;
+  padding: 0;
+  display: block;
+}
+
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.passenger-form {
+  display: flex;
+  flex-direction: column;
+}
+
+/*===================================
+    PASSENGER INFO CARD
+===================================*/
+
+.passenger-info-card {
+  background: #ffffff;
+  border: 2px solid #0066cc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+}
+
+/*===================================
+    IMPORTANT NOTICE
+===================================*/
+
+.important-notice {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #856404;
+}
+
+.important-notice p {
+  margin: 0;
+}
+
+/*===================================
+    FORM LABEL
+===================================*/
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+/*===================================
+    GENDER SELECTION
+===================================*/
+
+.gender-selection {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.radio-label:hover {
+  color: #0066cc;
+}
+
+.radio-label input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #0066cc;
+}
+
+.radio-label span {
+  user-select: none;
+}
+
+/*===================================
+    FORM GROUPS & INPUTS
+===================================*/
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group input,
+.form-group select {
+  padding: 12px 14px;
+  border: 2px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: white;
+  color: #1a1a1a;
+}
+
+.form-group input::placeholder {
+  color: #999;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 12px rgba(0, 102, 204, 0.2);
+}
+
+.form-group input.input-error {
+  border-color: #dc3545;
+  background: #fff8f8;
+}
+
+.form-group small {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 0;
+}
+
+/*===================================
+    FORM SECTIONS
+===================================*/
+
+.form-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.08);
+}
+
+.form-section:last-child {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #004a99;
+  margin: 0 0 12px 0;
+}
+
+.section-divider {
+  height: 2px;
+  background: linear-gradient(90deg, #0066cc 0%, transparent 100%);
+  margin-bottom: 20px;
+}
+
+.conditional-section {
+  background: #f0f5ff;
+  border-left: 4px solid #0066cc;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+.conditional-info {
+  color: #666;
+  font-size: 12px;
+  margin: 0 0 15px 0;
+  font-weight: 600;
+}
+
+/*===================================
+    CHECKBOXES & TEXTAREA
+===================================*/
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  color: #1a1a1a;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 8px 0;
+  user-select: none;
+}
+
+.checkbox-label:hover {
+  color: #0066cc;
+  padding-left: 3px;
+}
+
+.checkbox-label input[type='checkbox'] {
+  margin-right: 10px;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: #0066cc;
+  flex-shrink: 0;
+}
+
+.textarea-input {
+  padding: 12px 14px;
+  border: 2px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: white;
+  color: #1a1a1a;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.textarea-input::placeholder {
+  color: #999;
+}
+
+.textarea-input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 12px rgba(0, 102, 204, 0.2);
+}
+
+/*===================================
+    ACTION BUTTONS
+===================================*/
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.btn {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-next {
+  background: linear-gradient(135deg, #0066cc 0%, #004a99 100%);
+  color: white;
+  flex: 1;
+  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+}
+
+.btn-next:hover {
+  background: linear-gradient(135deg, #004a99 0%, #003d82 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 102, 204, 0.4);
+}
+
+.btn-next:active {
+  transform: translateY(-1px);
+}
+
+/*===================================
+    TRIP SUMMARY SECTION - RIGHT SIDE
+===================================*/
+
+.trip-summary-wrapper {
+  width: 350px;
+}
+
+.trip-summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.12);
+  position: sticky;
+  top: 90px;
+  border-top: 4px solid #0066cc;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+.trip-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e7f1ff;
+}
+
+.trip-summary-header h2 {
+  font-size: 20px;
+  color: #004a99;
+  margin: 0;
+  font-weight: 700;
+}
+
+.details-link {
+  color: #0066cc;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.details-link:hover {
+  color: #004a99;
+  text-decoration: underline;
+}
+
+/*===================================
+    TRIP SUMMARY CONTENT
+===================================*/
+
+.trip-summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trip-summary-section {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e7f1ff;
+  margin-bottom: 0;
+}
+
+.summary-text {
+  font-size: 13px;
+  color: #333;
+  margin: 0;
+  font-weight: 500;
+}
+
+/*===================================
+    FLIGHT SUMMARY SECTION
+===================================*/
+
+.flight-summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.summary-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #004a99;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e7f1ff;
+}
+
+/*===================================
+    FLIGHT ROUTE DISPLAY
+===================================*/
+
+.flight-route-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0;
+  background: #f9fbff;
+  border: 1px solid #e7f1ff;
+  border-radius: 6px;
+  padding: 10px 8px;
+}
+
+.flight-route-item {
+  flex: 1;
+  text-align: center;
+  padding: 0 4px;
+}
+
+.flight-location-label {
+  font-size: 10px;
+  color: #999;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
+.flight-location-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.flight-route-arrow {
+  font-size: 16px;
+  color: #0066cc;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
+/*===================================
+    DEPARTING CARD (DEPRECATED)
+===================================*/
+
+.departing-card {
+  background: #f9fbff;
+  border: 1px solid #e7f1ff;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0;
+  display: none;
+}
+
+.departing-header {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+}
+
+.departing-label {
+  display: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.departing-collapse {
+  font-size: 14px;
+  color: #999;
+  cursor: pointer;
+}
+
+/*===================================
+    FLIGHT LEG
+===================================*/
+
+.flight-leg {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.flight-leg-times {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.leg-time {
+  flex: 1;
+  text-align: center;
+}
+
+.leg-time-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.leg-location {
+  font-size: 12px;
+  color: #999;
+  margin: 4px 0 0 0;
+  line-height: 1.2;
+}
+
+.leg-duration {
+  flex: 0.8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.leg-duration p {
+  font-size: 11px;
+  color: #666;
+  margin: 0;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.leg-line {
+  width: 100%;
+  height: 1px;
+  background: #d0d0d0;
+}
+
+.flight-leg-details {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 0;
+  border: none;
+  margin: 0;
+  font-size: 12px;
+}
+
+.flight-number {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.airline-name {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+}
+
+/*===================================
+    CHECK-IN DETAILS
+===================================*/
+
+.checkin-details {
+  background: #f0f5ff;
+  border-left: 3px solid #0066cc;
+  padding: 9px 10px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.checkin-details p {
+  font-size: 11px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/*===================================
+    TOTAL FARE SECTION
+===================================*/
+
+.total-fare-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid #e7f1ff;
+  margin-top: 8px;
+  padding-top: 10px;
+}
+
+.total-fare-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.total-fare-amount {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0066cc;
+  margin: 0;
+}
+
+/*===================================
+    PASSENGER ACTIONS (BOTTOM BUTTON)
+===================================*/
+
+.passenger-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  z-index: 100;
+}
+
+.passenger-actions .btn-next {
+  flex: 1;
+  max-width: 600px;
+}
+
+.passenger-actions .btn-next:disabled {
+  background: #ccc;
+  color: #999;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.passenger-actions .btn-next:disabled:hover {
+  background: #ccc;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Add padding to page to account for fixed bottom button */
+.passenger-details-page {
+  padding-bottom: 100px;
+}
+
+/*===================================
+    CHILDREN & ASSISTANCE SECTIONS
+===================================*/
+
+.children-assistance-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.children-section,
+.assistance-section {
+  background: #ffffff;
+  border: 2px solid #0066cc;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+}
+
+.children-section h2,
+.assistance-section h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #004a99;
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e7f1ff;
+}
+
+.children-details,
+.assistance-details {
+  background: #f9fbff;
+  border-left: 3px solid #0066cc;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 4px;
+}
+
+.children-details p,
+.assistance-details p {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+/*===================================
+    RESPONSIVE DESIGN
+===================================*/
+
+@media (max-width: 1200px) {
+  .passenger-container {
+    flex-direction: column;
+    gap: 30px;
+    padding: 30px;
+  }
+
+  .form-section-wrapper {
+    flex: 1;
+  }
+
+  .trip-summary-wrapper {
+    width: 100%;
+  }
+
+  .trip-summary-card {
+    position: static;
+  }
+
+  .page-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .passenger-container {
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .form-section-wrapper {
+    padding: 0;
+  }
+
+  .page-title {
+    font-size: 22px;
+  }
+
+  .passenger-info-card {
+    padding: 15px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .gender-selection {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .flight-route {
+    gap: 20px;
+  }
+
+  .route-code {
+    font-size: 16px;
+  }
+
+  .route-icon {
+    font-size: 14px;
+    padding: 6px 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .passenger-container {
+    padding: 15px;
+  }
+
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .passenger-info-card {
+    padding: 12px;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  .important-notice {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+
+  .trip-summary-card {
+    padding: 20px;
+  }
+
+  .trip-summary-header h2 {
+    font-size: 18px;
+  }
+}

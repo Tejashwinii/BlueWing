@@ -174,7 +174,7 @@ export default function FlightSelection() {
 
     const handleFareSubmit = (payload) => {
         setSelectedFarePayload(payload);
-        navigate("/seat-selection", {
+        navigate("/passenger-details", {
             state: {
                 journey: searchCriteria,
                 selectedFare: payload,

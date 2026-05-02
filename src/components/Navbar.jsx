@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Navbar.css';
 
-const Navbar = ({ onNavClick = () => {}, hideLogin = false }) => {
+const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false }) => {
   const [hoveredMenu, setHoveredMenu] = useState(null);
 
   const navMenus = {
@@ -110,60 +110,64 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false }) => {
           <span className="logo-text">BlueWing</span>
         </div>
 
-        {/* Menu Items */}
-        <div className="navbar-menu">
-          {Object.entries(navMenus).map(([key, menu]) => (
-            <div
-              key={key}
-              className="menu-item-wrapper"
-              onMouseEnter={() => setHoveredMenu(key)}
-              onMouseLeave={() => setHoveredMenu(null)}
-            >
-              <button 
-                className="menu-item-btn"
-                onClick={() => onNavClick(key)}
+        {/* Menu Items - Hidden in minimalMode */}
+        {!minimalMode && (
+          <div className="navbar-menu">
+            {Object.entries(navMenus).map(([key, menu]) => (
+              <div
+                key={key}
+                className="menu-item-wrapper"
+                onMouseEnter={() => setHoveredMenu(key)}
+                onMouseLeave={() => setHoveredMenu(null)}
               >
-                {menu.label}
-              </button>
-              
-              {hoveredMenu === key && (
-                <div className="menu-panel">
-                  <div className="panel-header">
-                    <h3>{menu.mainTitle}</h3>
-                    <span className="close-panel">×</span>
-                  </div>
-                  
-                  <div className="panel-content">
-                    {menu.sections.map((section, sIdx) => (
-                      <div key={sIdx} className="panel-section">
-                        {section.heading && (
-                          <h4 className="section-heading">{section.heading}</h4>
-                        )}
-                        <div className="section-items">
-                          {section.items.map((item, idx) => (
-                            <a key={idx} href="#" className="panel-item">
-                              <span className="item-title">{item.title}</span>
-                              <span className="item-arrow">›</span>
-                            </a>
-                          ))}
+                <button 
+                  className="menu-item-btn"
+                  onClick={() => onNavClick(key)}
+                >
+                  {menu.label}
+                </button>
+                
+                {hoveredMenu === key && (
+                  <div className="menu-panel">
+                    <div className="panel-header">
+                      <h3>{menu.mainTitle}</h3>
+                      <span className="close-panel">×</span>
+                    </div>
+                    
+                    <div className="panel-content">
+                      {menu.sections.map((section, sIdx) => (
+                        <div key={sIdx} className="panel-section">
+                          {section.heading && (
+                            <h4 className="section-heading">{section.heading}</h4>
+                          )}
+                          <div className="section-items">
+                            {section.items.map((item, idx) => (
+                              <a key={idx} href="#" className="panel-item">
+                                <span className="item-title">{item.title}</span>
+                                <span className="item-arrow">›</span>
+                              </a>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
-        {/* Right Actions */}
-        <div className="navbar-right">
-          {!hideLogin && (
-            <Link to="/login" className="nav-btn">
-              LOG IN
-            </Link>
-          )}
-        </div>
+        {/* Right Actions - Hidden in minimalMode */}
+        {!minimalMode && (
+          <div className="navbar-right">
+            {!hideLogin && (
+              <Link to="/login" className="nav-btn">
+                LOG IN
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </nav>
   );

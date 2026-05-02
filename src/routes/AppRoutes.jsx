@@ -5,6 +5,7 @@ import ForgotPassword from "../pages/ForgotPassword";
 import RegistrationPage from "../pages/RegistrationPage";
 import FlightSelection from "../pages/FlightSelection";
 import SeatSelection from "../pages/SeatSelection";
+import PassengerDetails from "../pages/PassengerDetails";
 // import Payment from "../pages/Payment";
 // import Confirmation from "../pages/Confirmation";
 
@@ -14,6 +15,7 @@ function AppRoutes() {
       <Route path="/" element={<HomePage />} />
       <Route path="/flight-selection" element={<FlightSelection />} />
       <Route path="/seat-selection" element={<SeatSelection />} />
+      <Route path="/passenger-details" element={<PassengerDetails />} />
       <Route path="/login" element={<BlueWingLogin />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/registration" element={<RegistrationPage />} />
