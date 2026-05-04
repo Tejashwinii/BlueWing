@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import '../styles/Navbar.css';
 
 const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false }) => {
   const [hoveredMenu, setHoveredMenu] = useState(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const navMenus = {
     book: {
@@ -161,10 +165,53 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
         {/* Right Actions - Hidden in minimalMode */}
         {!minimalMode && (
           <div className="navbar-right">
-            {!hideLogin && (
-              <Link to="/login" className="nav-btn">
-                LOG IN
-              </Link>
+            {user && user.role === 'admin' ? (
+              <div className="profile-section">
+                <button 
+                  className="profile-icon-btn"
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                >
+                  👤 {user.name}
+                </button>
+                {showProfileDropdown && (
+                  <div className="profile-dropdown">
+                    <button 
+                      className="dropdown-item"
+                      onClick={() => {
+                        navigate('/admin-dashboard');
+                        setShowProfileDropdown(false);
+                      }}
+                    >
+                      Dashboard
+                    </button>
+                    <button 
+                      className="dropdown-item"
+                      onClick={() => {
+                        navigate('/');
+                        setShowProfileDropdown(false);
+                      }}
+                    >
+                      Home
+                    </button>
+                    <button 
+                      className="dropdown-item logout"
+                      onClick={() => {
+                        logout();
+                        navigate('/login');
+                        setShowProfileDropdown(false);
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              !hideLogin && (
+                <Link to="/login" className="nav-btn">
+                  LOG IN
+                </Link>
+              )
             )}
           </div>
         )}

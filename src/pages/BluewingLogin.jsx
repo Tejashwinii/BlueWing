@@ -1,8 +1,29 @@
 import AuthPage from "../components/AuthPage";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useContext, useState } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import "../styles/BlueWingLogin.css";
 
 function BlueWingLogin() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Admin credentials check
+    if (email === 'admin@gmail.com' && password === 'admin@BlueWing') {
+      login({ email, name: 'Admin', role: 'admin' });
+      navigate('/admin-dashboard');
+    } else {
+      setError('Invalid email or password');
+    }
+  };
+
   return (
     <AuthPage>
       <div className="bw-page">
@@ -17,27 +38,35 @@ function BlueWingLogin() {
         <div className="bw-left">
           <h2 className="bw-section-title">Login</h2>
 
-          <input
-            type="text"
-            placeholder="Email or BlueWing member number"
-            className="bw-input"
-          />
+          <form onSubmit={handleLogin}>
+            <input
+              type="email"
+              placeholder="Email or BlueWing member number"
+              className="bw-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="bw-input"
-          />
-          <Link to="/forgot-password" className="bw-link">
-            Forgot your password?
-          </Link>
+            <input
+              type="password"
+              placeholder="Password"
+              className="bw-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Link to="/forgot-password" className="bw-link">
+              Forgot your password?
+            </Link>
 
-          <div className="bw-checkbox">
-            <input type="checkbox" defaultChecked />
-            <span>Keep me logged in on this device</span>
-          </div>
+            <div className="bw-checkbox">
+              <input type="checkbox" defaultChecked />
+              <span>Keep me logged in on this device</span>
+            </div>
 
-          <button className="bw-login-btn">Log in</button>
+            {error && <p style={{ color: 'red', fontSize: '12px', marginBottom: '10px' }}>{error}</p>}
+
+            <button type="submit" className="bw-login-btn">Log in</button>
+          </form>
         </div>
 
         {/* RIGHT SECTION */}
