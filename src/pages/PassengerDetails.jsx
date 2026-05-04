@@ -129,9 +129,13 @@ const PassengerDetails = () => {
           journey,
           selectedFare,
           passengers: {
+            adults: adultCount,
+            children: childCount,
+            infants: infantCount,
+          },
+          passengerDetails: {
             adults: adultPassengers,
             children: childPassengers,
-            infants: infantCount,
           },
           contactDetails: contactData,
         },
