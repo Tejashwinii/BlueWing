@@ -1,0 +1,902 @@
+/* Payment Page Styles */
+
+.payment-page {
+  background: linear-gradient(135deg, #f0f5ff 0%, #e7f1ff 100%);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* Compact Route Card */
+.compact-route-card {
+  margin-top: 80px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 30px;
+  max-width: 1200px;
+  width: 100%;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  border: none;
+}
+
+.route-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  font-weight: 600;
+  color: white;
+}
+
+.route-from,
+.route-to {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.route-arrow {
+  font-size: 20px;
+  color: #0066ff;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
+/* Payment Container */
+.payment-container {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px 40px 40px;
+}
+
+.payment-form-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.1);
+  height: fit-content;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #004a99;
+  margin: 0 0 24px 0;
+}
+
+/* Status Messages */
+.status-message {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-message {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-left: 4px solid #4caf50;
+}
+
+.failure-message {
+  background: #ffebee;
+  color: #c62828;
+  border-left: 4px solid #f44336;
+}
+
+.processing-message {
+  background: #e3f2fd;
+  color: #1565c0;
+  border-left: 4px solid #2196f3;
+}
+
+.success-icon {
+  font-size: 20px;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.failure-icon {
+  font-size: 20px;
+  font-weight: bold;
+  color: #f44336;
+}
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #2196f3;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Payment Form */
+.payment-form {
+  width: 100%;
+}
+
+.payment-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #004a99;
+  font-size: 14px;
+}
+
+.form-group input {
+  padding: 12px 14px;
+  border: 2px solid #e0e8f5;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  transition: all 0.2s ease;
+  background: white;
+  color: #333;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+  background: #f9fbff;
+}
+
+.form-group input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.form-group input.input-error {
+  border-color: #f44336;
+  background: #ffebee;
+}
+
+.error-message {
+  color: #c62828;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.help-text {
+  color: #666;
+  font-size: 12px;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-pay {
+  width: 100%;
+  background: linear-gradient(135deg, #0066cc 0%, #004a99 100%);
+  color: white;
+  font-size: 16px;
+  padding: 14px;
+  margin-top: 10px;
+}
+
+.btn-pay:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0052a3 0%, #003d7a 100%);
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-pay:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-pay:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Scan to Pay Section */
+.scan-to-pay-section {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid #e0e8f5;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  color: #999;
+  font-weight: 600;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e0e8f5;
+}
+
+.btn-scan-to-pay {
+  width: 100%;
+  background: white;
+  color: #0066cc;
+  border: 2px solid #0066cc;
+  font-size: 16px;
+  padding: 14px;
+  margin-bottom: 20px;
+}
+
+.btn-scan-to-pay:hover:not(:disabled) {
+  background: #f0f5ff;
+  transform: translateY(-2px);
+}
+
+.btn-scan-to-pay:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.qr-icon {
+  font-size: 20px;
+}
+
+.qr-placeholder {
+  background: #f0f5ff;
+  border: 2px solid #0066cc;
+  border-radius: 8px;
+  padding: 60px 40px;
+  text-align: center;
+  color: #0066cc;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-placeholder p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Payment Sidebar */
+.payment-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: fit-content;
+}
+
+/* Session Timer */
+.session-timer {
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 0;
+  text-align: center;
+}
+
+.timer-label {
+  font-size: 11px;
+  color: #999;
+  margin: 0 0 4px 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.timer-display {
+  font-size: 20px;
+  font-weight: 700;
+  color: #c62828;
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+.timer-sublabel {
+  font-size: 9px;
+  color: #ccc;
+  margin: 4px 0 0 0;
+  font-style: italic;
+  line-height: 1.2;
+}
+
+/* Trip Summary Wrapper */
+.trip-summary-wrapper {
+  width: 350px;
+}
+
+.trip-summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.12);
+  position: sticky;
+  top: 90px;
+  border-top: 4px solid #0066cc;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+.trip-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e7f1ff;
+}
+
+.trip-summary-header h2 {
+  font-size: 20px;
+  color: #004a99;
+  margin: 0;
+  font-weight: 700;
+}
+
+.details-link {
+  color: #0066cc;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.details-link:hover {
+  color: #004a99;
+  text-decoration: underline;
+}
+
+.trip-summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trip-summary-section {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e7f1ff;
+  margin-bottom: 0;
+}
+
+.summary-text {
+  font-size: 13px;
+  color: #333;
+  margin: 0;
+  font-weight: 500;
+}
+
+.flight-summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.summary-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #004a99;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e7f1ff;
+}
+
+.flight-route-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 8px;
+  background: #f9fbff;
+  border: 1px solid #e7f1ff;
+  border-radius: 6px;
+}
+
+.flight-route-item {
+  flex: 1;
+  text-align: center;
+  padding: 0 4px;
+}
+
+.flight-location-label {
+  font-size: 10px;
+  color: #999;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
+.flight-location-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.flight-route-arrow {
+  font-size: 16px;
+  color: #0066cc;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
+.flight-leg-details {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 0;
+  border: none;
+  margin: 0;
+  font-size: 12px;
+}
+
+.flight-number {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.airline-name {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+}
+
+.checkin-details {
+  background: #f0f5ff;
+  border-left: 3px solid #0066cc;
+  padding: 9px 10px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.checkin-details p {
+  font-size: 11px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.total-fare-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid #e7f1ff;
+  margin-top: 8px;
+  padding-top: 10px;
+}
+
+.total-fare-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.total-fare-amount {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0066cc;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .payment-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 0 30px 30px 30px;
+  }
+
+  .trip-summary-wrapper {
+    width: 100%;
+  }
+
+  .payment-sidebar {
+    height: auto;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .payment-page {
+    padding-bottom: 20px;
+  }
+
+  .compact-route-card {
+    margin-top: 60px;
+    margin-bottom: 20px;
+    padding: 0;
+  }
+
+  .route-display {
+    gap: 20px;
+  }
+
+  .route-from,
+  .route-to {
+    font-size: 16px;
+  }
+
+  .payment-container {
+    gap: 20px;
+    padding: 0 16px 30px 16px;
+  }
+
+  .payment-form-wrapper {
+    padding: 20px;
+  }
+
+  .trip-summary-wrapper {
+    width: 100%;
+  }
+
+  .trip-summary-card {
+    position: relative;
+    top: auto;
+    max-height: none;
+  }
+
+  .page-title {
+    font-size: 22px;
+    margin-bottom: 18px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .timer-display {
+    font-size: 18px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .btn-pay,
+  .btn-scan-to-pay {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .compact-route-card {
+    margin-top: 50px;
+    margin-bottom: 15px;
+  }
+
+  .route-display {
+    gap: 15px;
+  }
+
+  .route-from,
+  .route-to {
+    font-size: 14px;
+    min-width: 50px;
+  }
+
+  .payment-form-wrapper {
+    padding: 16px;
+  }
+
+  .trip-summary-wrapper {
+    width: 100%;
+  }
+
+  .trip-summary-card {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .session-timer {
+    padding: 12px 0;
+  }
+
+  .timer-display {
+    font-size: 18px;
+  }
+
+  .timer-label {
+    font-size: 10px;
+  }
+
+  .form-label {
+    font-size: 13px;
+  }
+
+  .form-group input {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+}
+
+/* QR Scanner Modal */
+.qr-scanner-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.qr-scanner-container {
+  background: white;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.qr-scanner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e8f5;
+}
+
+.qr-scanner-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #004a99;
+  font-weight: 700;
+}
+
+.close-scanner {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.close-scanner:hover {
+  color: #333;
+}
+
+.scanner-error {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.scanner-error p {
+  color: #c62828;
+  margin: 0 0 20px 0;
+  font-size: 14px;
+}
+
+.qr-video {
+  display: block;
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.qr-overlay {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -400px;
+  height: 400px;
+  pointer-events: none;
+}
+
+.qr-frame {
+  width: 250px;
+  height: 250px;
+  border: 3px solid #4caf50;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(76, 175, 80, 0.3);
+  position: relative;
+}
+
+.qr-frame::before,
+.qr-frame::after,
+.qr-frame > * {
+  content: '';
+  position: absolute;
+  border: 3px solid #4caf50;
+}
+
+.qr-frame::before {
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 2px 0 0 0;
+}
+
+.qr-frame::after {
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0 2px 0 0;
+}
+
+.scanner-instructions {
+  padding: 20px;
+  text-align: center;
+  background: #f9fbff;
+}
+
+.scanner-instructions p {
+  margin: 0;
+  color: #004a99;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.scanner-instructions .small-text {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.scanner-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid #e0e8f5;
+}
+
+.scanner-actions .btn {
+  flex: 1;
+  margin: 0;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0066cc 0%, #004a99 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0052a3 0%, #003d7a 100%);
+}
+
+.btn-secondary {
+  background: white;
+  color: #0066cc;
+  border: 2px solid #0066cc;
+}
+
+.btn-secondary:hover {
+  background: #f0f5ff;
+}
+
+/* Mobile QR Scanner */
+@media (max-width: 600px) {
+  .qr-scanner-modal {
+    padding: 0;
+  }
+
+  .qr-scanner-container {
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .qr-video {
+    height: 300px;
+  }
+
+  .qr-overlay {
+    margin-top: -300px;
+    height: 300px;
+  }
+
+  .qr-frame {
+    width: 200px;
+    height: 200px;
+  }
+}

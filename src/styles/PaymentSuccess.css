@@ -1,0 +1,271 @@
+/* Payment Success Page Styles */
+
+.payment-success-page {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.success-container {
+  background: white;
+  border-radius: 16px;
+  padding: 60px 40px;
+  box-shadow: 0 10px 40px rgba(46, 125, 50, 0.2);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Success Icon */
+.success-icon-wrapper {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.success-icon-animated {
+  width: 80px;
+  height: 80px;
+  color: #4caf50;
+  stroke: #4caf50;
+  animation: scaleUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-icon-animated polyline {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: drawLine 0.6s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Typography */
+.success-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0 0 12px 0;
+}
+
+.success-subtitle {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 30px 0;
+  font-weight: 500;
+}
+
+/* Status Details */
+.status-details {
+  background: #f1f8e9;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+  border: 1px solid #dcedc8;
+  text-align: left;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #dcedc8;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  color: #333;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.success-status {
+  color: #2e7d32;
+  background: #e8f5e9;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+  font-size: 12px;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 14px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #45a049 0%, #307a38 100%);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: white;
+  color: #4caf50;
+  border: 2px solid #4caf50;
+}
+
+.btn-secondary:hover {
+  background: #f1f8e9;
+  transform: translateY(-2px);
+}
+
+/* Footer Message */
+.footer-message {
+  color: #999;
+  font-size: 12px;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .success-container {
+    padding: 40px 24px;
+  }
+
+  .success-icon-animated {
+    width: 60px;
+    height: 60px;
+  }
+
+  .success-title {
+    font-size: 24px;
+  }
+
+  .success-subtitle {
+    font-size: 14px;
+  }
+
+  .status-details {
+    padding: 16px;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .detail-label {
+    font-size: 11px;
+  }
+
+  .detail-value {
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .success-container {
+    padding: 30px 16px;
+  }
+
+  .success-icon-animated {
+    width: 50px;
+    height: 50px;
+  }
+
+  .success-title {
+    font-size: 22px;
+  }
+
+  .success-subtitle {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .status-details {
+    padding: 12px;
+    margin-bottom: 20px;
+  }
+
+  .detail-item {
+    padding: 10px 0;
+  }
+
+  .detail-label {
+    font-size: 10px;
+  }
+
+  .detail-value {
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .footer-message {
+    font-size: 11px;
+  }
+}
