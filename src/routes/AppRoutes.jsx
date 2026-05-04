@@ -9,6 +9,7 @@ import PassengerDetails from "../pages/PassengerDetails";
 import AdminDashboard from "../pages/AdminDashboard";
 import Payment from "../pages/Payment";
 import PaymentSuccess from "../pages/PaymentSuccess";
+import TicketSummary from "../pages/TicketSummary";
 // import Confirmation from "../pages/Confirmation";
 
 function AppRoutes() {
@@ -20,6 +21,7 @@ function AppRoutes() {
       <Route path="/passenger-details" element={<PassengerDetails />} />
       <Route path="/payment" element={<Payment />} />
       <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/ticket-summary" element={<TicketSummary />} />
       <Route path="/login" element={<BlueWingLogin />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/registration" element={<RegistrationPage />} />

@@ -32,8 +32,18 @@ const normalizeCabinClass = (value) => {
 const getPassengerSummary = (selectionContext = {}) => {
   const passengers = selectionContext.passengers || selectionContext.journey?.passengers || {};
 
-  const adults = Math.max(Number(passengers.adults ?? selectionContext.passengerCount ?? 1), 1);
-  const children = Math.max(Number(passengers.children ?? 0), 0);
+  // Handle both array and number formats for adults/children
+  const adultsValue = passengers.adults;
+  const childrenValue = passengers.children;
+  
+  const adults = Array.isArray(adultsValue) 
+    ? adultsValue.length 
+    : Math.max(Number(adultsValue ?? selectionContext.passengerCount ?? 1), 1);
+  
+  const children = Array.isArray(childrenValue)
+    ? childrenValue.length
+    : Math.max(Number(childrenValue ?? 0), 0);
+  
   const infants = Math.max(Number(passengers.infants ?? 0), 0);
   const total = Math.max(Number(selectionContext.passengerCount ?? adults + children + infants), 1);
 

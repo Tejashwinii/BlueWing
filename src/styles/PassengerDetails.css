@@ -225,6 +225,9 @@ body {
   height: 18px;
   cursor: pointer;
   accent-color: #0066cc;
+  pointer-events: auto;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .radio-label span {
@@ -980,6 +983,9 @@ body {
   height: 18px;
   cursor: pointer;
   accent-color: #0066cc;
+  pointer-events: auto;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .btn-save-passenger {

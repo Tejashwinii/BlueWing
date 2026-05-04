@@ -1,18 +1,22 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/PaymentSuccess.css';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const bookingData = location.state || {};
 
   useEffect(() => {
-    // Auto-redirect to home after 5 seconds
+    // Auto-redirect to ticket summary after 4 seconds
     const timer = setTimeout(() => {
-      navigate('/');
-    }, 5000);
+      navigate('/ticket-summary', {
+        state: bookingData,
+      });
+    }, 4000);
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, bookingData]);
 
   return (
     <div className="payment-success-page">
@@ -40,7 +44,7 @@ const PaymentSuccess = () => {
         <div className="status-details">
           <div className="detail-item">
             <span className="detail-label">Transaction ID</span>
-            <span className="detail-value">BW{Date.now()}</span>
+            <span className="detail-value">BW{bookingData.transactionId || Date.now()}</span>
           </div>
           <div className="detail-item">
             <span className="detail-label">Status</span>
@@ -52,25 +56,44 @@ const PaymentSuccess = () => {
           </div>
         </div>
 
+        {/* Booking Summary */}
+        {bookingData.journey && (
+          <div className="booking-summary">
+            <h3>Booking Summary</h3>
+            <div className="summary-item">
+              <span className="summary-label">Route:</span>
+              <span className="summary-value">{bookingData.journey?.departure} → {bookingData.journey?.arrival}</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Date:</span>
+              <span className="summary-value">{bookingData.journey?.date}</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Total Amount:</span>
+              <span className="summary-value">{bookingData.selectedFare?.price}</span>
+            </div>
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="action-buttons">
           <button
             className="btn btn-primary"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/ticket-summary', { state: bookingData })}
           >
-            Back to Home
+            View Tickets
           </button>
           <button
             className="btn btn-secondary"
-            onClick={() => navigate('/payment-history')}
+            onClick={() => navigate('/')}
           >
-            View Payment History
+            Back to Home
           </button>
         </div>
 
         {/* Footer Message */}
         <p className="footer-message">
-          Redirecting to home in 5 seconds...
+          Redirecting to tickets in 4 seconds...
         </p>
       </div>
     </div>
