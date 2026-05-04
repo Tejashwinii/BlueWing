@@ -900,3 +900,257 @@
     height: 200px;
   }
 }
+
+/* Payment Method Selection */
+.payment-method-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.method-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #004a99;
+  margin: 0 0 8px 0;
+}
+
+.method-option {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e7f1ff;
+}
+
+.method-option:last-child {
+  border-bottom: none;
+}
+
+.method-subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+/* Card Type Selection */
+.card-type-selection {
+  display: flex;
+  gap: 12px;
+}
+
+.card-type-btn {
+  flex: 1;
+  padding: 16px 12px;
+  border: 2px solid #e0e8f5;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #666;
+  font-size: 14px;
+}
+
+.card-type-btn:hover:not(:disabled) {
+  border-color: #0066cc;
+  background: #f0f5ff;
+  transform: translateY(-2px);
+}
+
+.card-type-btn.selected {
+  border-color: #0066cc;
+  background: linear-gradient(135deg, #f0f5ff 0%, #e7f1ff 100%);
+  color: #0066cc;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15);
+}
+
+.card-icon {
+  font-size: 24px;
+}
+
+.card-type-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Card Payment Form */
+.card-payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.back-button {
+  align-self: flex-start;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: #0066cc;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.back-button:hover {
+  color: #004a99;
+}
+
+.form-subtitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #004a99;
+  margin: 0 0 16px 0;
+}
+
+/* Amount Display */
+.amount-display {
+  padding: 12px 14px;
+  border: 2px solid #e7f1ff;
+  border-radius: 6px;
+  background: #f9fbff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #0066cc;
+  font-size: 16px;
+}
+
+.amount-value {
+  color: #0066cc;
+}
+
+/* QR Code Section */
+.qr-code-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: #f9fbff;
+  border-radius: 8px;
+  border: 2px solid #e7f1ff;
+}
+
+.qr-instruction {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+.qr-code-wrapper {
+  padding: 16px;
+  background: white;
+  border: 2px solid #e0e8f5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+}
+
+.qr-code-wrapper svg {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+}
+
+.qr-details {
+  width: 100%;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border-left: 4px solid #0066cc;
+  text-align: center;
+}
+
+.qr-details p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.qr-details strong {
+  color: #0066cc;
+}
+
+.qr-note {
+  font-size: 12px !important;
+  color: #666 !important;
+  font-weight: 400 !important;
+  font-style: italic;
+}
+
+/* Responsive Design Updates */
+@media (max-width: 768px) {
+  .card-type-selection {
+    flex-direction: column;
+  }
+
+  .card-type-btn {
+    flex: 1;
+    width: 100%;
+  }
+
+  .qr-code-wrapper {
+    padding: 12px;
+  }
+
+  .qr-code-wrapper svg {
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 600px) {
+  .method-title {
+    font-size: 18px;
+  }
+
+  .method-subtitle {
+    font-size: 15px;
+  }
+
+  .card-type-selection {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card-type-btn {
+    padding: 14px 10px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .card-icon {
+    font-size: 20px;
+  }
+
+  .qr-code-wrapper svg {
+    max-width: 120px;
+  }
+
+  .form-subtitle {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+}
+

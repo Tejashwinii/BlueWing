@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import QRCode from 'qrcode';
+import QRCode from 'qrcode.react';
 import Navbar from '../components/Navbar';
 import '../styles/Payment.css';
 
@@ -15,8 +15,8 @@ const Payment = () => {
   const contactDetails = location.state?.contactDetails || {};
 
   // Payment method state
-  const [paymentMethod, setPaymentMethod] = useState('card');
-  const [cardType, setCardType] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' or 'qr'
+  const [cardType, setCardType] = useState(''); // 'credit', 'debit', ''
   const [showCardForm, setShowCardForm] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
 
@@ -30,14 +30,13 @@ const Payment = () => {
 
   const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState(null); // null, 'success', 'failure'
   const [statusMessage, setStatusMessage] = useState('');
-  const [timeLeft, setTimeLeft] = useState(600);
 
-  // QR Code canvas ref
-  const qrCanvasRef = useRef(null);
+  // Countdown timer state
+  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
 
-  // Countdown timer
+  // Countdown timer effect
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -48,24 +47,9 @@ const Payment = () => {
         return prev - 1;
       });
     }, 1000);
+
     return () => clearInterval(timer);
   }, []);
-
-  // Generate QR Code when showing QR code section
-  useEffect(() => {
-    if (showQRCode && qrCanvasRef.current) {
-      const qrValue = JSON.stringify({
-        amount: selectedFare.price || '0',
-        transactionId: Date.now(),
-        merchant: 'BlueWing Airlines',
-      });
-      QRCode.toCanvas(qrCanvasRef.current, qrValue, { width: 200 }, (error) => {
-        if (error) {
-          console.error('Error generating QR code:', error);
-        }
-      });
-    }
-  }, [showQRCode, selectedFare.price]);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
@@ -74,7 +58,7 @@ const Payment = () => {
     return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  // Format passenger count
+  // Format passenger count display
   const passengerCountDisplay = useMemo(() => {
     const { adults = [], children = [], infants = 0 } = passengers;
     const counts = [];
@@ -102,10 +86,12 @@ const Payment = () => {
     const { name, value } = e.target;
     let processedValue = value;
 
+    // Format card number (only digits)
     if (name === 'cardNumber') {
       processedValue = value.replace(/\D/g, '').slice(0, 16);
     }
 
+    // Format expiry date (MM/YY)
     if (name === 'expiryDate') {
       let digitsOnly = value.replace(/\D/g, '').slice(0, 4);
       if (digitsOnly.length >= 2) {
@@ -114,12 +100,14 @@ const Payment = () => {
       processedValue = digitsOnly;
     }
 
+    // Format CVV (only digits)
     if (name === 'cvv') {
       processedValue = value.replace(/\D/g, '').slice(0, 3);
     }
 
     setFormData(prev => ({ ...prev, [name]: processedValue }));
 
+    // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -147,6 +135,8 @@ const Payment = () => {
       newErrors.cvv = 'CVV must be 3 digits';
     }
 
+    // Amount is pre-filled and should always be present, no validation error needed
+    // Only validate if amount is explicitly invalid (NaN or negative)
     if (formData.amount && isNaN(formData.amount)) {
       newErrors.amount = 'Invalid amount';
     }
@@ -163,11 +153,14 @@ const Payment = () => {
       setIsProcessing(true);
       setPaymentStatus(null);
 
+      // Simulate API call with delay
       setTimeout(() => {
+        // Check card number for success/failure
         if (formData.cardNumber === '4111111111111111') {
           setPaymentStatus('success');
           setStatusMessage('Payment Successful! Your transaction has been completed.');
 
+          // Store transaction in localStorage
           const transactions = JSON.parse(localStorage.getItem('paymentHistory') || '[]');
           transactions.push({
             id: Date.now(),
@@ -178,7 +171,7 @@ const Payment = () => {
           });
           localStorage.setItem('paymentHistory', JSON.stringify(transactions));
 
-          // Navigate to success page after showing success message
+          // Navigate to success page after 2 seconds
           setTimeout(() => {
             navigate('/payment-success', {
               state: {
@@ -189,12 +182,12 @@ const Payment = () => {
                 transactionId: Date.now(),
               },
             });
-            setIsProcessing(false);
           }, 2000);
         } else if (formData.cardNumber === '4000000000000002') {
           setPaymentStatus('failure');
           setStatusMessage('Payment Failed. Please try again with a different card.');
 
+          // Store transaction in localStorage
           const transactions = JSON.parse(localStorage.getItem('paymentHistory') || '[]');
           transactions.push({
             id: Date.now(),
@@ -204,20 +197,19 @@ const Payment = () => {
             status: 'failure',
           });
           localStorage.setItem('paymentHistory', JSON.stringify(transactions));
-
-          setIsProcessing(false);
         } else {
           setPaymentStatus('failure');
           setStatusMessage('Invalid test card. Use 4111111111111111 (success) or 4000000000000002 (failure).');
-          setIsProcessing(false);
         }
+
+        setIsProcessing(false);
       }, 2000);
     } else {
       setErrors(formErrors);
     }
   };
 
-  // Handle QR payment
+  // Handle scan to pay - Show QR Code
   const handleScanToPay = () => {
     setPaymentMethod('qr');
     setShowQRCode(true);
@@ -231,10 +223,12 @@ const Payment = () => {
   const handleQRCodeConfirm = () => {
     setIsProcessing(true);
 
+    // Simulate processing with QR payment
     setTimeout(() => {
       setPaymentStatus('success');
       setStatusMessage('Payment Completed via QR Code!');
 
+      // Store transaction
       const transactions = JSON.parse(localStorage.getItem('paymentHistory') || '[]');
       transactions.push({
         id: Date.now(),
@@ -245,6 +239,7 @@ const Payment = () => {
       });
       localStorage.setItem('paymentHistory', JSON.stringify(transactions));
 
+      // Navigate to success page after 2 seconds
       setTimeout(() => {
         navigate('/payment-success', {
           state: {
@@ -255,8 +250,9 @@ const Payment = () => {
             transactionId: Date.now(),
           },
         });
-        setIsProcessing(false);
       }, 2000);
+
+      setIsProcessing(false);
     }, 1500);
   };
 
@@ -264,6 +260,7 @@ const Payment = () => {
     <>
       <Navbar minimalMode={true} />
       <div className="payment-page">
+        {/* Compact Route Card Below Navbar */}
         <div className="compact-route-card">
           <div className="route-display">
             <span className="route-from">{journey.departure || 'FROM'}</span>
@@ -273,9 +270,11 @@ const Payment = () => {
         </div>
 
         <div className="payment-container">
+          {/* Left Section - Payment Form */}
           <div className="payment-form-wrapper">
             <h1 className="page-title">Payment</h1>
 
+            {/* Payment Status Messages */}
             {paymentStatus === 'success' && (
               <div className="status-message success-message">
                 <span className="success-icon">✓</span>
@@ -297,10 +296,12 @@ const Payment = () => {
               </div>
             )}
 
+            {/* Payment Method Selection */}
             {!showCardForm && !showQRCode && (
               <div className="payment-method-selection">
                 <h2 className="method-title">Select Payment Method</h2>
 
+                {/* Card Payment Option */}
                 <div className="method-option">
                   <h3 className="method-subtitle">💳 Pay with Card</h3>
                   <div className="card-type-selection">
@@ -325,6 +326,7 @@ const Payment = () => {
                   </div>
                 </div>
 
+                {/* QR Code Payment Option */}
                 <div className="method-option">
                   <h3 className="method-subtitle">📱 Scan QR Code to Pay</h3>
                   <button
@@ -340,6 +342,7 @@ const Payment = () => {
               </div>
             )}
 
+            {/* Card Payment Form */}
             {showCardForm && (
               <div className="card-payment-form">
                 <button
@@ -366,6 +369,7 @@ const Payment = () => {
 
                 <form onSubmit={handleSubmit} className="payment-form">
                   <div className="payment-form-card">
+                    {/* Card Number */}
                     <div className="form-group">
                       <label className="form-label">Card Number *</label>
                       <input
@@ -383,6 +387,7 @@ const Payment = () => {
                       )}
                     </div>
 
+                    {/* Expiry Date and CVV */}
                     <div className="form-row">
                       <div className="form-group">
                         <label className="form-label">Expiry Date (MM/YY) *</label>
@@ -419,6 +424,7 @@ const Payment = () => {
                       </div>
                     </div>
 
+                    {/* Amount Display (Non-editable) */}
                     <div className="form-group">
                       <label className="form-label">Amount to Pay *</label>
                       <div className="amount-display">
@@ -427,6 +433,7 @@ const Payment = () => {
                       <small className="help-text">Amount is fixed and cannot be changed</small>
                     </div>
 
+                    {/* Submit Button */}
                     <button
                       type="submit"
                       className="btn btn-pay"
@@ -439,6 +446,7 @@ const Payment = () => {
               </div>
             )}
 
+            {/* QR Code Display */}
             {showQRCode && (
               <div className="qr-code-section">
                 <button
@@ -457,7 +465,16 @@ const Payment = () => {
                 <div className="qr-code-container">
                   <p className="qr-instruction">Scan this QR code using any UPI or payment app</p>
                   <div className="qr-code-wrapper">
-                    <canvas ref={qrCanvasRef}></canvas>
+                    <QRCode
+                      value={JSON.stringify({
+                        amount: selectedFare.price || '0',
+                        transactionId: Date.now(),
+                        merchant: 'BlueWing Airlines',
+                      })}
+                      size={200}
+                      level="H"
+                      includeMargin={true}
+                    />
                   </div>
 
                   <div className="qr-details">
@@ -478,13 +495,16 @@ const Payment = () => {
             )}
           </div>
 
+          {/* Right Section - Trip Summary & Session Timer */}
           <div className="payment-sidebar">
+            {/* Session Timer */}
             <div className="session-timer">
               <p className="timer-label">Session expires in</p>
               <p className="timer-display">{formatTime(timeLeft)}</p>
               <p className="timer-sublabel">Complete your payment before session expires</p>
             </div>
 
+            {/* Trip Summary Card */}
             <div className="trip-summary-wrapper">
               <div className="trip-summary-card">
                 <div className="trip-summary-header">
@@ -493,10 +513,12 @@ const Payment = () => {
                 </div>
 
                 <div className="trip-summary-content">
+                  {/* Passenger Count */}
                   <div className="trip-summary-section">
                     <p className="summary-text">{passengerCountDisplay}</p>
                   </div>
 
+                  {/* Cabin Class */}
                   {journey.cabinClass && (
                     <div className="trip-summary-section">
                       <p className="summary-text">
@@ -505,12 +527,14 @@ const Payment = () => {
                     </div>
                   )}
 
+                  {/* Departure Date */}
                   {journey.date && (
                     <div className="trip-summary-section">
                       <p className="summary-text">{journey.date}</p>
                     </div>
                   )}
 
+                  {/* Journey Duration */}
                   {selectedFare.duration && (
                     <div className="trip-summary-section">
                       <p className="summary-text">
@@ -519,9 +543,11 @@ const Payment = () => {
                     </div>
                   )}
 
+                  {/* Flight Details Section */}
                   <div className="flight-summary-section">
                     <h3 className="summary-section-title">Flight Details</h3>
 
+                    {/* Flight Route */}
                     <div className="flight-route-display">
                       <div className="flight-route-item">
                         <p className="flight-location-value">{journey.departure || 'FROM'}</p>
@@ -534,15 +560,18 @@ const Payment = () => {
                       </div>
                     </div>
 
+                    {/* Flight Number and Airline */}
                     <div className="flight-leg-details">
                       <p className="flight-number">{selectedFare.flightNumber || 'Flight --'}</p>
                       <p className="airline-name">{selectedFare.airlineName || 'Airline'}</p>
                     </div>
 
+                    {/* Check-in Details */}
                     <div className="checkin-details">
                       <p><strong>Check-in:</strong> {selectedFare.checkinBaggage || '15 KG'} | Hand bag: Up to 7KG</p>
                     </div>
 
+                    {/* Total Fare */}
                     <div className="total-fare-section">
                       <p className="total-fare-label">TOTAL FARE</p>
                       <p className="total-fare-amount">{selectedFare.price || '₹ --'}</p>

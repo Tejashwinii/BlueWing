@@ -36,10 +36,20 @@ export default function SeatSelectionPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const handleContinueToPayment = (seatSummary) => {
+    navigate('/payment', {
+      state: {
+        ...location.state,
+        seatSummary,
+      }
+    });
+  };
+
   return (
     <SeatSelection
       bookingContext={location.state}
       onBack={() => navigate("/")}
+      onContinue={handleContinueToPayment}
     />
   );
 }
