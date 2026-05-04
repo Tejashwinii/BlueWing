@@ -1,6 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import AdultPassengerCard from '../components/AdultPassengerCard';
+import ChildPassengerCard from '../components/ChildPassengerCard';
+import ContactDetailsCard from '../components/ContactDetailsCard';
 import '../styles/PassengerDetails.css';
 
 const PassengerDetails = () => {
@@ -11,175 +14,129 @@ const PassengerDetails = () => {
   const journey = location.state?.journey || {};
   const selectedFare = location.state?.selectedFare || {};
   
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
+  // Get passenger counts from journey
+  const adultCount = journey.passengers?.adults || 1;
+  const childCount = journey.passengers?.children || 0;
+  const infantCount = journey.passengers?.infants || 0;
+
+  // Initialize passenger data for adults and children
+  const [adultPassengers, setAdultPassengers] = useState(
+    Array(adultCount).fill(null).map(() => ({
+      firstName: '',
+      lastName: '',
+      gender: '',
+    }))
+  );
+
+  const [childPassengers, setChildPassengers] = useState(
+    Array(childCount).fill(null).map(() => ({
+      firstName: '',
+      lastName: '',
+      gender: '',
+      dateOfBirth: '',
+    }))
+  );
+
+  // Contact details
+  const [contactData, setContactData] = useState({
+    contactPerson: '',
+    country: 'India',
     mobileNumber: '',
-    dateOfBirth: '',
-    gender: '',
-    hasChildren: 'No',
-    infantsBelow2: '',
-    childrenBetween2To3: '',
-    specialAssistance: 'No',
-    assistanceType: [],
-    otherSpecialNeeds: '',
+    email: '',
   });
 
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errors, setErrors] = useState({});
+  // Expanded state for cards
+  const [expandedCards, setExpandedCards] = useState({
+    adults: Array(adultCount).fill(false).map((_, i) => i === 0),
+    children: Array(childCount).fill(false).map((_, i) => i === 0),
+  });
 
-  // Determine if Next button should be enabled
-  const isNextButtonEnabled = useMemo(() => {
-    const hasFirstName = formData.firstName.trim() !== '';
-    const hasLastName = formData.lastName.trim() !== '';
-    const hasEmail = formData.email.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
-    const hasMobileNumber = formData.mobileNumber.trim() !== '' && /^[0-9]{10}$/.test(formData.mobileNumber);
-    const hasDateOfBirth = formData.dateOfBirth !== '' && new Date(formData.dateOfBirth) < new Date();
-    const hasGender = formData.gender !== '';
+
+  // Format passenger count display
+  const passengerCountDisplay = useMemo(() => {
+    const counts = [];
+    if (adultCount > 0) counts.push(`${adultCount} Adult${adultCount !== 1 ? 's' : ''}`);
+    if (childCount > 0) counts.push(`${childCount} Child${childCount !== 1 ? 'ren' : ''}`);
+    if (infantCount > 0) counts.push(`${infantCount} Infant${infantCount !== 1 ? 's' : ''}`);
+    return counts.join(', ');
+  }, [adultCount, childCount, infantCount]);
+
+  // Handle adult passenger data change
+  const handleAdultDataChange = (index, field, value) => {
+    const updated = [...adultPassengers];
+    updated[index] = { ...updated[index], [field]: value };
+    setAdultPassengers(updated);
+  };
+
+  // Handle child passenger data change
+  const handleChildDataChange = (index, field, value) => {
+    const updated = [...childPassengers];
+    updated[index] = { ...updated[index], [field]: value };
+    setChildPassengers(updated);
+  };
+
+  // Handle contact data change
+  const handleContactDataChange = (field, value) => {
+    setContactData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Handle save for adult passenger
+  const handleAdultSave = (index) => {
+    // Collapse current, expand next if available
+    const newExpanded = { ...expandedCards };
+    newExpanded.adults[index] = false;
+    if (index + 1 < adultCount) {
+      newExpanded.adults[index + 1] = true;
+    } else if (childCount > 0) {
+      newExpanded.children[0] = true;
+    }
+    setExpandedCards(newExpanded);
+  };
+
+  // Handle save for child passenger
+  const handleChildSave = (index) => {
+    // Collapse current, expand next if available
+    const newExpanded = { ...expandedCards };
+    newExpanded.children[index] = false;
+    if (index + 1 < childCount) {
+      newExpanded.children[index + 1] = true;
+    }
+    setExpandedCards(newExpanded);
+  };
+
+  // Toggle card expand/collapse
+  const toggleCardExpand = (type, index) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [type]: prev[type].map((exp, i) => i === index ? !exp : exp)
+    }));
+  };
+
+  // Check if all required data is filled
+  const isFormComplete = useMemo(() => {
+    const allAdultsFilled = adultPassengers.every(p => p.firstName && p.lastName && p.gender);
+    const allChildrenFilled = childPassengers.every(p => p.firstName && p.lastName && p.gender && p.dateOfBirth);
+    const contactFilled = contactData.mobileNumber && contactData.email && contactData.contactPerson !== '';
     
-    return hasFirstName && hasLastName && hasEmail && hasMobileNumber && hasDateOfBirth && hasGender;
-  }, [formData]);
-
-  // Handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: '',
-      });
-    }
-  };
-
-  // Handle checkbox changes for special assistance
-  const handleAssistanceCheckboxChange = (e) => {
-    const { value, checked } = e.target;
-    let updatedAssistanceType = [...formData.assistanceType];
-
-    if (checked) {
-      updatedAssistanceType.push(value);
-    } else {
-      updatedAssistanceType = updatedAssistanceType.filter((item) => item !== value);
-    }
-
-    setFormData({
-      ...formData,
-      assistanceType: updatedAssistanceType,
-    });
-  };
-
-  // Validate form
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First Name is required';
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last Name is required';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.mobileNumber.trim()) {
-      newErrors.mobileNumber = 'Mobile Number is required';
-    } else if (!/^[0-9]{10}$/.test(formData.mobileNumber)) {
-      newErrors.mobileNumber = 'Mobile Number must be 10 digits';
-    }
-
-    if (!formData.dateOfBirth) {
-      newErrors.dateOfBirth = 'Date of Birth is required';
-    } else {
-      const selectedDate = new Date(formData.dateOfBirth);
-      const today = new Date();
-      if (selectedDate >= today) {
-        newErrors.dateOfBirth = 'Date of Birth must be a past date';
-      }
-    }
-
-    if (!formData.gender) {
-      newErrors.gender = 'Gender is required';
-    }
-
-    return newErrors;
-  };
+    return allAdultsFilled && allChildrenFilled && contactFilled;
+  }, [adultPassengers, childPassengers, contactData]);
 
   // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formErrors = validateForm();
-
-    if (Object.keys(formErrors).length === 0) {
+  const handleSubmit = () => {
+    if (isFormComplete) {
       navigate('/seat-selection', {
         state: {
           journey,
           selectedFare,
-          passengerDetails: formData,
-          passengers: journey.passengers || {
-            adults: passengerCount,
-            children: 0,
-            infants: 0,
+          passengers: {
+            adults: adultPassengers,
+            children: childPassengers,
+            infants: infantCount,
           },
-          passengerCount,
-          passengerLabel: passengerCountDisplay,
+          contactDetails: contactData,
         },
       });
-    } else {
-      setErrors(formErrors);
     }
-  };
-
-  // Handle cancel
-  const handleCancel = () => {
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      mobileNumber: '',
-      dateOfBirth: '',
-      gender: '',
-      hasChildren: 'No',
-      infantsBelow2: '',
-      childrenBetween2To3: '',
-      specialAssistance: 'No',
-      assistanceType: [],
-      otherSpecialNeeds: '',
-    });
-    setErrors({});
-    setSuccessMessage('');
-  };
-
-  // Format passenger count display
-  const passengerCountDisplay = useMemo(() => {
-    const { adults = 1, children = 0, infants = 0 } = journey.passengers || {};
-    const counts = [];
-    if (adults > 0) counts.push(`${adults} Adult${adults !== 1 ? 's' : ''}`);
-    if (children > 0) counts.push(`${children} Child${children !== 1 ? 'ren' : ''}`);
-    if (infants > 0) counts.push(`${infants} Infant${infants !== 1 ? 's' : ''}`);
-    return counts.join(', ');
-  }, [journey.passengers]);
-
-  const passengerCount = useMemo(() => {
-    const { adults = 1, children = 0, infants = 0 } = journey.passengers || {};
-    return Math.max(Number(adults) + Number(children) + Number(infants), 1);
-  }, [journey.passengers]);
-
-  // Get fare details to display in trip summary
-  const getBaggageFromFare = () => {
-    // Extract baggage info from selected fare if available
-    // This could be enhanced based on the fare data structure
-    return ['Baggage allowance as per fare type'];
   };
 
   return (
@@ -196,312 +153,55 @@ const PassengerDetails = () => {
         </div>
 
         <div className="passenger-container">
-          {/* Left Section - Form */}
+          {/* Left Section - Passenger Cards */}
           <div className="form-section-wrapper">
-            {/* Passenger Details Heading */}
+            {/* Page Title */}
             <h1 className="page-title">Passenger Details</h1>
 
-            {successMessage && (
-              <div className="success-message">{successMessage}</div>
-            )}
-
-            <form onSubmit={handleSubmit} className="passenger-form">
-              {/* Passenger Info Card */}
-              <div className="passenger-info-card">
-                {/* Important Notice */}
-                <div className="important-notice">
-                  <p>
-                    <strong>Important:</strong> For Domestic Travelling - Please enter your name exactly as it appears in your Government ID proofs.
-                  </p>
-                </div>
-
-                {/* Gender Selection */}
-                <div className="form-group">
-                  <label className="form-label">Gender *</label>
-                  <div className="gender-selection">
-                    <label className="radio-label">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="Male"
-                        checked={formData.gender === 'Male'}
-                        onChange={handleInputChange}
-                      />
-                      <span>Male</span>
-                    </label>
-                    <label className="radio-label">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="Female"
-                        checked={formData.gender === 'Female'}
-                        onChange={handleInputChange}
-                      />
-                      <span>Female</span>
-                    </label>
-                  </div>
-                  {errors.gender && (
-                    <span className="error-message">{errors.gender}</span>
-                  )}
-                </div>
-
-                {/* First and Last Name */}
-                <div className="form-row">
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      placeholder="First Name *"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className={errors.firstName ? 'input-error' : ''}
-                    />
-                    {errors.firstName && (
-                      <span className="error-message">{errors.firstName}</span>
-                    )}
-                  </div>
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      id="lastName"
-                      name="lastName"
-                      placeholder="Last Name *"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className={errors.lastName ? 'input-error' : ''}
-                    />
-                    {errors.lastName && (
-                      <span className="error-message">{errors.lastName}</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div className="form-group">
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Email Address *"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={errors.email ? 'input-error' : ''}
+            {/* Adult Passenger Cards */}
+            <div className="passengers-section">
+              <h2 className="section-heading">Adults</h2>
+              <div className="passengers-list">
+                {adultPassengers.map((passenger, index) => (
+                  <AdultPassengerCard
+                    key={`adult-${index}`}
+                    passengerIndex={index}
+                    passengerData={passenger}
+                    onSave={handleAdultSave}
+                    onDataChange={handleAdultDataChange}
+                    isExpanded={expandedCards.adults[index]}
+                    onToggleExpand={() => toggleCardExpand('adults', index)}
                   />
-                  {errors.email && (
-                    <span className="error-message">{errors.email}</span>
-                  )}
-                </div>
-
-                {/* Date of Birth */}
-                <div className="form-group">
-                  <input
-                    type="date"
-                    id="dateOfBirth"
-                    name="dateOfBirth"
-                    value={formData.dateOfBirth}
-                    onChange={handleInputChange}
-                    className={errors.dateOfBirth ? 'input-error' : ''}
-                  />
-                  {errors.dateOfBirth && (
-                    <span className="error-message">{errors.dateOfBirth}</span>
-                  )}
-                </div>
-
-                {/* Mobile Number */}
-                <div className="form-group">
-                  <input
-                    type="tel"
-                    id="mobileNumber"
-                    name="mobileNumber"
-                    placeholder="Mobile Number *"
-                    value={formData.mobileNumber}
-                    onChange={handleInputChange}
-                    className={errors.mobileNumber ? 'input-error' : ''}
-                    maxLength="10"
-                  />
-                  {errors.mobileNumber && (
-                    <span className="error-message">{errors.mobileNumber}</span>
-                  )}
-                </div>
-              </div>
-            </form>
-
-            {/* Children / Infant Details Section - Below Form */}
-            <div className="children-assistance-wrapper">
-              <div className="children-section">
-                <h2>Children / Infant Details</h2>
-
-                <div className="form-group">
-                  <label htmlFor="hasChildren">Are children travelling with you? *</label>
-                  <select
-                    id="hasChildren"
-                    name="hasChildren"
-                    value={formData.hasChildren}
-                    onChange={handleInputChange}
-                  >
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                  </select>
-                </div>
-
-                {/* Conditional rendering for children details */}
-                {formData.hasChildren === 'Yes' && (
-                  <div className="children-details">
-                    <p>
-                      Please specify the number of children travelling with you
-                    </p>
-                    {errors.childrenDetails && (
-                      <span className="error-message">{errors.childrenDetails}</span>
-                    )}
-
-                    <div className="form-row">
-                      <div className="form-group">
-                        <label htmlFor="infantsBelow2">
-                          Infants Below 2 Years
-                        </label>
-                        <input
-                          type="number"
-                          id="infantsBelow2"
-                          name="infantsBelow2"
-                          placeholder="0"
-                          value={formData.infantsBelow2}
-                          onChange={handleInputChange}
-                          className={errors.infantsBelow2 ? 'input-error' : ''}
-                          min="0"
-                        />
-                        {errors.infantsBelow2 && (
-                          <span className="error-message">{errors.infantsBelow2}</span>
-                        )}
-                      </div>
-
-                      <div className="form-group">
-                        <label htmlFor="childrenBetween2To3">
-                          Children 2-3 Years
-                        </label>
-                        <input
-                          type="number"
-                          id="childrenBetween2To3"
-                          name="childrenBetween2To3"
-                          placeholder="0"
-                          value={formData.childrenBetween2To3}
-                          onChange={handleInputChange}
-                          className={errors.childrenBetween2To3 ? 'input-error' : ''}
-                          min="0"
-                        />
-                        {errors.childrenBetween2To3 && (
-                          <span className="error-message">
-                            {errors.childrenBetween2To3}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Special Assistance Section - Below Form */}
-              <div className="assistance-section">
-                <h2>Special Assistance / Disability Support</h2>
-
-                <div className="form-group">
-                  <label htmlFor="specialAssistance">
-                    Do you require special assistance? *
-                  </label>
-                  <select
-                    id="specialAssistance"
-                    name="specialAssistance"
-                    value={formData.specialAssistance}
-                    onChange={handleInputChange}
-                  >
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                  </select>
-                </div>
-
-                {/* Conditional rendering for assistance options */}
-                {formData.specialAssistance === 'Yes' && (
-                  <div className="assistance-details">
-                    <p>
-                      Please select the assistance you require (select all that apply)
-                    </p>
-                    {errors.assistanceType && (
-                      <span className="error-message">{errors.assistanceType}</span>
-                    )}
-
-                    <div className="checkbox-group">
-                      <label className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          value="Wheelchair"
-                          checked={formData.assistanceType.includes('Wheelchair')}
-                          onChange={handleAssistanceCheckboxChange}
-                        />
-                        Wheelchair Assistance
-                      </label>
-
-                      <label className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          value="Visual Impairment"
-                          checked={formData.assistanceType.includes('Visual Impairment')}
-                          onChange={handleAssistanceCheckboxChange}
-                        />
-                        Visual Impairment Assistance
-                      </label>
-
-                      <label className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          value="Hearing Impairment"
-                          checked={formData.assistanceType.includes('Hearing Impairment')}
-                          onChange={handleAssistanceCheckboxChange}
-                        />
-                        Hearing Impairment Assistance
-                      </label>
-
-                      <label className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          value="Elderly Passenger"
-                          checked={formData.assistanceType.includes('Elderly Passenger')}
-                          onChange={handleAssistanceCheckboxChange}
-                        />
-                        Elderly Passenger Assistance
-                      </label>
-
-                      <label className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          value="Other"
-                          checked={formData.assistanceType.includes('Other')}
-                          onChange={handleAssistanceCheckboxChange}
-                        />
-                        Other Special Needs
-                      </label>
-                    </div>
-
-                    {/* Text input for other special needs */}
-                    {formData.assistanceType.includes('Other') && (
-                      <div className="form-group">
-                        <label htmlFor="otherSpecialNeeds">
-                          Please describe your special needs
-                        </label>
-                        <textarea
-                          id="otherSpecialNeeds"
-                          name="otherSpecialNeeds"
-                          placeholder="Describe your special needs..."
-                          value={formData.otherSpecialNeeds}
-                          onChange={handleInputChange}
-                          rows="4"
-                          className="textarea-input"
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
+                ))}
               </div>
             </div>
+
+            {/* Child Passenger Cards */}
+            {childCount > 0 && (
+              <div className="passengers-section">
+                <h2 className="section-heading">Children</h2>
+                <div className="passengers-list">
+                  {childPassengers.map((passenger, index) => (
+                    <ChildPassengerCard
+                      key={`child-${index}`}
+                      passengerIndex={index}
+                      passengerData={passenger}
+                      onSave={handleChildSave}
+                      onDataChange={handleChildDataChange}
+                      isExpanded={expandedCards.children[index]}
+                      onToggleExpand={() => toggleCardExpand('children', index)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Contact Details Card */}
+            <ContactDetailsCard
+              adultPassengers={adultPassengers}
+              contactData={contactData}
+              onDataChange={handleContactDataChange}
+            />
           </div>
 
           {/* Right Section - Trip Summary Card */}
@@ -588,7 +288,7 @@ const PassengerDetails = () => {
             type="button" 
             className="btn btn-next"
             onClick={handleSubmit}
-            disabled={!isNextButtonEnabled}
+            disabled={!isFormComplete}
           >
             Next
           </button>
