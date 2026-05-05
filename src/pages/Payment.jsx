@@ -25,7 +25,7 @@ const Payment = () => {
     cardNumber: '',
     expiryDate: '',
     cvv: '',
-    amount: selectedFare.price || '0',
+    amount: selectedFare.totalFare || selectedFare.price || '0',
   });
 
   const [errors, setErrors] = useState({});
@@ -55,7 +55,7 @@ const Payment = () => {
   useEffect(() => {
     if (showQRCode && qrCanvasRef.current) {
       const qrValue = JSON.stringify({
-        amount: selectedFare.price || '0',
+        amount: selectedFare.totalFare || selectedFare.price || '0',
         transactionId: Date.now(),
         merchant: 'BlueWing Airlines',
       });
@@ -65,7 +65,7 @@ const Payment = () => {
         }
       });
     }
-  }, [showQRCode, selectedFare.price]);
+  }, [showQRCode, selectedFare.totalFare, selectedFare.price]);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
@@ -93,7 +93,7 @@ const Payment = () => {
       cardNumber: '',
       expiryDate: '',
       cvv: '',
-      amount: selectedFare.price || '0',
+      amount: selectedFare.totalFare || selectedFare.price || '0',
     });
   };
 
@@ -351,7 +351,7 @@ const Payment = () => {
                       cardNumber: '',
                       expiryDate: '',
                       cvv: '',
-                      amount: selectedFare.price || '0',
+                      amount: selectedFare.totalFare || selectedFare.price || '0',
                     });
                     setErrors({});
                   }}
@@ -541,11 +541,6 @@ const Payment = () => {
 
                     <div className="checkin-details">
                       <p><strong>Check-in:</strong> {selectedFare.checkinBaggage || '15 KG'} | Hand bag: Up to 7KG</p>
-                    </div>
-
-                    <div className="total-fare-section">
-                      <p className="total-fare-label">TOTAL FARE</p>
-                      <p className="total-fare-amount">{selectedFare.price || '₹ --'}</p>
                     </div>
                   </div>
                 </div>

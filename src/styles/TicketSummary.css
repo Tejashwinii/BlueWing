@@ -22,6 +22,17 @@
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .ticket-summary-header h1 {
   font-size: 42px;
   color: #1565c0;
@@ -35,6 +46,51 @@
   color: #555;
   margin: 0;
   letter-spacing: 0.3px;
+}
+
+/* Fare Summary Section */
+.ticket-fare-summary {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.fare-summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.fare-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.fare-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fare-value {
+  font-size: 28px;
+  color: #1565c0;
+  font-weight: 700;
+}
+
+.fare-amount {
+  font-size: 32px;
+  color: #2e7d32;
 }
 
 .ticket-summary-container {
