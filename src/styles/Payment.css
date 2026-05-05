@@ -552,6 +552,35 @@
   margin: 0;
 }
 
+/* Selected Seats Section */
+.selected-seats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e7f1ff;
+}
+
+.seats-display {
+  background: #f9fbff;
+  border: 1px solid #e7f1ff;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.seats-list {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  word-break: break-word;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .payment-container {
