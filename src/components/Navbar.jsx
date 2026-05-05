@@ -111,7 +111,7 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
       <div className="navbar-container">
         {/* Logo */}
         <div className="navbar-logo">
-          <span className="logo-text">BlueWing</span>
+          <Link to="/" className="logo-text">BlueWing</Link>
         </div>
 
         {/* Menu Items - Hidden in minimalMode */}
