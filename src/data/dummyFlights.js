@@ -360,44 +360,53 @@ const rawDummyFlights = [
   }
 ];
 
-const createFareTypes = (flight) => [
-  {
-    id: "economy",
-    title: "Saver fare",
-    badge: "Saver fare",
-    price: flight.economyPrice ?? flight.price,
-    earnText: `+ Earn ${Math.round((flight.economyPrice ?? flight.price ?? 0) / 10)} BlueWing BluChips`,
-    baggage: ["7 kg Cabin bag allowance", "15 kg Check-in bag allowance"],
-    cancellationLabel: "Standard",
-    features: ["Complimentary Meal", "Complimentary standard seat"],
-  },
-  {
-    id: "business",
-    title: "Flexi plus fare",
-    badge: "Flexi plus fare",
-    price: flight.businessPrice ?? flight.price,
-    earnText: `+ Earn ${Math.round((flight.businessPrice ?? flight.price ?? 0) / 10)} BlueWing BluChips`,
-    baggage: ["7 kg Cabin bag allowance", "15 kg Check-in bag allowance"],
-    cancellationLabel: "Partial",
-    features: ["Complimentary meal", "Complimentary standard seat"],
-  },
-  {
-    id: "first-class",
-    title: "BlueWing UpFront",
-    badge: "BlueWing UpFront",
-    price: flight.firstClassPrice ?? flight.price,
-    earnText: `+ Earn ${Math.round((flight.firstClassPrice ?? flight.price ?? 0) / 10)} BlueWing BluChips`,
-    baggage: ["7 kg Cabin bag allowance", "20 kg Check-in bag allowance"],
-    cancellationLabel: "Low",
-    features: [
-      "ZERO change fee",
-      "Complimentary meal",
-      "Complimentary Front row Economy Seat*",
-      "Fast Forward not included",
-    ],
-    isNew: true,
-  },
-];
+const createFareTypes = (flight, selectedClass = "economy") => {
+  const basePrice =
+    selectedClass === "business"
+      ? flight.businessPrice
+      : selectedClass === "first-class"
+      ? flight.firstClassPrice
+      : flight.economyPrice;
+
+  return [
+    {
+      id: "economy",
+      title: "Saver fare",
+      badge: "Saver fare",
+      price: Math.round(basePrice * 1),
+      earnText: `+ Earn ${Math.round((basePrice * 1) / 10)} BlueWing BluChips`,
+      baggage: ["7 kg Cabin bag allowance", "15 kg Check-in bag allowance"],
+      cancellationLabel: "Standard",
+      features: ["Complimentary Meal", "Complimentary standard seat"],
+    },
+    {
+      id: "business",
+      title: "Flexi plus fare",
+      badge: "Flexi plus fare",
+      price: Math.round(basePrice * 1.25),
+      earnText: `+ Earn ${Math.round((basePrice * 1.25) / 10)} BlueWing BluChips`,
+      baggage: ["7 kg Cabin bag allowance", "15 kg Check-in bag allowance"],
+      cancellationLabel: "Partial",
+      features: ["Complimentary meal", "Complimentary standard seat"],
+    },
+    {
+      id: "first-class",
+      title: "BlueWing UpFront",
+      badge: "BlueWing UpFront",
+      price: Math.round(basePrice * 1.5),
+      earnText: `+ Earn ${Math.round((basePrice * 1.5) / 10)} BlueWing BluChips`,
+      baggage: ["7 kg Cabin bag allowance", "20 kg Check-in bag allowance"],
+      cancellationLabel: "Low",
+      features: [
+        "ZERO change fee",
+        "Complimentary meal",
+        "Complimentary Front row Economy Seat*",
+        "Fast Forward not included",
+      ],
+      isNew: true,
+    },
+  ];
+};
 
 const dummyFlights = rawDummyFlights.map((flight) => ({
   ...flight,
@@ -405,4 +414,5 @@ const dummyFlights = rawDummyFlights.map((flight) => ({
   aircraft: createDefaultAircraftLayout(),
 }));
 
+export { createFareTypes };
 export default dummyFlights;

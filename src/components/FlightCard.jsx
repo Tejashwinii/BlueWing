@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import dummyFlightsData from "../data/dummyFlights";
+import dummyFlightsData, { createFareTypes } from "../data/dummyFlights";
 import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 import FareTypeCard from "./FareTypeCard";
 import "../styles/FlightCard.css";
@@ -43,49 +43,8 @@ export default function FlightCard({ flight, selectedCabinClass = "economy", onF
     const priceLabel = selectedFlight.priceLabel || "Lowest Price";
 
     const fareTypes = useMemo(() => {
-        if (Array.isArray(selectedFlight.fareTypes) && selectedFlight.fareTypes.length > 0) {
-            return selectedFlight.fareTypes;
-        }
-
-        return [
-            {
-                id: "economy",
-                title: "Saver fare",
-                badge: "Saver fare",
-                price: selectedFlight.economyPrice || selectedFlight.price || "N/A",
-                earnText: `+ Earn ${Math.round((selectedFlight.economyPrice || selectedFlight.price || 0) / 10) || 0} BlueWing BluChips`,
-                baggage: ["7 kg Cabin bag allowance", "15 kg Check-in bag allowance"],
-                cancellationLabel: "Standard",
-                features: ["Complimentary Meal", "Complimentary standard seat"],
-            },
-            {
-                id: "business",
-                title: "Flexi plus fare",
-                badge: "Flexi plus fare",
-                price: selectedFlight.businessPrice || "N/A",
-                earnText: `+ Earn ${Math.round((selectedFlight.businessPrice || 0) / 10) || 0} BlueWing BluChips`,
-                baggage: ["7 kg Cabin bag allowance", "15 kg Check-in bag allowance"],
-                cancellationLabel: "Partial",
-                features: ["Complimentary meal", "Complimentary standard seat"],
-            },
-            {
-                id: "first-class",
-                title: "BlueWing UpFront",
-                badge: "BlueWing UpFront",
-                price: selectedFlight.firstClassPrice || "N/A",
-                earnText: `+ Earn ${Math.round((selectedFlight.firstClassPrice || 0) / 10) || 0} BlueWing BluChips`,
-                baggage: ["7 kg Cabin bag allowance", "20 kg Check-in bag allowance"],
-                cancellationLabel: "Low",
-                features: [
-                    "ZERO change fee",
-                    "Complimentary meal",
-                    "Complimentary Front row Economy Seat*",
-                    "Fast Forward not included",
-                ],
-                isNew: true,
-            },
-        ];
-    }, [selectedFlight]);
+        return createFareTypes(selectedFlight, selectedCabinClass);
+    }, [selectedFlight, selectedCabinClass]);
 
     const formatPrice = (value) => {
         if (typeof value === "number") {
