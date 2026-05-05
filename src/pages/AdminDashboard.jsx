@@ -11,7 +11,9 @@ const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [flights, setFlights] = useState(dummyFlights);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showFlightForm, setShowFlightForm] = useState(false);
+  const [formMode, setFormMode] = useState('add');
+  const [selectedFlight, setSelectedFlight] = useState(null);
 
   if (!user || user.role !== 'admin') {
     navigate('/login');
@@ -20,7 +22,14 @@ const AdminDashboard = () => {
 
   const handleAddFlight = (newFlight) => {
     setFlights([...flights, newFlight]);
-    setShowAddForm(false);
+    setShowFlightForm(false);
+    setSelectedFlight(null);
+  };
+
+  const handleUpdateFlight = (updatedFlight) => {
+    setFlights(flights.map(flight => flight.id === updatedFlight.id ? updatedFlight : flight));
+    setShowFlightForm(false);
+    setSelectedFlight(null);
   };
 
   const handleDeleteFlight = (flightId) => {
@@ -30,8 +39,15 @@ const AdminDashboard = () => {
   };
 
   const handleEditFlight = (flight) => {
-    // For now, just log - can be expanded with edit modal
-    console.log('Edit flight:', flight);
+    setSelectedFlight(flight);
+    setFormMode('edit');
+    setShowFlightForm(true);
+  };
+
+  const handleOpenAddFlight = () => {
+    setSelectedFlight(null);
+    setFormMode('add');
+    setShowFlightForm(true);
   };
 
   return (
@@ -50,7 +66,7 @@ const AdminDashboard = () => {
             <div className="action-panel">
               <button 
                 className="btn-action btn-add"
-                onClick={() => setShowAddForm(true)}
+                onClick={handleOpenAddFlight}
               >
                 ➕ Add Flight
               </button>
@@ -95,11 +111,17 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Add Flight Modal */}
-      {showAddForm && (
+      {/* Add / Edit Flight Modal */}
+      {showFlightForm && (
         <AddFlight
-          onAdd={handleAddFlight}
-          onCancel={() => setShowAddForm(false)}
+          mode={formMode}
+          initialFlight={selectedFlight}
+          onSave={formMode === 'edit' ? handleUpdateFlight : handleAddFlight}
+          onCancel={() => {
+            setShowFlightForm(false);
+            setSelectedFlight(null);
+            setFormMode('add');
+          }}
         />
       )}
     </div>
