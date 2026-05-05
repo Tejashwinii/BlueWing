@@ -36,7 +36,13 @@ const TicketSummary = () => {
   };
 
   const handleDownloadAllTickets = () => {
-    const ticketCards = document.querySelectorAll('.ticket-card');
+    const ticketCards = document.querySelectorAll('.ticket-card:not(.cancelled-ticket)');
+
+    if (ticketCards.length === 0) {
+      alert('All tickets are cancelled. Download is not available.');
+      return;
+    }
+
     ticketCards.forEach((card, index) => {
       setTimeout(() => {
         const printWindow = window.open('', '', 'height=600,width=800');
@@ -65,6 +71,7 @@ const TicketSummary = () => {
                   passenger={passenger}
                   journey={journey}
                   selectedFare={selectedFare}
+                  contactDetails={contactDetails}
                 />
               ))}
             </div>

@@ -23,11 +23,48 @@
   overflow: hidden;
   transition: all 0.3s ease;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
 }
 
 .ticket-card:hover {
   box-shadow: 0 12px 32px rgba(25, 118, 210, 0.25);
   transform: translateY(-4px);
+}
+
+.cancelled-ticket {
+  opacity: 0.55;
+  filter: grayscale(35%);
+}
+
+.cancelled-ticket:hover {
+  transform: none;
+  box-shadow: 0 8px 24px rgba(25, 118, 210, 0.15);
+}
+
+.cancelled-overlay-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 3px dotted #d32f2f;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.cancelled-overlay-line span {
+  position: absolute;
+  left: 50%;
+  top: -16px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: #d32f2f;
+  border: 2px solid #d32f2f;
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
 /* Left Section - Airline Design Strip */
@@ -391,6 +428,28 @@
 .btn-history:hover {
   background: #e8ecf1;
   box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
+}
+
+.btn-cancel-ticket {
+  background: #fff5f5;
+  color: #c62828;
+  border: 2px solid #c62828;
+  flex: 1;
+  max-width: 220px;
+}
+
+.btn-cancel-ticket:hover {
+  background: #ffe9e9;
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.2);
+}
+
+.btn-cancel-ticket.btn-cancelled,
+.btn-cancel-ticket:disabled {
+  background: #f2f2f2;
+  border-color: #9e9e9e;
+  color: #757575;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Responsive Design */

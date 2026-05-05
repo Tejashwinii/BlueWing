@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/HomePage.css';
 import Navbar from '../../src/components/Navbar';
+import dummyFlights from '../data/dummyFlights';
 
 
 const HomePage = () => {
@@ -32,6 +33,22 @@ const HomePage = () => {
   };
 
   const [formData, setFormData] = useState(getInitialFormData);
+
+  const departureOptions = useMemo(() => {
+    const options = dummyFlights
+      .map((flight) => flight.from || flight.departure)
+      .filter(Boolean);
+
+    return Array.from(new Set(options)).sort((first, second) => first.localeCompare(second));
+  }, []);
+
+  const arrivalOptions = useMemo(() => {
+    const options = dummyFlights
+      .map((flight) => flight.to || flight.arrival)
+      .filter(Boolean);
+
+    return Array.from(new Set(options)).sort((first, second) => first.localeCompare(second));
+  }, []);
 
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
 
@@ -172,25 +189,35 @@ const HomePage = () => {
               <div className="style-new">
                 <div className="form-group">
                   <label htmlFor="departure">Departure</label>
-                  <input
-                    type="text"
+                  <select
                     id="departure"
                     name="departure"
-                    placeholder="From"
                     value={formData.departure}
                     onChange={handleInputChange}
-                  />
+                  >
+                    <option value="">Select departure</option>
+                    {departureOptions.map((airport) => (
+                      <option key={airport} value={airport}>
+                        {airport}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group">
                   <label htmlFor="arrival">Arrival</label>
-                  <input
-                    type="text"
+                  <select
                     id="arrival"
                     name="arrival"
-                    placeholder="To"
                     value={formData.arrival}
                     onChange={handleInputChange}
-                  />
+                  >
+                    <option value="">Select arrival</option>
+                    {arrivalOptions.map((airport) => (
+                      <option key={airport} value={airport}>
+                        {airport}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group">
                   <label htmlFor="date">Departure Date</label>

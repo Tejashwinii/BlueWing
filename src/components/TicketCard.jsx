@@ -1,9 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
 import '../styles/TicketCard.css';
 
-const TicketCard = ({ passenger, journey, selectedFare }) => {
+const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {} }) => {
   const ticketRef = useRef(null);
+  const [isCancelled, setIsCancelled] = useState(false);
 
   const getRandomSeat = () => {
     const rows = Array.from({ length: 30 }, (_, i) => i + 1);
@@ -18,10 +19,24 @@ const TicketCard = ({ passenger, journey, selectedFare }) => {
     return gates[Math.floor(Math.random() * gates.length)];
   };
 
-  const seatNumber = getRandomSeat();
-  const gateNumber = getRandomGate();
+  const seatNumber = useMemo(() => getRandomSeat(), []);
+  const gateNumber = useMemo(() => getRandomGate(), []);
+
+  const getMaskedMobile = () => {
+    const mobile = (contactDetails?.mobileNumber || '').toString();
+    if (!mobile || mobile.length < 4) {
+      return 'registered mobile number';
+    }
+    const lastFourDigits = mobile.slice(-4);
+    return `******${lastFourDigits}`;
+  };
 
   const handleDownloadTicket = () => {
+    if (isCancelled) {
+      alert('Cancelled tickets cannot be downloaded.');
+      return;
+    }
+
     const element = ticketRef.current;
     const opt = {
       margin: 10,
@@ -33,9 +48,44 @@ const TicketCard = ({ passenger, journey, selectedFare }) => {
     html2pdf().set(opt).from(element).save();
   };
 
+  const handleCancelTicket = () => {
+    if (isCancelled) {
+      return;
+    }
+
+    const isConfirmed = window.confirm('Are you sure you want to cancel this ticket?');
+    if (!isConfirmed) {
+      return;
+    }
+
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const maskedMobile = getMaskedMobile();
+
+    alert(`OTP has been sent to ${maskedMobile}.\nDemo OTP: ${otp}`);
+    const enteredOtp = window.prompt('Enter OTP to confirm ticket cancellation:');
+
+    if (!enteredOtp) {
+      alert('Cancellation aborted. OTP not entered.');
+      return;
+    }
+
+    if (enteredOtp.trim() === otp) {
+      setIsCancelled(true);
+      alert('Ticket cancelled successfully.');
+    } else {
+      alert('Invalid OTP. Ticket cancellation failed.');
+    }
+  };
+
   return (
     <div className="ticket-card-wrapper">
-      <div className="ticket-card" ref={ticketRef}>
+      <div className={`ticket-card ${isCancelled ? 'cancelled-ticket' : ''}`} ref={ticketRef}>
+        {isCancelled && (
+          <div className="cancelled-overlay-line">
+            <span>CANCELLED</span>
+          </div>
+        )}
+
         {/* Left Section - Airline Design Strip */}
         <div className="ticket-left-section">
           <div className="airline-logo">
@@ -202,11 +252,17 @@ const TicketCard = ({ passenger, journey, selectedFare }) => {
 
       {/* Action Buttons */}
       <div className="ticket-actions">
-        <button className="btn btn-download" onClick={handleDownloadTicket}>
-          📥 Download Ticket
-        </button>
-        <button className="btn btn-history">
-          📋 Go to History
+        {!isCancelled && (
+          <button className="btn btn-download" onClick={handleDownloadTicket}>
+            📥 Download Ticket
+          </button>
+        )}
+        <button
+          className={`btn btn-cancel-ticket ${isCancelled ? 'btn-cancelled' : ''}`}
+          onClick={handleCancelTicket}
+          disabled={isCancelled}
+        >
+          {isCancelled ? '❌ Ticket Cancelled' : '🧾 Cancellation Ticket'}
         </button>
       </div>
     </div>
