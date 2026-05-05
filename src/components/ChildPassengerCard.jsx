@@ -12,9 +12,11 @@ const ChildPassengerCard = ({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    onDataChange(passengerIndex, name, value);
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+    // For radio buttons with unique names like "gender-child-0", extract the field name
+    const fieldName = name.includes('gender') ? 'gender' : name;
+    onDataChange(passengerIndex, fieldName, value);
+    if (errors[fieldName]) {
+      setErrors(prev => ({ ...prev, [fieldName]: '' }));
     }
   };
 
@@ -121,26 +123,38 @@ const ChildPassengerCard = ({
           <div className="form-group">
             <label className="form-label">Gender *</label>
             <div className="gender-selection">
-              <label className="radio-label">
+              <div className="radio-option">
                 <input
                   type="radio"
-                  name="gender"
+                  id={`gender-child-${passengerIndex}-male`}
+                  name={`gender-child-${passengerIndex}`}
                   value="Male"
                   checked={passengerData.gender === 'Male'}
                   onChange={handleInputChange}
                 />
-                <span>Male</span>
-              </label>
-              <label className="radio-label">
+                <label 
+                  htmlFor={`gender-child-${passengerIndex}-male`} 
+                  className="radio-label-text"
+                >
+                  Male
+                </label>
+              </div>
+              <div className="radio-option">
                 <input
                   type="radio"
-                  name="gender"
+                  id={`gender-child-${passengerIndex}-female`}
+                  name={`gender-child-${passengerIndex}`}
                   value="Female"
                   checked={passengerData.gender === 'Female'}
                   onChange={handleInputChange}
                 />
-                <span>Female</span>
-              </label>
+                <label 
+                  htmlFor={`gender-child-${passengerIndex}-female`} 
+                  className="radio-label-text"
+                >
+                  Female
+                </label>
+              </div>
             </div>
             {errors.gender && (
               <span className="error-message">{errors.gender}</span>

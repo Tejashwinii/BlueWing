@@ -183,22 +183,31 @@
 }
 
 .seat-classButton {
-  display: grid;
-  gap: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   text-align: left;
   padding: 14px 16px;
   border-radius: 14px;
   background: #f9fbff;
   border: 1px solid #d9e4f2;
   color: #10233f;
+  transition: all 0.2s ease;
 }
 
-.seat-classButton strong {
-  font-size: 1.05rem;
+.seat-classButton:hover:not(:disabled) {
+  background: #f0f4ff;
+  border-color: #b8d0f0;
+}
+
+.seat-classButton span {
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .seat-classButton small {
   color: #5b6b7f;
+  font-size: 0.85rem;
 }
 
 .seat-classButton.is-active {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import TicketCard from '../components/TicketCard';
 import Navbar from '../components/Navbar';
@@ -31,6 +31,14 @@ const TicketSummary = () => {
     }];
   }
 
+  // Format total fare for display
+  const totalFareDisplay = useMemo(() => {
+    if (selectedFare.totalFare) {
+      return `₹${typeof selectedFare.totalFare === 'number' ? selectedFare.totalFare.toLocaleString('en-IN') : selectedFare.totalFare}`;
+    }
+    return selectedFare.price || '₹ --';
+  }, [selectedFare]);
+
   const handleGoHome = () => {
     navigate('/');
   };
@@ -60,6 +68,20 @@ const TicketSummary = () => {
         <div className="ticket-summary-header">
           <h1>Your Ticket Summary</h1>
           <p className="transaction-id">Transaction ID: {transactionId || 'N/A'}</p>
+        </div>
+
+        {/* Total Fare Summary Section */}
+        <div className="ticket-fare-summary">
+          <div className="fare-summary-card">
+            <div className="fare-summary-item">
+              <span className="fare-label">Number of Passengers:</span>
+              <span className="fare-value">{allPassengers.length}</span>
+            </div>
+            <div className="fare-summary-item">
+              <span className="fare-label">Total Fare:</span>
+              <span className="fare-value fare-amount">{totalFareDisplay}</span>
+            </div>
+          </div>
         </div>
 
         <div className="ticket-summary-container">

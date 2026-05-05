@@ -13,19 +13,24 @@ const Payment = () => {
   const selectedFare = location.state?.selectedFare || {};
   const passengers = location.state?.passengers || {};
   const contactDetails = location.state?.contactDetails || {};
+  const selectedSeats = location.state?.selectedSeats || [];
+  const totalFareFromSeats = location.state?.totalFare || 0;
 
-  // Payment method state
+  // Payment form state
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [cardType, setCardType] = useState('');
   const [showCardForm, setShowCardForm] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+
+  // Determine the total fare to use (prefer from seat selection, fallback to fare)
+  const displayTotalFare = totalFareFromSeats || selectedFare.totalFare || selectedFare.price || '0';
 
   // Payment form state
   const [formData, setFormData] = useState({
     cardNumber: '',
     expiryDate: '',
     cvv: '',
-    amount: selectedFare.price || '0',
+    amount: displayTotalFare,
   });
 
   const [errors, setErrors] = useState({});
@@ -55,7 +60,7 @@ const Payment = () => {
   useEffect(() => {
     if (showQRCode && qrCanvasRef.current) {
       const qrValue = JSON.stringify({
-        amount: selectedFare.price || '0',
+        amount: displayTotalFare,
         transactionId: Date.now(),
         merchant: 'BlueWing Airlines',
       });
@@ -65,7 +70,7 @@ const Payment = () => {
         }
       });
     }
-  }, [showQRCode, selectedFare.price]);
+  }, [showQRCode, displayTotalFare]);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
@@ -93,7 +98,7 @@ const Payment = () => {
       cardNumber: '',
       expiryDate: '',
       cvv: '',
-      amount: selectedFare.price || '0',
+      amount: displayTotalFare,
     });
   };
 
@@ -351,7 +356,7 @@ const Payment = () => {
                       cardNumber: '',
                       expiryDate: '',
                       cvv: '',
-                      amount: selectedFare.price || '0',
+                      amount: selectedFare.totalFare || selectedFare.price || '0',
                     });
                     setErrors({});
                   }}
@@ -543,9 +548,20 @@ const Payment = () => {
                       <p><strong>Check-in:</strong> {selectedFare.checkinBaggage || '15 KG'} | Hand bag: Up to 7KG</p>
                     </div>
 
+                    {/* Selected Seats Section */}
+                    {selectedSeats && selectedSeats.length > 0 && (
+                      <div className="selected-seats-section">
+                        <h4 className="summary-section-title">Selected Seats</h4>
+                        <div className="seats-display">
+                          <p className="seats-list">{selectedSeats.join(', ')}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Total Fare Section */}
                     <div className="total-fare-section">
                       <p className="total-fare-label">TOTAL FARE</p>
-                      <p className="total-fare-amount">{selectedFare.price || '₹ --'}</p>
+                      <p className="total-fare-amount">₹{typeof displayTotalFare === 'number' ? displayTotalFare.toLocaleString('en-IN') : displayTotalFare}</p>
                     </div>
                   </div>
                 </div>

@@ -38,8 +38,14 @@ export default function FlightCard({ flight, selectedCabinClass = "economy", onF
         "first-class": "First Class",
     };
 
-    const travelClass = travelClassLabelMap[selectedCabinClass] || selectedFlight.class || selectedFlight.travelClass || "Economy";
-    const price = priceMapByClass[selectedCabinClass] || selectedFlight.price || selectedFlight.amount || "N/A";
+    const priceData = useMemo(() => {
+        const travelClass = travelClassLabelMap[selectedCabinClass] || selectedFlight.class || selectedFlight.travelClass || "Economy";
+        const priceValue = priceMapByClass[selectedCabinClass] || selectedFlight.price || selectedFlight.amount || "N/A";
+        return { travelClass, price: priceValue };
+    }, [selectedCabinClass, selectedFlight]);
+
+    const travelClass = priceData.travelClass;
+    const price = priceData.price;
     const priceLabel = selectedFlight.priceLabel || "Lowest Price";
 
     const fareTypes = useMemo(() => {
@@ -71,6 +77,7 @@ export default function FlightCard({ flight, selectedCabinClass = "economy", onF
             fareTypeId: selectedFareType.id,
             fareTypeTitle: selectedFareType.title,
             price: formatPrice(selectedFareType.price || "N/A"),
+            rawPrice: selectedFareType.price || 0,
             travelClass,
         };
 

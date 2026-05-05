@@ -37,10 +37,23 @@ export default function SeatSelectionPage() {
   const navigate = useNavigate();
 
   const handleContinueToPayment = (seatSummary) => {
+    // Extract selected seats and calculate total fare
+    const selectedSeats = seatSummary.seats || [];
+    const totalFare = seatSummary.totalPrice || 0;
+    
+    // Get existing fare information
+    const selectedFare = location.state?.selectedFare || {};
+    
     navigate('/payment', {
       state: {
         ...location.state,
         seatSummary,
+        selectedSeats, // Pass selected seats explicitly
+        totalFare, // Pass total fare explicitly (calculated from seat selection)
+        selectedFare: {
+          ...selectedFare,
+          totalFare, // Ensure selectedFare has the totalFare
+        }
       }
     });
   };

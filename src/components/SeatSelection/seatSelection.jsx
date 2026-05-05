@@ -122,7 +122,6 @@ const buildCabinOptions = (flight) => {
     return {
       id: cabinClass,
       label: cabinClassLabels[cabinClass],
-      price: formatCurrency(getSeatPrice(flight, cabinClass)),
       availableSeats: Math.max(counts.total - counts.booked, 0),
       totalSeats: counts.total,
     };
@@ -135,11 +134,13 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
   const cabinOptions = useMemo(() => buildCabinOptions(resolvedFlight), [resolvedFlight]);
   const passengerSummary = useMemo(() => getPassengerSummary(selectionContext), [selectionContext]);
 
-  const lockedCabinClass = selectionContext.fareTypeId
-    ? normalizeCabinClass(selectionContext.fareTypeId)
-    : selectionContext.travelClass
-      ? normalizeCabinClass(selectionContext.travelClass)
-      : null;
+  const lockedCabinClass = selectionContext.journey?.cabinClass
+    ? normalizeCabinClass(selectionContext.journey.cabinClass)
+    : selectionContext.fareTypeId
+      ? normalizeCabinClass(selectionContext.fareTypeId)
+      : selectionContext.travelClass
+        ? normalizeCabinClass(selectionContext.travelClass)
+        : null;
 
   const initialCabinClass = cabinOptions.some((option) => option.id === lockedCabinClass)
     ? lockedCabinClass
@@ -164,7 +165,11 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
     return count;
   }, [seatMatrix]);
 
-  const seatPrice = getSeatPrice(resolvedFlight, selectedCabinClass);
+  const seatPrice = selectionContext.selectedFare?.rawPrice 
+    ? Number(selectionContext.selectedFare.rawPrice)
+    : selectionContext.price 
+    ? Number(String(selectionContext.price).replace(/[^\d.]/g, ''))
+    : getSeatPrice(resolvedFlight, selectedCabinClass);
   const selectedTotal = selectedSeats.length * seatPrice;
   const isSelectionComplete = selectedSeats.length === passengerCount;
   const selectedFareLabel = selectionContext.fareTypeTitle || cabinClassLabels[selectedCabinClass];
@@ -291,7 +296,6 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
                   disabled={Boolean(lockedCabinClass) && lockedCabinClass !== option.id}
                 >
                   <span>{option.label}</span>
-                  <strong>{option.price}</strong>
                   <small>{option.availableSeats} seats left</small>
                 </button>
               ))}

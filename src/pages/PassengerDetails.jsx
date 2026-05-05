@@ -61,6 +61,22 @@ const PassengerDetails = () => {
     return counts.join(', ');
   }, [adultCount, childCount, infantCount]);
 
+  // Calculate total passengers (adults + children, infants typically travel free)
+  const totalPassengers = useMemo(() => {
+    return adultCount + childCount;
+  }, [adultCount, childCount]);
+
+  // Calculate total fare = price per person × total passengers
+  const totalFare = useMemo(() => {
+    const pricePerPerson = selectedFare.rawPrice || 0;
+    const total = pricePerPerson * totalPassengers;
+    
+    if (typeof total === 'number') {
+      return `₹${total.toLocaleString('en-IN')}`;
+    }
+    return selectedFare.price || '₹ --';
+  }, [selectedFare, totalPassengers]);
+
   // Handle adult passenger data change
   const handleAdultDataChange = (index, field, value) => {
     const updated = [...adultPassengers];
@@ -127,7 +143,10 @@ const PassengerDetails = () => {
       navigate('/seat-selection', {
         state: {
           journey,
-          selectedFare,
+          selectedFare: {
+            ...selectedFare,
+            totalFare: selectedFare.rawPrice ? selectedFare.rawPrice * totalPassengers : 0,
+          },
           passengers: {
             adults: adultPassengers,
             children: childPassengers,
@@ -278,7 +297,7 @@ const PassengerDetails = () => {
                   {/* Total Fare */}
                   <div className="total-fare-section">
                     <p className="total-fare-label">TOTAL FARE</p>
-                    <p className="total-fare-amount">{selectedFare.price || '₹ --'}</p>
+                    <p className="total-fare-amount">{totalFare}</p>
                   </div>
                 </div>
               </div>
