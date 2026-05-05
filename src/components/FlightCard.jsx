@@ -125,8 +125,8 @@ export default function FlightCard({ flight, selectedCabinClass = "economy", onF
         <div className="flight-details">
             <div className="flight-nameTimingsInformation">
                 <div className="flight-name">
-                    <h3>{airlineName}</h3>
-                    <p>Flight Number: {flightNumber}</p>
+                    <h3>{flightNumber}</h3>
+                    <p>BlueWing Airlines</p>
                 </div>
 
                 <div className="flight-timings">
