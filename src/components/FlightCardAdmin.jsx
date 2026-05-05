@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import '../styles/FlightCardAdmin.css';
 
 const FlightCardAdmin = ({ flight, onEdit, onDelete }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Select a random background image
+  const backgroundImage = useMemo(() => {
+    const images = ['/BlueFlight.jpg', '/SkyBlueFlight.jpg', '/OrangeFlight.jpg'];
+    return images[Math.floor(Math.random() * images.length)];
+  }, []);
+
   const getAirportName = (code) => {
     const airports = {
       'DEL': 'Delhi',
@@ -19,15 +27,21 @@ const FlightCardAdmin = ({ flight, onEdit, onDelete }) => {
     return airports[code] || code;
   };
 
+  const routeFrom = flight.from || getAirportName(flight.departure) || 'N/A';
+  const routeTo = flight.to || getAirportName(flight.arrival) || 'N/A';
+
   return (
-    <div className="flight-card-admin">
-      <div className="flight-card-image">
-        <div className="flight-background">
-          ✈️
-        </div>
-      </div>
-      
-      <div className="flight-card-content">
+    <div 
+      className={`flight-card-admin ${isExpanded ? 'expanded' : ''}`}
+      onMouseEnter={() => setIsExpanded(true)}
+      onMouseLeave={() => setIsExpanded(false)}
+      style={{ backgroundImage: `url(${backgroundImage})` }}
+    >
+      {/* dark overlay layer (absolute) */}
+      <div className="flight-background-overlay" />
+
+      {/* content wrapper in normal flow so expanding pushes layout */}
+      <div className="flight-info-wrapper">
         <div className="flight-card-header">
           <div className="flight-plane-name">
             <h3>{flight.airline}</h3>
@@ -41,24 +55,25 @@ const FlightCardAdmin = ({ flight, onEdit, onDelete }) => {
 
         <div className="flight-route">
           <div className="route-part">
-            <span className="airport-code">{flight.departure}</span>
-            <p className="airport-name">{getAirportName(flight.departure)}</p>
+            <span className="airport-code">{routeFrom}</span>
+            <p className="airport-name">From</p>
           </div>
           <div className="route-arrow">
             <span>→</span>
           </div>
           <div className="route-part">
-            <span className="airport-code">{flight.arrival}</span>
-            <p className="airport-name">{getAirportName(flight.arrival)}</p>
+            <span className="airport-code">{routeTo}</span>
+            <p className="airport-name">To</p>
           </div>
         </div>
 
-        <div className="flight-actions">
+        {/* Actions Section - visible on hover with smooth expansion */}
+        <div className="flight-actions-container">
           <button className="btn-edit" onClick={() => onEdit(flight)}>
-            Edit
+            ✎ Edit
           </button>
           <button className="btn-delete" onClick={() => onDelete(flight.id)}>
-            Delete
+            🗑 Delete
           </button>
         </div>
       </div>

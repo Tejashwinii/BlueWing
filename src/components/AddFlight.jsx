@@ -1,16 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getDuration, airports, calculateArrivalTime } from '../data/flightdetails';
 import '../styles/AddFlight.css';
 
-const AddFlight = ({ onAdd, onCancel }) => {
+const getEmptyFormData = () => ({
+  airline: '',
+  flightNumber: '',
+  from: '',
+  to: '',
+  departureTime: '',
+  arrivalTime: '',
+});
+
+const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => {
   const [formData, setFormData] = useState({
-    airline: '',
-    flightNumber: '',
-    departure: '',
-    arrival: '',
-    departureTime: '',
-    arrivalTime: '',
+    ...getEmptyFormData(),
   });
+
+  useEffect(() => {
+    if (initialFlight) {
+      setFormData({
+        airline: initialFlight.airline || '',
+        flightNumber: initialFlight.flightNumber || '',
+        from: initialFlight.from || initialFlight.departure || '',
+        to: initialFlight.to || initialFlight.arrival || '',
+        departureTime: initialFlight.departureTime || '',
+        arrivalTime: initialFlight.arrivalTime || '',
+      });
+    } else {
+      setFormData(getEmptyFormData());
+    }
+  }, [initialFlight]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,7 +39,7 @@ const AddFlight = ({ onAdd, onCancel }) => {
     }));
 
     // Auto-calculate arrival time when departure time or route changes
-    if (name === 'departureTime' || name === 'departure' || name === 'arrival') {
+    if (name === 'departureTime' || name === 'from' || name === 'to') {
       updateArrivalTime({
         ...formData,
         [name]: value
@@ -29,8 +48,8 @@ const AddFlight = ({ onAdd, onCancel }) => {
   };
 
   const updateArrivalTime = (data) => {
-    if (data.departure && data.arrival && data.departureTime) {
-      const duration = getDuration(data.departure, data.arrival);
+    if (data.from && data.to && data.departureTime) {
+      const duration = getDuration(data.from, data.to);
       if (duration) {
         const arrival = calculateArrivalTime(data.departureTime, duration);
         setFormData(prev => ({
@@ -44,22 +63,22 @@ const AddFlight = ({ onAdd, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.airline || !formData.flightNumber || !formData.departure || 
-        !formData.arrival || !formData.departureTime) {
+    if (!formData.airline || !formData.flightNumber || !formData.from || 
+        !formData.to || !formData.departureTime) {
       alert('Please fill all required fields');
       return;
     }
 
-    onAdd({
+    onSave({
       ...formData,
-      id: Date.now(),
+      id: initialFlight?.id || Date.now(),
     });
   };
 
   return (
     <div className="add-flight-modal">
       <div className="modal-content">
-        <h2>Add New Flight</h2>
+        <h2>{mode === 'edit' ? 'Edit Flight' : 'Add New Flight'}</h2>
         
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -92,8 +111,8 @@ const AddFlight = ({ onAdd, onCancel }) => {
             <div className="form-group">
               <label>From *</label>
               <select
-                name="departure"
-                value={formData.departure}
+                name="from"
+                value={formData.from}
                 onChange={handleInputChange}
                 required
               >
@@ -109,8 +128,8 @@ const AddFlight = ({ onAdd, onCancel }) => {
             <div className="form-group">
               <label>To *</label>
               <select
-                name="arrival"
-                value={formData.arrival}
+                name="to"
+                value={formData.to}
                 onChange={handleInputChange}
                 required
               >
@@ -152,7 +171,7 @@ const AddFlight = ({ onAdd, onCancel }) => {
               Cancel
             </button>
             <button type="submit" className="btn-submit">
-              Add Flight
+              {mode === 'edit' ? 'Update Flight' : 'Add Flight'}
             </button>
           </div>
         </form>
