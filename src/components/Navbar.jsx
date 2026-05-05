@@ -165,25 +165,27 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
         {/* Right Actions - Hidden in minimalMode */}
         {!minimalMode && (
           <div className="navbar-right">
-            {user && user.role === 'admin' ? (
+            {user ? (
               <div className="profile-section">
                 <button 
                   className="profile-icon-btn"
                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                 >
-                  👤 {user.name}
+                  👤 Hello, {user.firstName}!
                 </button>
                 {showProfileDropdown && (
                   <div className="profile-dropdown">
-                    <button 
-                      className="dropdown-item"
-                      onClick={() => {
-                        navigate('/admin-dashboard');
-                        setShowProfileDropdown(false);
-                      }}
-                    >
-                      Dashboard
-                    </button>
+                    {user.role === 'admin' && (
+                      <button 
+                        className="dropdown-item"
+                        onClick={() => {
+                          navigate('/admin-dashboard');
+                          setShowProfileDropdown(false);
+                        }}
+                      >
+                        Dashboard
+                      </button>
+                    )}
                     <button 
                       className="dropdown-item"
                       onClick={() => {
@@ -209,7 +211,7 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
             ) : (
               !hideLogin && (
                 <Link to="/login" className="nav-btn">
-                  LOG IN
+                  LOG IN / REGISTER
                 </Link>
               )
             )}

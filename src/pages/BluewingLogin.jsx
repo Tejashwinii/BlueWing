@@ -17,8 +17,18 @@ function BlueWingLogin() {
 
     // Admin credentials check
     if (email === 'admin@gmail.com' && password === 'admin@BlueWing') {
-      login({ email, name: 'Admin', role: 'admin' });
+      login({ email, firstName: 'Admin', role: 'admin' });
       navigate('/admin-dashboard');
+      return;
+    }
+
+    // Check registered users in localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (user) {
+      login({ email, firstName: user.firstName, role: 'user' });
+      navigate('/');
     } else {
       setError('Invalid email or password');
     }
