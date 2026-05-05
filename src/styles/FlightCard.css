@@ -54,7 +54,7 @@
 
 .flight-name h3 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.35rem;
   font-weight: 400;
   letter-spacing: 0.2px;
 }
@@ -94,8 +94,9 @@
 .flight-arrivalTime {
   margin: 0;
   color: #10233f;
-  font-size: 1.7rem;
-  font-weight: 800;
+  font-size: 1.4rem;
+  font-family: "Manrope", sans-serif;
+  font-weight: 600;
   line-height: 1.05;
 }
 
@@ -160,8 +161,9 @@
 
 .flight-priceAmount {
   margin: 0;
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 1.5rem;
+  font-family: "Manrope", sans-serif;
+  font-weight: 600;
   line-height: 1.1;
 }
 
@@ -200,8 +202,8 @@
 .flight-fareTypes {
   margin-top: 24px;
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: minmax(220px, 240px) minmax(0, 1fr);
+  gap: 18px;
   padding: 16px;
   border-radius: 22px;
   background: #f9fbff;
@@ -280,8 +282,8 @@
 
 .flight-fareTypeCards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
   align-items: stretch;
   min-width: 0;
 }
