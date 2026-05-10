@@ -1,7 +1,7 @@
 .ticket-summary-page {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
   min-height: 100vh;
-  padding: 40px 20px;
+  padding: 100px 20px 40px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -35,17 +35,18 @@
 
 .ticket-summary-header h1 {
   font-size: 42px;
-  color: #1565c0;
+  color: #001a4d;
   margin: 0 0 10px 0;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 .transaction-id {
   font-size: 14px;
-  color: #555;
+  color: #666;
   margin: 0;
   letter-spacing: 0.3px;
+  font-weight: 500;
 }
 
 /* Fare Summary Section */
@@ -57,14 +58,15 @@
 
 .fare-summary-card {
   background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(0, 26, 77, 0.12);
   display: flex;
   justify-content: space-around;
   align-items: center;
   flex-wrap: wrap;
   gap: 40px;
+  border: 1px solid rgba(0, 102, 255, 0.1);
 }
 
 .fare-summary-item {
@@ -75,22 +77,23 @@
 }
 
 .fare-label {
-  font-size: 14px;
+  font-size: 13px;
   color: #666;
-  font-weight: 500;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .fare-value {
   font-size: 28px;
-  color: #1565c0;
-  font-weight: 700;
+  color: #0066ff;
+  font-weight: 800;
 }
 
 .fare-amount {
   font-size: 32px;
-  color: #2e7d32;
+  color: #00a86b;
+  font-weight: 800;
 }
 
 .ticket-summary-container {
@@ -101,15 +104,16 @@
 .tickets-list {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 28px;
 }
 
 .no-tickets {
   background: white;
   padding: 60px 40px;
-  border-radius: 12px;
+  border-radius: 16px;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 26, 77, 0.12);
+  border: 1px solid rgba(0, 102, 255, 0.1);
 }
 
 .no-tickets p {
@@ -120,12 +124,13 @@
 
 .ticket-summary-footer {
   background: white;
-  border-radius: 12px;
-  padding: 30px;
+  border-radius: 16px;
+  padding: 32px;
   margin: 0 auto 40px;
   max-width: 1200px;
-  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 26, 77, 0.12);
   animation: fadeInUp 0.6s ease-out 0.2s both;
+  border: 1px solid rgba(0, 102, 255, 0.1);
 }
 
 @keyframes fadeInUp {
@@ -142,8 +147,9 @@
 .footer-content h3 {
   margin: 0 0 20px 0;
   font-size: 18px;
-  color: #1565c0;
-  font-weight: 700;
+  color: #001a4d;
+  font-weight: 800;
+  letter-spacing: -0.3px;
 }
 
 .trip-info {

@@ -10,6 +10,7 @@ import AdminDashboard from "../pages/AdminDashboard";
 import Payment from "../pages/Payment";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import TicketSummary from "../pages/TicketSummary";
+import Help from "../pages/Help";
 // import Confirmation from "../pages/Confirmation";
 
 function AppRoutes() {
@@ -26,6 +27,7 @@ function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/registration" element={<RegistrationPage />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/help" element={<Help />} />
       <Route path="*" element={<Navigate to="/" replace />} />
       {/* <Route path="/confirmation" element={<Confirmation />} /> */}
     </Routes>

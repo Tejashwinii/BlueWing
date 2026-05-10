@@ -13,12 +13,18 @@
 
 .flight-card {
   font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
-  border: 1px solid var(--bw-border);
-  border-radius: 20px;
-  box-shadow: 0 10px 28px rgba(16, 35, 63, 0.07);
+  background: white;
+  border: 1px solid #e0e8f5;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 26, 77, 0.08);
   padding: 20px;
   color: var(--bw-text);
+  transition: all 0.3s ease;
+}
+
+.flight-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 26, 77, 0.12);
+  border-color: rgba(0, 102, 255, 0.2);
 }
 
 .flight-card h2 {
@@ -68,9 +74,9 @@
 
 .flight-timings {
   display: grid;
-  grid-template-columns: minmax(160px, 1fr) minmax(180px, 220px) minmax(160px, 1fr);
+  grid-template-columns: minmax(120px, 1fr) 1fr minmax(120px, 1fr);
   align-items: center;
-  gap: 18px;
+  gap: 16px;
 }
 
 .flight-departure,
@@ -105,14 +111,21 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 8px 4px;
+  gap: 12px;
+  padding: 12px 8px;
+  position: relative;
+}
+
+.flight-duration::before {
+  content: '✈️';
+  font-size: 24px;
+  opacity: 0.8;
 }
 
 .flight-durationTop,
 .flight-durationBottom {
   margin: 0;
-  font-size: 0.84rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #5f7390;
 }
@@ -124,14 +137,27 @@
 
 .flight-durationLine {
   width: 100%;
-  max-width: 170px;
-  height: 2px;
+  max-width: 140px;
+  height: 3px;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(26, 115, 232, 0.12) 0%, rgba(26, 115, 232, 0.7) 50%, rgba(26, 115, 232, 0.12) 100%);
+  background: linear-gradient(90deg, #0066ff 0%, #00d4ff 50%, #0066ff 100%);
+  position: relative;
+}
+
+.flight-durationLine::after {
+  content: '→';
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  font-weight: 700;
+  color: #00d4ff;
 }
 
 .flight-durationBottom {
-  color: #2a79e6;
+  color: #0066ff;
+  font-size: 0.85rem;
 }
 
 .flight-price {
@@ -185,18 +211,22 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  border: 1px solid var(--bw-border);
+  border: 2px solid #0066ff;
   border-radius: 12px;
-  background: #fff;
-  color: var(--bw-accent);
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.05), rgba(0, 212, 255, 0.05));
+  color: #0066ff;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: all 0.3s ease;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .flight-dropdownLabel:hover {
-  transform: translateY(-1px);
-  border-color: rgba(26, 115, 232, 0.35);
-  box-shadow: 0 8px 18px rgba(26, 115, 232, 0.12);
+  transform: translateY(-2px);
+  border-color: #00d4ff;
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.1), rgba(0, 212, 255, 0.1));
+  box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2);
+  color: #00d4ff;
 }
 
 .flight-fareTypes {

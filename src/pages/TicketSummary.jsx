@@ -17,10 +17,20 @@ const TicketSummary = () => {
   // Safely handle passengers data
   let allPassengers = [];
   if (Array.isArray(passengers.adults)) {
-    allPassengers = [...allPassengers, ...passengers.adults];
+    allPassengers = [...allPassengers, ...passengers.adults.map((p, i) => ({
+      ...p,
+      name: `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Passenger',
+      type: 'adult',
+      passengerNumber: i + 1,
+    }))];
   }
   if (Array.isArray(passengers.children)) {
-    allPassengers = [...allPassengers, ...passengers.children];
+    allPassengers = [...allPassengers, ...passengers.children.map((p, i) => ({
+      ...p,
+      name: `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Passenger',
+      type: 'child',
+      passengerNumber: allPassengers.length + i + 1,
+    }))];
   }
   
   // If no passengers found, create a dummy passenger for demo purposes

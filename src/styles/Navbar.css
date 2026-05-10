@@ -1,14 +1,18 @@
-/* Navbar Styles - Emirates Style */
+/* ============================================
+   MODERN AIRLINE NAVBAR - BlueWing
+   ============================================ */
 
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background: #333;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+  background: linear-gradient(135deg, #001a4d 0%, #003d99 100%);
+  box-shadow: 0 4px 20px rgba(0, 26, 77, 0.25);
   height: 70px;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .navbar-container {
@@ -16,34 +20,59 @@
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  padding: 0 20px;
+  padding: 0 40px;
   max-width: 1600px;
   margin: 0 auto;
+  width: 100%;
 }
 
-.navbar-logo {
-  font-size: 20px;
-  font-weight: 800;
-  color: white;
-  letter-spacing: 2px;
-  flex-shrink: 0;
-}
+/* ============================================
+   BRAND SECTION
+   ============================================ */
 
-.logo-text {
+.navbar-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 20px;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+  transform: translateY(-2px);
+}
+
+.brand-logo {
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand:hover .brand-logo {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.brand-text {
+  font-size: 22px;
   font-weight: 800;
   color: white;
   letter-spacing: 2px;
-  text-decoration: none;
-  cursor: pointer;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.logo-text:hover {
-  opacity: 0.95;
-}
+/* ============================================
+   MENU SECTION
+   ============================================ */
 
 .navbar-menu {
   display: flex;
@@ -59,157 +88,234 @@
   height: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
 .menu-item-btn {
   background: transparent;
   border: none;
-  color: white;
-  padding: 0 16px;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0 20px;
   font-size: 12px;
   font-weight: 700;
+  letter-spacing: 1px;
   cursor: pointer;
   display: flex;
   align-items: center;
   height: 100%;
-  transition: background-color 0.3s ease;
-  letter-spacing: 0.5px;
+  position: relative;
   white-space: nowrap;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
 }
 
 .menu-item-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
-.menu-panel {
+.menu-item-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #00d4ff, #0099ff);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.menu-item-btn:hover::after {
+  transform: scaleX(1);
+}
+
+.menu-item-wrapper:hover .menu-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* ============================================
+   DROPDOWN MENU
+   ============================================ */
+
+.menu-dropdown {
   position: absolute;
   top: 100%;
-  left: -150px;
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  z-index: 1001;
-  min-height: auto;
-  max-height: 500px;
-  padding: 15px 20px;
-  display: grid;
-  grid-template-columns: 1fr;
-  width: 350px;
-  border-radius: 4px;
-  overflow-y: auto;
-}
-
-.panel-header {
-  display: none;
-}
-
-.panel-header h3 {
-  font-size: 14px;
-  color: #c41e3a;
-  margin: 0 0 10px;
-  font-weight: 700;
-}
-
-.close-panel {
-  font-size: 24px;
-  color: #999;
-  cursor: pointer;
-  border: none;
-  background: none;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 26, 77, 0.25);
+  min-width: 400px;
   padding: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1001;
+  margin-top: 8px;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.panel-content {
+.dropdown-content {
   display: flex;
   flex-direction: column;
   gap: 0;
+  padding: 16px 0;
 }
 
-.panel-section {
+.dropdown-item {
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
 }
 
-.section-heading {
-  font-size: 11px;
-  font-weight: 700;
-  color: #666;
-  margin: 10px 0 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 6px;
+.dropdown-item:hover {
+  background: linear-gradient(90deg, rgba(0, 99, 255, 0.08), rgba(0, 212, 255, 0.08));
+  padding-left: 24px;
 }
 
-.section-items {
+.item-icon {
+  font-size: 24px;
+  min-width: 30px;
   display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.panel-item {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 6px 5px;
-  text-decoration: none;
-  color: #333;
-  font-size: 11px;
-  border-bottom: none;
-  transition: all 0.3s ease;
+  justify-content: center;
+  transition: transform 0.3s ease;
 }
 
-.panel-item:last-child {
-  border-bottom: none;
+.dropdown-item:hover .item-icon {
+  transform: scale(1.1);
 }
 
-.panel-item:hover {
-  color: #c41e3a;
-  padding-left: 5px;
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .item-title {
-  flex: 1;
-}
-
-.item-arrow {
-  color: #c41e3a;
   font-size: 14px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  font-weight: 600;
+  color: #001a4d;
+  transition: color 0.2s ease;
 }
 
-.panel-item:hover .item-arrow {
-  opacity: 1;
+.dropdown-item:hover .item-title {
+  color: #0066ff;
 }
+
+.item-description {
+  font-size: 12px;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.dropdown-item:hover .item-description {
+  color: #0066ff;
+}
+
+/* ============================================
+   REVIEWS DROPDOWN STYLING
+   ============================================ */
+
+.reviews-dropdown {
+  min-width: 500px;
+}
+
+.review-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px !important;
+  padding: 18px 24px !important;
+  background: #f9f9f9;
+  margin: 8px 12px;
+  border-radius: 12px;
+  border-left: 4px solid #0066ff;
+  transition: all 0.3s ease;
+}
+
+.review-item:hover {
+  background: #fff !important;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.15);
+  padding-left: 28px !important;
+}
+
+.review-stars {
+  display: flex;
+  gap: 4px;
+}
+
+.star {
+  font-size: 16px;
+  color: #ffc107;
+}
+
+.review-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.review-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #001a4d;
+  margin: 0;
+}
+
+.review-text {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ============================================
+   RIGHT SECTION - LOGIN/PROFILE
+   ============================================ */
 
 .navbar-right {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
   flex-shrink: 0;
 }
 
-.nav-btn {
-  background: transparent;
-  border: none;
+.nav-login-btn {
+  background: linear-gradient(135deg, #00d4ff, #0099ff);
   color: white;
-  padding: 6px 12px;
-  cursor: pointer;
+  padding: 10px 24px;
+  border-radius: 25px;
+  text-decoration: none;
   font-size: 12px;
-  font-weight: 500;
-  transition: background-color 0.3s ease;
-  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+  white-space: nowrap;
 }
 
-.nav-btn:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+.nav-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+  background: linear-gradient(135deg, #0099ff, #0066ff);
 }
 
-.search-btn {
-  font-size: 16px;
-  padding: 6px 10px;
-}
+/* ============================================
+   PROFILE SECTION
+   ============================================ */
 
 .profile-section {
   position: relative;
@@ -217,87 +323,173 @@
   align-items: center;
 }
 
-.profile-icon-btn {
-  background: linear-gradient(135deg, #0066cc, #0052a3);
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   padding: 8px 16px;
-  border-radius: 20px;
+  border-radius: 25px;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 600;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
-.profile-icon-btn:hover {
-  background: linear-gradient(135deg, #0052a3, #003d7a);
-  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+.profile-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.profile-icon {
+  font-size: 16px;
+}
+
+.profile-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .profile-dropdown {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   right: 0;
   background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 180px;
-  margin-top: 8px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 26, 77, 0.2);
+  min-width: 200px;
   overflow: hidden;
+  z-index: 1002;
+  border: 1px solid rgba(0, 26, 77, 0.1);
 }
 
-.dropdown-item {
+.dropdown-option {
   display: block;
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 16px;
   border: none;
   background: white;
   text-align: left;
   cursor: pointer;
   font-size: 14px;
   color: #333;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
-.dropdown-item:hover {
-  background: #f0f0f0;
+.dropdown-option:hover {
+  background: linear-gradient(90deg, rgba(0, 99, 255, 0.08), rgba(0, 212, 255, 0.08));
+  color: #0066ff;
+  padding-left: 20px;
 }
 
-.dropdown-item.logout {
+.dropdown-option.logout {
   color: #d9534f;
   border-top: 1px solid #eee;
+  font-weight: 600;
 }
 
-.dropdown-item.logout:hover {
-  background: #fff3f3;
+.dropdown-option.logout:hover {
+  background: rgba(217, 83, 79, 0.08);
+  color: #c9302c;
 }
 
-@media (max-width: 1024px) {
-  .navbar-menu {
-    gap: 5px;
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1200px) {
+  .navbar-container {
+    padding: 0 30px;
   }
 
   .menu-item-btn {
-    padding: 0 12px;
+    padding: 0 16px;
     font-size: 11px;
   }
 
-  .menu-panel {
-    padding: 20px 30px;
+  .menu-dropdown {
+    min-width: 350px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .navbar-container {
+    padding: 0 20px;
   }
 
-  .panel-content {
-    gap: 30px;
+  .menu-item-btn {
+    padding: 0 14px;
+    font-size: 11px;
+  }
+
+  .menu-dropdown {
+    min-width: 320px;
+  }
+
+  .brand-text {
+    font-size: 20px;
   }
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    height: 60px;
+  }
+
+  .navbar-container {
+    padding: 0 16px;
+  }
+
   .navbar-menu {
     display: none;
   }
-  
+
+  .brand-text {
+    font-size: 18px;
+  }
+
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+
+  .nav-login-btn {
+    padding: 8px 16px;
+    font-size: 11px;
+  }
+
+  .profile-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
   .navbar-container {
-    padding: 0 15px;
+    padding: 0 12px;
+  }
+
+  .brand-text {
+    display: none;
+  }
+
+  .brand-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .profile-text {
+    display: none;
+  }
+
+  .profile-dropdown {
+    right: -10px;
   }
 }

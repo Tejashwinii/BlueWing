@@ -4,6 +4,8 @@
   margin: 0 auto;
   padding: 24px 20px 40px;
   padding-top: 94px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  min-height: 100vh;
 }
 
 .flight-selection-topBar {
@@ -11,39 +13,39 @@
   align-items: center;
   gap: 24px;
   margin-bottom: 28px;
-  padding: 24px 28px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #e3f2fd 0%, #f5f9ff 50%, #ffffff 100%);
-  border: 1px solid #bbdefb;
-  box-shadow: 0 4px 12px rgba(25, 103, 210, 0.12);
+  padding: 16px 28px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #001a4d 0%, #003d99 100%);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 26, 77, 0.2);
 }
 
 .flight-selection-backButton {
-  background: none;
-  border: none;
-  color: #0066cc;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .flight-selection-backButton:hover {
-  background-color: rgba(0, 102, 204, 0.12);
-  color: #0052a3;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .flight-selection-backButton:active {
-  background-color: rgba(0, 102, 204, 0.18);
-  color: #003d7a;
+  background-color: rgba(255, 255, 255, 0.35);
 }
 
 .flight-selection-header {
@@ -55,30 +57,38 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 4px;
 }
 
 .flight-selection-header h1 {
-  margin: 0 0 16px 0;
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #0a1f3a;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
   letter-spacing: -0.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .flight-selection-header p {
   margin: 0;
-  color: #1976d2;
-  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.15rem;
   font-weight: 600;
-  line-height: 1.8;
+  line-height: 1.4;
   letter-spacing: 0.3px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 20px;
   flex-wrap: wrap;
   width: 100%;
   text-align: center;
+}
+
+.flight-selection-header p span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .flight-selection-area {

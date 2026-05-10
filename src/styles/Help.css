@@ -1,10 +1,11 @@
-/* Help Page Styles */
+/* Help Page Styles - Modern Professional */
 
 .help-page {
   width: 100%;
   overflow-x: hidden;
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
   padding-top: 70px;
+  min-height: 100vh;
 }
 
 .container {
@@ -15,9 +16,9 @@
 
 /* Header Section */
 .help-header {
-  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #0c4a6e 100%);
+  background: linear-gradient(135deg, #001a4d 0%, #003d99 50%, #0066ff 100%);
   color: white;
-  padding: 80px 20px;
+  padding: 100px 20px;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -30,34 +31,55 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1), transparent),
-              radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1), transparent);
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.15), transparent),
+    radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.1), transparent);
   pointer-events: none;
+  animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
 }
 
 .help-header-content {
   position: relative;
   z-index: 1;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .help-title {
   font-size: 48px;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 12px;
   letter-spacing: -1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .help-subtitle {
   font-size: 18px;
-  font-weight: 300;
+  font-weight: 400;
   margin-bottom: 0;
   opacity: 0.95;
+  letter-spacing: 0.3px;
 }
 
 /* Quick Help Section */
 .quick-help-section {
   padding: 80px 20px;
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
 }
 
 .section-title {
@@ -65,43 +87,50 @@
   font-weight: 700;
   text-align: center;
   margin-bottom: 50px;
-  color: #1e3a8a;
+  color: #001a4d;
   letter-spacing: -0.5px;
 }
 
 .quick-help-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
 }
 
 .quick-help-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 40px 30px;
   text-align: center;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  border: 1px solid rgba(30, 58, 138, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 26, 77, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 102, 255, 0.1);
 }
 
 .quick-help-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(30, 58, 138, 0.15);
-  border-color: rgba(30, 58, 138, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 26, 77, 0.15);
+  border-color: rgba(0, 102, 255, 0.2);
+  background: linear-gradient(135deg, #ffffff 0%, rgba(0, 102, 255, 0.02) 100%);
 }
 
 .card-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 56px;
+  margin-bottom: 18px;
   display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.quick-help-card:hover .card-icon {
+  transform: scale(1.1);
 }
 
 .card-title {
   font-size: 20px;
-  font-weight: 600;
-  color: #1e3a8a;
+  font-weight: 700;
+  color: #001a4d;
   margin-bottom: 12px;
+  letter-spacing: -0.3px;
 }
 
 .card-description {
@@ -112,19 +141,20 @@
 }
 
 .card-link {
-  color: #0c4a6e;
+  color: #0066ff;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
   transition: all 0.3s ease;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
+  letter-spacing: 0.5px;
 }
 
 .card-link:hover {
-  color: #1e3a8a;
+  color: #00d4ff;
   transform: translateX(4px);
   display: inline-block;
 }
@@ -136,25 +166,31 @@
 }
 
 .faq-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .faq-item {
   margin-bottom: 16px;
-  border: 1px solid rgba(30, 58, 138, 0.1);
-  border-radius: 8px;
+  border: 1px solid #e0e8f5;
+  border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
+  background: white;
 }
 
 .faq-item:hover {
-  box-shadow: 0 4px 16px rgba(30, 58, 138, 0.1);
-  border-color: rgba(30, 58, 138, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 26, 77, 0.12);
+  border-color: rgba(0, 102, 255, 0.2);
+}
+
+.faq-item.expanded {
+  box-shadow: 0 8px 24px rgba(0, 102, 255, 0.15);
+  border-color: rgba(0, 102, 255, 0.3);
 }
 
 .faq-question {
-  background: #f8f9fa;
+  background: linear-gradient(90deg, #ffffff 0%, rgba(0, 102, 255, 0.02) 100%);
   padding: 24px;
   cursor: pointer;
   display: flex;
@@ -165,20 +201,22 @@
 }
 
 .faq-question:hover {
-  background: #f0f4f8;
+  background: linear-gradient(90deg, #ffffff 0%, rgba(0, 102, 255, 0.05) 100%);
 }
 
 .faq-question h3 {
   font-size: 16px;
-  font-weight: 600;
-  color: #1e3a8a;
+  font-weight: 700;
+  color: #001a4d;
   margin: 0;
   flex: 1;
+  text-align: left;
+  letter-spacing: -0.3px;
 }
 
 .faq-toggle {
-  font-size: 12px;
-  color: #0c4a6e;
+  font-size: 24px;
+  color: #0066ff;
   transition: transform 0.3s ease;
   margin-left: 16px;
   flex-shrink: 0;
@@ -186,18 +224,33 @@
 
 .faq-toggle.open {
   transform: rotate(180deg);
+  color: #00d4ff;
 }
 
 .faq-answer {
   padding: 24px;
-  background: white;
-  border-top: 1px solid rgba(30, 58, 138, 0.1);
-  animation: slideDown 0.3s ease;
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.02), rgba(0, 212, 255, 0.02));
+  border-top: 1px solid rgba(0, 102, 255, 0.1);
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .faq-answer p {
   font-size: 15px;
   color: #666;
+  margin: 0;
+  line-height: 1.7;
+}
   line-height: 1.8;
   margin: 0;
 }
