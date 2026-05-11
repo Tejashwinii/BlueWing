@@ -28,7 +28,7 @@ body {
 .hero-section {
   margin-top: 70px;
   position: relative;
-  height: 500px;
+  height: 560px;
   overflow: visible;
   background: url('../assets/image.png') center/cover no-repeat;
   background-size: cover;
@@ -126,19 +126,7 @@ body {
   width: 90%;
   max-width: 1000px;
   z-index: 10;
-  top: 420px;
-  animation: slideUp 0.8s ease-out 0.2s backwards;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+  top: 390px;
 }
 
 .search-card {
@@ -399,7 +387,7 @@ body {
 
 
 .highlights-section {
-  margin-top: 80px;
+  margin-top: 220px;
   padding: 80px 20px;
   background: #f8f9fa;
   position: relative;
