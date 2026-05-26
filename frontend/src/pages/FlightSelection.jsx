@@ -2,8 +2,9 @@ import FlightCard from "../components/FlightCard";
 import Navbar from "../components/Navbar";
 import dummyFlightsData from "../data/dummyFlights";
 import "../styles/FlightSelection.css";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { flightAPI } from "../utils/api";
 
 export default function FlightSelection() {
     const navigate = useNavigate();
@@ -21,9 +22,10 @@ export default function FlightSelection() {
         navigate('/', { state: { searchForm } });
     };
 
-  const flights = Array.isArray(dummyFlightsData)
-    ? dummyFlightsData
-    : dummyFlightsData?.dummyFlights || [];
+  // State for flights from API
+  const [flights, setFlights] = useState([]);
+  const [apiLoading, setApiLoading] = useState(true);
+  const [apiError, setApiError] = useState(null);
 
     const normalizeCity = (value) => String(value || "").trim().toLowerCase();
 
@@ -57,6 +59,58 @@ export default function FlightSelection() {
         };
     }, [location.state, searchParams]);
 
+    // Fetch flights from API when search criteria changes
+    useEffect(() => {
+        const fetchFlights = async () => {
+            // Only fetch if we have departure and arrival
+            if (!searchCriteria.departure || !searchCriteria.arrival) {
+                setApiLoading(false);
+                // Fallback to dummy data if no search criteria
+                const fallbackFlights = Array.isArray(dummyFlightsData)
+                    ? dummyFlightsData
+                    : dummyFlightsData?.dummyFlights || [];
+                setFlights(fallbackFlights);
+                return;
+            }
+
+            try {
+                setApiLoading(true);
+                setApiError(null);
+                
+                const searchParams = {
+                    from: searchCriteria.departure,
+                    to: searchCriteria.arrival,
+                    departureDate: searchCriteria.date,
+                    cabinClass: searchCriteria.cabinClass,
+                };
+
+                const response = await flightAPI.searchFlights(searchParams);
+                
+                if (response.success && response.data) {
+                    setFlights(response.data);
+                } else {
+                    // Fallback to dummy data if API returns no data
+                    const fallbackFlights = Array.isArray(dummyFlightsData)
+                        ? dummyFlightsData
+                        : dummyFlightsData?.dummyFlights || [];
+                    setFlights(fallbackFlights);
+                }
+            } catch (error) {
+                console.error('Failed to fetch flights from API:', error);
+                setApiError('Failed to load flights. Showing cached results.');
+                // Fallback to dummy data on error
+                const fallbackFlights = Array.isArray(dummyFlightsData)
+                    ? dummyFlightsData
+                    : dummyFlightsData?.dummyFlights || [];
+                setFlights(fallbackFlights);
+            } finally {
+                setApiLoading(false);
+            }
+        };
+
+        fetchFlights();
+    }, [searchCriteria.departure, searchCriteria.arrival, searchCriteria.date]);
+
     const [draftStopFilter, setDraftStopFilter] = useState("any");
     const [appliedStopFilter, setAppliedStopFilter] = useState("any");
 
@@ -75,7 +129,17 @@ export default function FlightSelection() {
     const [selectedFarePayload, setSelectedFarePayload] = useState(null);
 
     const activeStopFilterCount = draftStopFilter === "any" ? 0 : 1;
+    
+    // When using API, flights are already filtered by route/date
+    // This useMemo provides fallback filtering for dummy data
     const matchingRouteFlights = useMemo(() => {
+        // If flights came from API (already filtered), return as-is
+        // Only apply manual filtering if using fallback dummy data
+        if (flights.length > 0 && !apiError) {
+            return flights;
+        }
+        
+        // Fallback filtering for dummy data
         return flights.filter((flight) => {
             const matchesDeparture =
                 !searchCriteria.departure || normalizeCity(flight.from) === normalizeCity(searchCriteria.departure);
@@ -85,7 +149,7 @@ export default function FlightSelection() {
 
             return matchesDeparture && matchesArrival && matchesDate;
         });
-    }, [flights, searchCriteria]);
+    }, [flights, searchCriteria, apiError]);
 
     const parseTimeToMinutes = (value) => {
         if (!value || typeof value !== "string") {
@@ -347,22 +411,36 @@ export default function FlightSelection() {
                 </aside>
 
                 <div className="flight-selection-list">
+                    {/* Loading state */}
+                    {apiLoading && (
+                        <div className="flight-selection-loading">
+                            <p>Loading flights...</p>
+                        </div>
+                    )}
+
+                    {/* Error message (non-blocking) */}
+                    {apiError && !apiLoading && (
+                        <div className="flight-selection-error">
+                            <p>{apiError}</p>
+                        </div>
+                    )}
+
                     {selectedFarePayload ? (
                         <div className="flight-selection-selectedMeta">
                             Selected: {selectedFarePayload.flightNumber} - {selectedFarePayload.fareTypeTitle} ({selectedFarePayload.price})
                         </div>
                     ) : null}
 
-                    {filteredFlights.map((flight) => (
+                    {!apiLoading && filteredFlights.map((flight) => (
                         <FlightCard
-                            key={flight.id}
+                            key={flight._id || flight.id || flight.flightNumber}
                             flight={flight}
                             selectedCabinClass={appliedCabinClass}
                             onFareSubmit={handleFareSubmit}
                         />
                     ))}
 
-                    {filteredFlights.length === 0 ? (
+                    {!apiLoading && filteredFlights.length === 0 ? (
                         <div className="flight-selection-emptyState">
                             No flights match the selected route. Try changing the search details or filters.
                         </div>

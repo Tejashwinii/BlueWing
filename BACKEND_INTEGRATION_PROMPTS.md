@@ -1,5 +1,24 @@
 # BlueWing Airlines - Backend Integration Prompts
 
+## Architecture Overview
+
+**Important:** This project uses **MongoDB Atlas for persistent data storage**. 
+
+**Data Flow Architecture:**
+- ✅ **Authentication**: User data stored in `users` collection
+- ✅ **Flights**: All flight data stored in `flights` collection (created in Phase 1)
+- ✅ **Bookings**: Booking data stored in `bookings` collection (created in Phase 8)
+- ✅ **Frontend State**: React Context + localStorage only for JWT token & user session
+- ❌ **NO localStorage for business data** (flights, bookings, passengers) - Always fetch from API/database
+
+**localStorage Usage (LIMITED):**
+- `bluewing_token` - JWT authentication token
+- `bluewing_user` - Minimal user info for UX
+
+**All Other Data:** Fetched from backend API → stored in database → not in localStorage
+
+---
+
 ## Project Status Overview
 
 ### ✅ COMPLETED (Phase 0 - Authentication)
@@ -407,10 +426,13 @@ Update PassengerDetails.jsx for booking flow.
 
 Requirements:
 
-1. Get from context/localStorage:
-   - Selected flight
-   - Fare type
-   - Number of passengers
+1. Get from context/sessionStorage (temporary) or booking state:
+   - Selected flight (from FlightSelection page via context)
+   - Fare type (from FlightSelection page via context)
+   - Number of passengers (from FlightSelection page via context)
+   
+   NOTE: These come from the FlightSelection page state, NOT localStorage.
+   For permanent storage, create a Booking model later (Phase 8).
 
 2. If no flight selected:
    - Redirect to /flights

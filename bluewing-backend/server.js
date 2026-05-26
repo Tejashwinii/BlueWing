@@ -7,6 +7,7 @@ import connectDB from './config/database.js';
 
 // Import routes
 import authRoutes from './routes/authRoutes.js';
+import flightRoutes from './routes/flightRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -43,6 +44,9 @@ app.get('/api/health', (req, res) => {
 
 // 3. Auth routes
 app.use('/api/auth', authRoutes);
+
+// 4. Flight routes
+app.use('/api/flights', flightRoutes);
 
 // =====================
 // ERROR HANDLING
@@ -95,11 +99,18 @@ const startServer = async () => {
       console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
       console.log(`🔐 Auth routes: http://localhost:${PORT}/api/auth`);
+      console.log(`✈️  Flight routes: http://localhost:${PORT}/api/flights`);
       console.log('');
       console.log('📌 Available Auth Endpoints:');
       console.log('   POST /api/auth/register - Register new user');
       console.log('   POST /api/auth/login    - Login user');
       console.log('   GET  /api/auth/profile  - Get user profile (protected)');
+      console.log('');
+      console.log('📌 Available Flight Endpoints:');
+      console.log('   GET  /api/flights               - Get all flights (paginated)');
+      console.log('   GET  /api/flights/featured      - Get featured flights');
+      console.log('   POST /api/flights/search        - Search flights by route & date');
+      console.log('   GET  /api/flights/:id           - Get flight by ID');
       console.log('');
     });
   } catch (error) {

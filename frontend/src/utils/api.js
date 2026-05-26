@@ -118,36 +118,64 @@ export const authAPI = {
 };
 
 // =====================
-// FLIGHT API (for future use)
+// FLIGHT API
 // =====================
 
 export const flightAPI = {
-  getAll: async (params = {}) => {
+  /**
+   * Search flights by route and date
+   * @param {Object} searchParams - { from, to, departureDate, cabinClass (optional) }
+   * @returns {Promise} - Response with filtered flights
+   */
+  searchFlights: async (searchParams) => {
     try {
-      const response = await apiClient.get('/flights', { params });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch flights.' };
-    }
-  },
-
-  search: async (from, to, date) => {
-    try {
-      const response = await apiClient.get('/flights/search', {
-        params: { from, to, date }
-      });
+      const response = await apiClient.post('/flights/search', searchParams);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to search flights.' };
     }
   },
 
-  getById: async (id) => {
+  /**
+   * Get all flights with pagination
+   * @param {number} limit - Number of flights to return (default 100)
+   * @param {number} skip - Number of flights to skip (default 0)
+   * @returns {Promise} - Response with flights array
+   */
+  getAllFlights: async (limit = 100, skip = 0) => {
     try {
-      const response = await apiClient.get(`/flights/${id}`);
+      const response = await apiClient.get(`/flights?limit=${limit}&skip=${skip}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch flights.' };
+    }
+  },
+
+  /**
+   * Get flight by ID
+   * @param {string} flightId - Flight _id
+   * @returns {Promise} - Response with single flight object
+   */
+  getFlightById: async (flightId) => {
+    try {
+      const response = await apiClient.get(`/flights/${flightId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch flight details.' };
+    }
+  },
+
+  /**
+   * Get featured flights (rating >= 4.0)
+   * @param {number} limit - Number of featured flights (default 6)
+   * @returns {Promise} - Response with featured flights array
+   */
+  getFeaturedFlights: async (limit = 6) => {
+    try {
+      const response = await apiClient.get(`/flights/featured?limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch featured flights.' };
     }
   },
 };

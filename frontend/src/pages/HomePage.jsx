@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/HomePage.css';
 import Navbar from '../../src/components/Navbar';
 import dummyFlights from '../data/dummyFlights';
+import { flightAPI } from '../utils/api';
 
 
 const HomePage = () => {
@@ -33,22 +34,50 @@ const HomePage = () => {
   };
 
   const [formData, setFormData] = useState(getInitialFormData);
+  
+  // State for flights from API
+  const [flights, setFlights] = useState([]);
+  const [flightsLoading, setFlightsLoading] = useState(true);
+
+  // Fetch flights from API on component mount
+  useEffect(() => {
+    const fetchFlights = async () => {
+      try {
+        setFlightsLoading(true);
+        const response = await flightAPI.getAllFlights(1000, 0);
+        if (response.success && response.data) {
+          setFlights(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch flights from API, using fallback data:', error);
+        // Fallback to dummyFlights if API fails
+        setFlights(dummyFlights);
+      } finally {
+        setFlightsLoading(false);
+      }
+    };
+
+    fetchFlights();
+  }, []);
+
+  // Use flights from API, fallback to dummyFlights if empty
+  const flightData = flights.length > 0 ? flights : dummyFlights;
 
   const departureOptions = useMemo(() => {
-    const options = dummyFlights
+    const options = flightData
       .map((flight) => flight.from || flight.departure)
       .filter(Boolean);
 
     return Array.from(new Set(options)).sort((first, second) => first.localeCompare(second));
-  }, []);
+  }, [flightData]);
 
   const arrivalOptions = useMemo(() => {
-    const options = dummyFlights
+    const options = flightData
       .map((flight) => flight.to || flight.arrival)
       .filter(Boolean);
 
     return Array.from(new Set(options)).sort((first, second) => first.localeCompare(second));
-  }, []);
+  }, [flightData]);
 
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
 
