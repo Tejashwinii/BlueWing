@@ -1,0 +1,5 @@
+.auth-page {
+  min-height: 100vh;
+  padding-top: 90px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+}
