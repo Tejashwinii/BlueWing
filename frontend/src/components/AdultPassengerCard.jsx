@@ -34,6 +34,12 @@ const AdultPassengerCard = ({
     if (!passengerData.gender) {
       newErrors.gender = 'Gender is required';
     }
+
+    if (!passengerData.age) {
+      newErrors.age = 'Age is required';
+    } else if (Number(passengerData.age) <= 0) {
+      newErrors.age = 'Age must be a positive number';
+    }
     
     return newErrors;
   };
@@ -138,6 +144,22 @@ const AdultPassengerCard = ({
             </div>
             {errors.gender && (
               <span className="error-message">{errors.gender}</span>
+            )}
+          </div>
+
+          {/* Age */}
+          <div className="form-group">
+            <input
+              type="number"
+              name="age"
+              placeholder="Age *"
+              value={passengerData.age || ''}
+              onChange={handleInputChange}
+              min="1"
+              className={errors.age ? 'input-error' : ''}
+            />
+            {errors.age && (
+              <span className="error-message">{errors.age}</span>
             )}
           </div>
 

@@ -67,7 +67,7 @@ export default function FlightCard({ flight, selectedCabinClass = "economy", onF
         }
 
         const payload = {
-            flightId: selectedFlight.id,
+            flightId: selectedFlight._id || selectedFlight.id,
             flightNumber,
             airlineName,
             departureCity,

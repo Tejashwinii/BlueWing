@@ -54,6 +54,12 @@ const ChildPassengerCard = ({
     } else if (childAge > 12) {
       newErrors.dateOfBirth = 'Child age must be 12 years or below';
     }
+
+    if (!passengerData.age) {
+      newErrors.age = 'Age is required';
+    } else if (Number(passengerData.age) <= 0) {
+      newErrors.age = 'Age must be a positive number';
+    }
     
     return newErrors;
   };
@@ -175,6 +181,22 @@ const ChildPassengerCard = ({
             )}
             {errors.dateOfBirth && (
               <span className="error-message">{errors.dateOfBirth}</span>
+            )}
+          </div>
+
+          {/* Age */}
+          <div className="form-group">
+            <input
+              type="number"
+              name="age"
+              placeholder="Age *"
+              value={passengerData.age || ''}
+              onChange={handleInputChange}
+              min="1"
+              className={errors.age ? 'input-error' : ''}
+            />
+            {errors.age && (
+              <span className="error-message">{errors.age}</span>
             )}
           </div>
 

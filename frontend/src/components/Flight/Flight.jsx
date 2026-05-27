@@ -30,7 +30,7 @@ const SeatLayout = memo(function SeatLayout({
   );
 
   const renderSeat = (row, colIndex, colNumber) => {
-    const seatId = `${row}${colNumber}`;
+    const seatId = `${colNumber}${row}`;
     const isBooked = seatMatrix[row] && seatMatrix[row][colNumber - 1];
     const isSelected = selectedSeats?.includes(seatId);
 

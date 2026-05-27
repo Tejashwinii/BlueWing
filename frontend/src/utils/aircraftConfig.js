@@ -107,7 +107,7 @@ const generateSeatMatrix = (cabinType, bookedSeats = {}) => {
   cabin.rows.forEach((row) => {
     matrix[row] = [];
     for (let col = 1; col <= cabin.seatsPerRow; col++) {
-      const seatId = `${row}${col}`;
+      const seatId = `${col}${row}`;
       // true = booked (unavailable), false = available
       matrix[row].push(bookedSeats[seatId] === true);
     }

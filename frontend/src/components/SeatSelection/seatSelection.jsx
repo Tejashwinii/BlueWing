@@ -1,6 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dummyFlightsData from "../../data/dummyFlights";
 import Flight from "../Flight/Flight";
+import { flightAPI } from "../../utils/api";
+import { CABIN_TYPES, generateSeatMatrix } from "../../utils/aircraftConfig";
 import "./SeatSelection.css";
 
 const flights = Array.isArray(dummyFlightsData)
@@ -95,12 +97,12 @@ const getSeatPrice = (flight, cabinClass) => {
   return Number(flight?.economyPrice ?? flight?.price ?? 0);
 };
 
-const buildCabinOptions = (flight) => {
-  if (!flight.aircraft) return [];
+const buildCabinOptions = (aircraft) => {
+  if (!aircraft) return [];
 
   const cabinCounts = {};
-  Object.keys(flight.aircraft).forEach((cabinType) => {
-    const seatMatrix = flight.aircraft[cabinType];
+  Object.keys(aircraft).forEach((cabinType) => {
+    const seatMatrix = aircraft[cabinType];
     let total = 0;
     let booked = 0;
 
@@ -128,10 +130,44 @@ const buildCabinOptions = (flight) => {
   });
 };
 
+const buildAircraftFromSeats = (seats = []) => {
+  const bookedByCabin = {
+    [CABIN_TYPES.FIRST_CLASS]: {},
+    [CABIN_TYPES.BUSINESS]: {},
+    [CABIN_TYPES.ECONOMY]: {},
+  };
+
+  seats.forEach((seat) => {
+    const row = String(seat.row || '').toLowerCase();
+    const col = Number(seat.column);
+    if (!row || !col) return;
+
+    const seatId = `${col}${row}`;
+    if (seat.cabin === 'firstClass') {
+      bookedByCabin[CABIN_TYPES.FIRST_CLASS][seatId] = Boolean(seat.isBooked);
+    } else if (seat.cabin === 'business') {
+      bookedByCabin[CABIN_TYPES.BUSINESS][seatId] = Boolean(seat.isBooked);
+    } else {
+      bookedByCabin[CABIN_TYPES.ECONOMY][seatId] = Boolean(seat.isBooked);
+    }
+  });
+
+  return {
+    [CABIN_TYPES.FIRST_CLASS]: generateSeatMatrix(CABIN_TYPES.FIRST_CLASS, bookedByCabin[CABIN_TYPES.FIRST_CLASS]),
+    [CABIN_TYPES.BUSINESS]: generateSeatMatrix(CABIN_TYPES.BUSINESS, bookedByCabin[CABIN_TYPES.BUSINESS]),
+    [CABIN_TYPES.ECONOMY]: generateSeatMatrix(CABIN_TYPES.ECONOMY, bookedByCabin[CABIN_TYPES.ECONOMY]),
+  };
+};
+
 function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
   const selectionContext = bookingContext || flight || {};
   const resolvedFlight = useMemo(() => resolveFlight(selectionContext), [selectionContext]);
-  const cabinOptions = useMemo(() => buildCabinOptions(resolvedFlight), [resolvedFlight]);
+  const [activeFlight, setActiveFlight] = useState(resolvedFlight);
+  const [aircraft, setAircraft] = useState(resolvedFlight.aircraft || null);
+  const [isLoadingSeats, setIsLoadingSeats] = useState(false);
+  const [seatLoadError, setSeatLoadError] = useState(null);
+
+  const cabinOptions = useMemo(() => buildCabinOptions(aircraft), [aircraft]);
   const passengerSummary = useMemo(() => getPassengerSummary(selectionContext), [selectionContext]);
 
   const lockedCabinClass = selectionContext.journey?.cabinClass
@@ -152,8 +188,45 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
   const [showFullAircraft, setShowFullAircraft] = useState(false);
   const passengerCount = passengerSummary.total;
 
+  useEffect(() => {
+    const loadSeatsFromBackend = async () => {
+      const backendFlightId = selectionContext?.selectedFare?.flightId || selectionContext?.flightId;
+
+      if (!backendFlightId) {
+        setActiveFlight(resolvedFlight);
+        setAircraft(resolvedFlight.aircraft || null);
+        return;
+      }
+
+      try {
+        setIsLoadingSeats(true);
+        setSeatLoadError(null);
+
+        const response = await flightAPI.getFlightById(backendFlightId);
+        const backendFlight = response?.data || null;
+
+        if (backendFlight && backendFlight.seats) {
+          setActiveFlight(backendFlight);
+          setAircraft(buildAircraftFromSeats(backendFlight.seats));
+        } else {
+          setActiveFlight(resolvedFlight);
+          setAircraft(resolvedFlight.aircraft || null);
+        }
+      } catch (error) {
+        console.error('Failed to load seats from backend:', error);
+        setSeatLoadError('Unable to load seats from backend. Showing cached layout.');
+        setActiveFlight(resolvedFlight);
+        setAircraft(resolvedFlight.aircraft || null);
+      } finally {
+        setIsLoadingSeats(false);
+      }
+    };
+
+    loadSeatsFromBackend();
+  }, [selectionContext, resolvedFlight]);
+
   // Get available seats for the selected cabin from aircraft data
-  const seatMatrix = resolvedFlight.aircraft?.[selectedCabinClass];
+  const seatMatrix = aircraft?.[selectedCabinClass];
   const availableSeatCount = useMemo(() => {
     if (!seatMatrix) return 0;
     let count = 0;
@@ -169,7 +242,7 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
     ? Number(selectionContext.selectedFare.rawPrice)
     : selectionContext.price 
     ? Number(String(selectionContext.price).replace(/[^\d.]/g, ''))
-    : getSeatPrice(resolvedFlight, selectedCabinClass);
+    : getSeatPrice(activeFlight, selectedCabinClass);
   const selectedTotal = selectedSeats.length * seatPrice;
   const isSelectionComplete = selectedSeats.length === passengerCount;
   const selectedFareLabel = selectionContext.fareTypeTitle || cabinClassLabels[selectedCabinClass];
@@ -185,12 +258,12 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
   };
 
   const handleSeatClick = (seatId) => {
-    const seatMatrix = resolvedFlight.aircraft?.[selectedCabinClass];
+    const seatMatrix = aircraft?.[selectedCabinClass];
     if (!seatMatrix) return;
 
-    // Parse seat ID (e.g., "a1" -> row="a", col=1)
-    const row = seatId.charAt(0);
-    const col = parseInt(seatId.slice(1), 10);
+    // Parse seat ID (e.g., "1a" -> row="a", col=1)
+    const row = seatId.slice(-1);
+    const col = parseInt(seatId.slice(0, -1), 10);
 
     // Check if seat is booked
     if (seatMatrix[row]?.[col - 1]) {
@@ -217,8 +290,8 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
     }
 
     const summary = {
-      flightNumber: selectionContext.flightNumber || resolvedFlight.flightNumber || "Unknown flight",
-      airlineName: selectionContext.airlineName || resolvedFlight.airline || "BlueWing Airlines",
+      flightNumber: selectionContext.flightNumber || activeFlight.flightNumber || "Unknown flight",
+      airlineName: selectionContext.airlineName || activeFlight.airline || "BlueWing Airlines",
       cabinClass: selectedCabinClass,
       passengerCount,
       seats: selectedSeats,
@@ -248,10 +321,10 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
         <div>
           <p className="seat-flightLabel">Flight</p>
           <h2>
-            {selectionContext.airlineName || resolvedFlight.airline || "BlueWing Airlines"} · {selectionContext.flightNumber || resolvedFlight.flightNumber || "Flight"}
+            {selectionContext.airlineName || activeFlight.airline || "BlueWing Airlines"} · {selectionContext.flightNumber || activeFlight.flightNumber || "Flight"}
           </h2>
           <p className="seat-flightRoute">
-            {selectionContext.departureCity || resolvedFlight.from || "Origin"} → {selectionContext.arrivalCity || resolvedFlight.to || "Destination"}
+            {selectionContext.departureCity || activeFlight.from || "Origin"} → {selectionContext.arrivalCity || activeFlight.to || "Destination"}
           </p>
         </div>
 
@@ -270,6 +343,18 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
           </div>
         </div>
       </section>
+
+      {isLoadingSeats && (
+        <div className="seat-note" style={{ margin: "12px 0" }}>
+          Loading seats from backend...
+        </div>
+      )}
+
+      {seatLoadError && (
+        <div className="seat-note" style={{ margin: "12px 0", color: "#c0392b" }}>
+          {seatLoadError}
+        </div>
+      )}
 
       <div className="seat-layout">
         <aside className="seat-sidebar">
@@ -309,7 +394,7 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
         <main className="seat-mapPanel">
           <Flight
             cabinType={selectedCabinClass}
-            aircraft={resolvedFlight.aircraft}
+            aircraft={aircraft}
             selectedSeats={selectedSeats}
             onSeatClick={handleSeatClick}
             showFullAircraft={showFullAircraft}

@@ -25,6 +25,7 @@ const PassengerDetails = () => {
       firstName: '',
       lastName: '',
       gender: '',
+      age: '',
     }))
   );
 
@@ -34,6 +35,7 @@ const PassengerDetails = () => {
       lastName: '',
       gender: '',
       dateOfBirth: '',
+      age: '',
     }))
   );
 
@@ -130,8 +132,8 @@ const PassengerDetails = () => {
 
   // Check if all required data is filled
   const isFormComplete = useMemo(() => {
-    const allAdultsFilled = adultPassengers.every(p => p.firstName && p.lastName && p.gender);
-    const allChildrenFilled = childPassengers.every(p => p.firstName && p.lastName && p.gender && p.dateOfBirth);
+    const allAdultsFilled = adultPassengers.every(p => p.firstName && p.lastName && p.gender && p.age);
+    const allChildrenFilled = childPassengers.every(p => p.firstName && p.lastName && p.gender && p.dateOfBirth && p.age);
     const contactFilled = contactData.mobileNumber && contactData.email && contactData.contactPerson !== '';
     
     return allAdultsFilled && allChildrenFilled && contactFilled;
