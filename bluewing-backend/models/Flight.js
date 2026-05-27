@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 
 // Seat schema (embedded)
+// Format: seatId = "1a", "2a", "3a" where number is column, letter is row
+// First Class: rows a, b, c (3 seats per row)
+// Business: rows d-i (5 seats per row)
+// Economy: rows j-z (9 seats per row)
 const seatSchema = new mongoose.Schema(
   {
     seatId: {
@@ -8,11 +12,11 @@ const seatSchema = new mongoose.Schema(
       required: true,
     },
     row: {
-      type: Number,
+      type: String,  // Changed to String: "a", "b", "c", etc.
       required: true,
     },
     column: {
-      type: String,
+      type: Number,  // Changed to Number: 1, 2, 3, etc.
       required: true,
     },
     cabin: {
