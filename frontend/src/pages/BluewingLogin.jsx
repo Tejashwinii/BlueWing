@@ -374,6 +374,13 @@ function BluewingLogin() {
                   {isLoading ? 'Signing In...' : 'Sign In'}
                 </button>
 
+                {/* Forgot Password Link */}
+                <div className="forgot-password-container">
+                  <Link to="/forgot-password" className="forgot-password-link">
+                    Forgot your password?
+                  </Link>
+                </div>
+
               </form>
             </div>
           </div>
