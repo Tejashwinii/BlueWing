@@ -2,6 +2,7 @@ import Booking from '../models/Booking.js';
 import Payment from '../models/Payment.js';
 import Flight from '../models/Flight.js';
 import User from '../models/User.js';
+import { ObjectId } from 'mongodb';
 import {
 	lockSeatsAtomic,
 	releaseSeats,
@@ -118,7 +119,7 @@ export const createBooking = async (req, res) => {
 			});
 		}
 
-		const bookingId = new (require('mongodb')).ObjectId();
+		const bookingId = new ObjectId();
 		await lockSeatsAtomic(flightId, selectedSeats, bookingId.toString());
 
 		const payment = await Payment.create({
@@ -131,7 +132,7 @@ export const createBooking = async (req, res) => {
 		});
 
 		const passengersWithSeats = passengers.map((passenger, index) => ({
-			passengerId: new (require('mongodb')).ObjectId(),
+			passengerId: new ObjectId(),
 			firstName: passenger.firstName,
 			lastName: passenger.lastName,
 			gender: passenger.gender,

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import QRCode from 'qrcode';
 import Navbar from '../components/Navbar';
+import { bookingAPI } from '../utils/api';
 import '../styles/Payment.css';
 
 const Payment = () => {
@@ -38,6 +39,9 @@ const Payment = () => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [timeLeft, setTimeLeft] = useState(600);
+  const [bookingId, setBookingId] = useState(null);
+  const [bookingReference, setBookingReference] = useState(null);
+  const [bookingCreated, setBookingCreated] = useState(false);
 
   // QR Code canvas ref
   const qrCanvasRef = useRef(null);
@@ -159,8 +163,72 @@ const Payment = () => {
     return newErrors;
   };
 
+  // Create booking in backend
+  const createBooking = async () => {
+    try {
+      // Prepare passengers array from adults and children
+      const passengersArray = [];
+      
+      if (Array.isArray(passengers.adults)) {
+        passengers.adults.forEach((p, index) => {
+          passengersArray.push({
+            firstName: p.firstName,
+            lastName: p.lastName,
+            gender: p.gender,
+            age: parseInt(p.age) || 25,
+          });
+        });
+      }
+      
+      if (Array.isArray(passengers.children)) {
+        passengers.children.forEach((p) => {
+          passengersArray.push({
+            firstName: p.firstName,
+            lastName: p.lastName,
+            gender: p.gender,
+            age: parseInt(p.age) || 10,
+          });
+        });
+      }
+
+      // Determine fare type from selectedFare
+      const fareTitle = selectedFare?.fareTypeTitle || selectedFare?.title || 'Saver';
+      let fareType = 'Saver';
+      if (/flexi/i.test(fareTitle)) fareType = 'Flexi Plus';
+      if (/upfront/i.test(fareTitle)) fareType = 'BlueWing Upfront';
+
+      const bookingPayload = {
+        flightId: selectedFare?.flightId || journey?.flightId,
+        fareType,
+        passengers: passengersArray,
+        selectedSeats: selectedSeats || [],
+        contactDetails: {
+          phone: contactDetails?.mobileNumber || contactDetails?.phone,
+          email: contactDetails?.email,
+          country: contactDetails?.country || 'India',
+          contactPassengerIndex: 0,
+        },
+      };
+
+      console.log('Creating booking with payload:', bookingPayload);
+      const response = await bookingAPI.create(bookingPayload);
+      
+      if (response.success && response.data?.booking) {
+        setBookingId(response.data.booking._id);
+        setBookingReference(response.data.booking.bookingReference);
+        setBookingCreated(true);
+        return response.data.booking;
+      } else {
+        throw new Error(response.message || 'Failed to create booking');
+      }
+    } catch (error) {
+      console.error('Booking creation error:', error);
+      throw error;
+    }
+  };
+
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
 
@@ -168,11 +236,35 @@ const Payment = () => {
       setIsProcessing(true);
       setPaymentStatus(null);
 
-      setTimeout(() => {
-        if (formData.cardNumber === '4111111111111111') {
-          setPaymentStatus('success');
-          setStatusMessage('Payment Successful! Your transaction has been completed.');
+      try {
+        // Step 1: Create booking first (if not already created)
+        let currentBookingId = bookingId;
+        if (!bookingCreated) {
+          const booking = await createBooking();
+          currentBookingId = booking._id;
+        }
 
+        // Step 2: Simulate payment processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        if (formData.cardNumber === '4111111111111111' || formData.cardNumber.length === 16) {
+          // Step 3: Confirm booking after successful payment
+          const transactionId = `TXN${Date.now()}`;
+          const paymentGatewayId = `PG${Date.now()}`;
+
+          try {
+            await bookingAPI.confirmBooking(currentBookingId, {
+              paymentGatewayId,
+              transactionId,
+            });
+          } catch (confirmError) {
+            console.warn('Booking confirmation warning:', confirmError);
+          }
+
+          setPaymentStatus('success');
+          setStatusMessage('Payment Successful! Your booking has been confirmed.');
+
+          // Save to local storage for history
           const transactions = JSON.parse(localStorage.getItem('paymentHistory') || '[]');
           transactions.push({
             id: Date.now(),
@@ -180,10 +272,11 @@ const Payment = () => {
             amount: formData.amount,
             date: new Date().toLocaleString(),
             status: 'success',
+            bookingReference: bookingReference,
           });
           localStorage.setItem('paymentHistory', JSON.stringify(transactions));
 
-          // Navigate to success page after showing success message
+          // Navigate to payment success page
           setTimeout(() => {
             navigate('/payment-success', {
               state: {
@@ -191,7 +284,10 @@ const Payment = () => {
                 selectedFare,
                 passengers,
                 contactDetails,
-                transactionId: Date.now(),
+                selectedSeats,
+                transactionId,
+                bookingId: currentBookingId,
+                bookingReference,
               },
             });
             setIsProcessing(false);
@@ -199,24 +295,34 @@ const Payment = () => {
         } else if (formData.cardNumber === '4000000000000002') {
           setPaymentStatus('failure');
           setStatusMessage('Payment Failed. Please try again with a different card.');
-
-          const transactions = JSON.parse(localStorage.getItem('paymentHistory') || '[]');
-          transactions.push({
-            id: Date.now(),
-            cardNumber: `****${formData.cardNumber.slice(-4)}`,
-            amount: formData.amount,
-            date: new Date().toLocaleString(),
-            status: 'failure',
-          });
-          localStorage.setItem('paymentHistory', JSON.stringify(transactions));
-
           setIsProcessing(false);
         } else {
-          setPaymentStatus('failure');
-          setStatusMessage('Invalid test card. Use 4111111111111111 (success) or 4000000000000002 (failure).');
-          setIsProcessing(false);
+          // For demo: accept any 16-digit card
+          setPaymentStatus('success');
+          setStatusMessage('Payment Successful! Your booking has been confirmed.');
+          
+          setTimeout(() => {
+            navigate('/payment-success', {
+              state: {
+                journey,
+                selectedFare,
+                passengers,
+                contactDetails,
+                selectedSeats,
+                transactionId: `TXN${Date.now()}`,
+                bookingId: currentBookingId,
+                bookingReference,
+              },
+            });
+            setIsProcessing(false);
+          }, 2000);
         }
-      }, 2000);
+      } catch (error) {
+        console.error('Payment processing error:', error);
+        setPaymentStatus('failure');
+        setStatusMessage(error.message || 'Payment failed. Please try again.');
+        setIsProcessing(false);
+      }
     } else {
       setErrors(formErrors);
     }
@@ -233,10 +339,31 @@ const Payment = () => {
   };
 
   // Handle QR Code confirmation
-  const handleQRCodeConfirm = () => {
+  const handleQRCodeConfirm = async () => {
     setIsProcessing(true);
 
-    setTimeout(() => {
+    try {
+      // Step 1: Create booking first (if not already created)
+      let currentBookingId = bookingId;
+      if (!bookingCreated) {
+        const booking = await createBooking();
+        currentBookingId = booking._id;
+      }
+
+      // Step 2: Simulate QR payment processing
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Step 3: Confirm booking
+      const transactionId = `QR-TXN${Date.now()}`;
+      try {
+        await bookingAPI.confirmBooking(currentBookingId, {
+          paymentGatewayId: `QR-PG${Date.now()}`,
+          transactionId,
+        });
+      } catch (confirmError) {
+        console.warn('Booking confirmation warning:', confirmError);
+      }
+
       setPaymentStatus('success');
       setStatusMessage('Payment Completed via QR Code!');
 
@@ -247,6 +374,7 @@ const Payment = () => {
         amount: formData.amount,
         date: new Date().toLocaleString(),
         status: 'success',
+        bookingReference: bookingReference,
       });
       localStorage.setItem('paymentHistory', JSON.stringify(transactions));
 
@@ -257,12 +385,20 @@ const Payment = () => {
             selectedFare,
             passengers,
             contactDetails,
-            transactionId: Date.now(),
+            selectedSeats,
+            transactionId,
+            bookingId: currentBookingId,
+            bookingReference,
           },
         });
         setIsProcessing(false);
       }, 2000);
-    }, 1500);
+    } catch (error) {
+      console.error('QR Payment error:', error);
+      setPaymentStatus('failure');
+      setStatusMessage(error.message || 'QR Payment failed. Please try again.');
+      setIsProcessing(false);
+    }
   };
 
   return (

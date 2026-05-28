@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { bookingAPI } from '../utils/api';
 import '../styles/PaymentSuccess.css';
 
 const PaymentSuccess = () => {
@@ -8,77 +7,9 @@ const PaymentSuccess = () => {
   const location = useLocation();
   const bookingData = location.state || {};
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const createBackendBooking = async () => {
-      try {
-        const passengersRaw = bookingData?.passengers || {};
-        const passengers = [];
-
-        if (Array.isArray(passengersRaw.adults)) {
-          passengersRaw.adults.forEach((p) => {
-            passengers.push({
-              firstName: p.firstName,
-              lastName: p.lastName,
-              gender: p.gender,
-              age: p.age,
-            });
-          });
-        }
-
-        if (Array.isArray(passengersRaw.children)) {
-          passengersRaw.children.forEach((p) => {
-            passengers.push({
-              firstName: p.firstName,
-              lastName: p.lastName,
-              gender: p.gender,
-              age: p.age,
-            });
-          });
-        }
-
-        const fareTitle = bookingData?.selectedFare?.fareTypeTitle || bookingData?.selectedFare?.title || '';
-        let fareType = 'Saver';
-        if (/flexi/i.test(fareTitle)) fareType = 'Flexi Plus';
-        if (/upfront/i.test(fareTitle)) fareType = 'BlueWing Upfront';
-
-        const payload = {
-          flightId: bookingData?.selectedFare?.flightId || bookingData?.journey?.flightId,
-          fareType,
-          passengers,
-          selectedSeats: bookingData?.selectedSeats || bookingData?.seatSummary?.seats || [],
-          contactDetails: {
-            phone: bookingData?.contactDetails?.mobileNumber,
-            email: bookingData?.contactDetails?.email,
-            country: bookingData?.contactDetails?.country || 'India',
-            contactPassengerIndex: 0,
-          },
-        };
-
-        const response = await bookingAPI.create(payload);
-        if (isMounted && response?.data?.booking?._id) {
-          bookingData.bookingId = response.data.booking._id;
-        }
-      } catch (error) {
-        console.warn('Booking creation failed:', error?.message || error);
-      } finally {
-        const timer = setTimeout(() => {
-          if (isMounted) {
-            navigate('/ticket-summary', { state: bookingData });
-          }
-        }, 2000);
-
-        return () => clearTimeout(timer);
-      }
-    };
-
-    createBackendBooking();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [navigate, bookingData]);
+  const handleViewTickets = () => {
+    navigate('/ticket-summary', { state: bookingData });
+  };
 
   return (
     <div className="payment-success-page">
@@ -155,7 +86,7 @@ const PaymentSuccess = () => {
 
         {/* Footer Message */}
         <p className="footer-message">
-          Redirecting to tickets in 4 seconds...
+          Click "View Tickets" to see your boarding passes
         </p>
       </div>
     </div>

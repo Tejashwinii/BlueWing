@@ -2,25 +2,36 @@ import React, { useMemo, useRef, useState } from 'react';
 import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
 import '../styles/TicketCard.css';
 
-const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {} }) => {
+const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, bookingReference }) => {
   const ticketRef = useRef(null);
   const [isCancelled, setIsCancelled] = useState(false);
-
-  const getRandomSeat = () => {
-    const rows = Array.from({ length: 30 }, (_, i) => i + 1);
-    const cols = ['A', 'B', 'C', 'D', 'E', 'F'];
-    const randomRow = rows[Math.floor(Math.random() * rows.length)];
-    const randomCol = cols[Math.floor(Math.random() * cols.length)];
-    return `${randomRow}${randomCol}`;
-  };
 
   const getRandomGate = () => {
     const gates = Array.from({ length: 50 }, (_, i) => i + 1);
     return gates[Math.floor(Math.random() * gates.length)];
   };
 
-  const seatNumber = useMemo(() => getRandomSeat(), []);
+  // Use passenger's actual seat number or generate a placeholder
+  const seatNumber = useMemo(() => {
+    return passenger?.seatNumber || 'N/A';
+  }, [passenger?.seatNumber]);
+  
   const gateNumber = useMemo(() => getRandomGate(), []);
+
+  // Format date as DD-MM-YYYY
+  const formatDate = (dateStr) => {
+    if (!dateStr) return 'N/A';
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr;
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    } catch {
+      return dateStr;
+    }
+  };
 
   const getMaskedMobile = () => {
     const mobile = (contactDetails?.mobileNumber || '').toString();
@@ -133,21 +144,21 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {} }) =
             <div className="route-section">
               <div className="route-part">
                 <label className="field-label">From</label>
-                <p className="field-value">{journey?.departure || 'N/A'}</p>
+                <p className="field-value">{journey?.from || journey?.departure || 'N/A'}</p>
               </div>
 
               <div className="route-arrow">→</div>
 
               <div className="route-part">
                 <label className="field-label">To</label>
-                <p className="field-value">{journey?.arrival || 'N/A'}</p>
+                <p className="field-value">{journey?.to || journey?.arrival || 'N/A'}</p>
               </div>
             </div>
 
             <div className="details-grid">
               <div className="detail-item">
                 <label className="field-label">Date</label>
-                <p className="field-value">{journey?.date || 'N/A'}</p>
+                <p className="field-value">{formatDate(journey?.departureDate || journey?.date)}</p>
               </div>
 
               <div className="detail-item">
@@ -197,19 +208,19 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {} }) =
               <div className="mini-route">
                 <div className="mini-from">
                   <p className="mini-label">From</p>
-                  <p className="mini-value">{journey?.departure || 'N/A'}</p>
+                  <p className="mini-value">{journey?.from || journey?.departure || 'N/A'}</p>
                 </div>
                 <div className="mini-arrow">→</div>
                 <div className="mini-to">
                   <p className="mini-label">To</p>
-                  <p className="mini-value">{journey?.arrival || 'N/A'}</p>
+                  <p className="mini-value">{journey?.to || journey?.arrival || 'N/A'}</p>
                 </div>
               </div>
 
               <div className="mini-details">
                 <div className="mini-detail">
                   <span className="mini-label">Date</span>
-                  <span className="mini-value">{journey?.date || 'N/A'}</span>
+                  <span className="mini-value">{formatDate(journey?.departureDate || journey?.date)}</span>
                 </div>
                 <div className="mini-detail">
                   <span className="mini-label">Flight</span>

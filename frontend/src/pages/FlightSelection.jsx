@@ -2,14 +2,16 @@ import FlightCard from "../components/FlightCard";
 import Navbar from "../components/Navbar";
 import dummyFlightsData from "../data/dummyFlights";
 import "../styles/FlightSelection.css";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { flightAPI } from "../utils/api";
+import { AuthContext } from "../context/AuthContext";
 
 export default function FlightSelection() {
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams] = useSearchParams();
+    const { isAuthenticated } = useContext(AuthContext);
 
     const goBackToHome = () => {
         const searchForm = {
@@ -237,6 +239,18 @@ export default function FlightSelection() {
     };
 
     const handleFareSubmit = (payload) => {
+        // Conditional check: is user signed in?
+        if (!isAuthenticated()) {
+            // NOT signed in - save booking data and redirect to login
+            sessionStorage.setItem('pendingBooking', JSON.stringify({
+                journey: searchCriteria,
+                selectedFare: payload,
+            }));
+            navigate('/login');
+            return;
+        }
+        
+        // User IS signed in - proceed to passenger details
         setSelectedFarePayload(payload);
         navigate("/passenger-details", {
             state: {

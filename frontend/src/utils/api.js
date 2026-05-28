@@ -181,10 +181,15 @@ export const flightAPI = {
 };
 
 // =====================
-// BOOKING API (for future use)
+// BOOKING API
 // =====================
 
 export const bookingAPI = {
+  /**
+   * Create a new booking
+   * @param {Object} bookingData - { flightId, fareType, passengers, selectedSeats, contactDetails }
+   * @returns {Promise} - Response with booking data and payment details
+   */
   create: async (bookingData) => {
     try {
       const response = await apiClient.post('/bookings', bookingData);
@@ -194,30 +199,76 @@ export const bookingAPI = {
     }
   },
 
-  getMyBookings: async () => {
+  /**
+   * Get booking by ID
+   * @param {string} bookingId - The booking ID
+   * @returns {Promise} - Response with booking details
+   */
+  getById: async (bookingId) => {
     try {
-      const response = await apiClient.get('/bookings/my-bookings');
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to fetch bookings.' };
-    }
-  },
-
-  getById: async (id) => {
-    try {
-      const response = await apiClient.get(`/bookings/${id}`);
+      const response = await apiClient.get(`/bookings/${bookingId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch booking details.' };
     }
   },
 
-  cancel: async (id) => {
+  /**
+   * Get all bookings for a user
+   * @param {string} userId - The user ID
+   * @param {Object} params - { status, limit, skip }
+   * @returns {Promise} - Response with user's bookings
+   */
+  getUserBookings: async (userId, params = {}) => {
     try {
-      const response = await apiClient.put(`/bookings/${id}/cancel`);
+      const queryString = new URLSearchParams(params).toString();
+      const response = await apiClient.get(`/bookings/user/${userId}${queryString ? '?' + queryString : ''}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch bookings.' };
+    }
+  },
+
+  /**
+   * Confirm booking after payment
+   * @param {string} bookingId - The booking ID
+   * @param {Object} paymentInfo - { paymentGatewayId, transactionId }
+   * @returns {Promise} - Response with confirmed booking
+   */
+  confirmBooking: async (bookingId, paymentInfo = {}) => {
+    try {
+      const response = await apiClient.patch(`/bookings/${bookingId}/confirm`, paymentInfo);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to confirm booking.' };
+    }
+  },
+
+  /**
+   * Cancel a booking
+   * @param {string} bookingId - The booking ID
+   * @returns {Promise} - Response with cancelled booking
+   */
+  cancel: async (bookingId) => {
+    try {
+      const response = await apiClient.patch(`/bookings/${bookingId}/cancel`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to cancel booking.' };
+    }
+  },
+
+  /**
+   * Get flight seats with availability
+   * @param {string} flightId - The flight ID
+   * @returns {Promise} - Response with seats and statistics
+   */
+  getFlightSeats: async (flightId) => {
+    try {
+      const response = await apiClient.get(`/bookings/flight/${flightId}/seats`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch flight seats.' };
     }
   },
 };
