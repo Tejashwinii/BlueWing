@@ -58,6 +58,36 @@ const userSchema = new mongoose.Schema(
       },
       default: 'active',
     },
+    gender: {
+      type: String,
+      enum: {
+        values: ['male', 'female', 'other', ''],
+        message: 'Gender must be male, female, or other',
+      },
+      default: '',
+    },
+    dateOfBirth: {
+      type: Date,
+      default: null,
+    },
+    address: {
+      type: String,
+      trim: true,
+      maxlength: [200, 'Address cannot be more than 200 characters'],
+      default: '',
+    },
+    city: {
+      type: String,
+      trim: true,
+      maxlength: [50, 'City cannot be more than 50 characters'],
+      default: '',
+    },
+    country: {
+      type: String,
+      trim: true,
+      maxlength: [50, 'Country cannot be more than 50 characters'],
+      default: '',
+    },
     createdAt: {
       type: Date,
       default: Date.now,

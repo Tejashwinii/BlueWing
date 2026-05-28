@@ -168,6 +168,11 @@ export const getProfile = async (req, res) => {
           email: user.email,
           phone: user.phone,
           role: user.role,
+          gender: user.gender || '',
+          dateOfBirth: user.dateOfBirth || null,
+          address: user.address || '',
+          city: user.city || '',
+          country: user.country || '',
           isEmailVerified: user.isEmailVerified,
           status: user.status,
           createdAt: user.createdAt,
@@ -194,12 +199,23 @@ export const getProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.userId;
-    const { firstName, lastName, phone } = req.body;
+    const { firstName, lastName, phone, gender, dateOfBirth, address, city, country } = req.body;
+
+    // Build update object with only provided fields
+    const updateData = {};
+    if (firstName !== undefined) updateData.firstName = firstName;
+    if (lastName !== undefined) updateData.lastName = lastName;
+    if (phone !== undefined) updateData.phone = phone;
+    if (gender !== undefined) updateData.gender = gender;
+    if (dateOfBirth !== undefined) updateData.dateOfBirth = dateOfBirth;
+    if (address !== undefined) updateData.address = address;
+    if (city !== undefined) updateData.city = city;
+    if (country !== undefined) updateData.country = country;
 
     // Find and update user (excluding password and email changes)
     const user = await User.findByIdAndUpdate(
       userId,
-      { firstName, lastName, phone },
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -221,6 +237,11 @@ export const updateProfile = async (req, res) => {
           email: user.email,
           phone: user.phone,
           role: user.role,
+          gender: user.gender || '',
+          dateOfBirth: user.dateOfBirth || null,
+          address: user.address || '',
+          city: user.city || '',
+          country: user.country || '',
           isEmailVerified: user.isEmailVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
