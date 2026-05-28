@@ -4,7 +4,7 @@ import '../styles/ForgotPassword.css';
 
 const API_URL = 'http://localhost:5000/api/auth';
 
-function ForgotPassword() {
+export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
@@ -22,8 +22,14 @@ function ForgotPassword() {
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (!email) { setError('Please enter your email address.'); return; }
-    setError(''); setSuccess(''); setDevOtp(''); setLoading(true);
+    if (!email) {
+      setError('Please enter your email address.');
+      return;
+    }
+    setError('');
+    setSuccess('');
+    setDevOtp('');
+    setLoading(true);
     try {
       const res = await fetch(API_URL + '/send-otp', {
         method: 'POST',
@@ -40,13 +46,20 @@ function ForgotPassword() {
       }
     } catch (err) {
       setError('Server error. Is the backend running?');
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    if (!otp) { setError('Please enter the OTP.'); return; }
-    setError(''); setSuccess(''); setLoading(true);
+    if (!otp) {
+      setError('Please enter the OTP.');
+      return;
+    }
+    setError('');
+    setSuccess('');
+    setLoading(true);
     try {
       const res = await fetch(API_URL + '/verify-otp', {
         method: 'POST',
@@ -63,15 +76,28 @@ function ForgotPassword() {
       }
     } catch (err) {
       setError('Server error. Please try again.');
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newPassword || !confirmPassword) { setError('Please fill both password fields.'); return; }
-    if (newPassword.length < 6) { setError('Password must be at least 6 characters.'); return; }
-    if (newPassword !== confirmPassword) { setError('Passwords do not match.'); return; }
-    setError(''); setSuccess(''); setLoading(true);
+    if (!newPassword || !confirmPassword) {
+      setError('Please fill both password fields.');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setError('');
+    setSuccess('');
+    setLoading(true);
     try {
       const res = await fetch(API_URL + '/reset-password', {
         method: 'POST',
@@ -87,11 +113,16 @@ function ForgotPassword() {
       }
     } catch (err) {
       setError('Server error. Please try again.');
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResendOtp = async () => {
-    setError(''); setSuccess(''); setDevOtp(''); setLoading(true);
+    setError('');
+    setSuccess('');
+    setDevOtp('');
+    setLoading(true);
     try {
       const res = await fetch(API_URL + '/send-otp', {
         method: 'POST',
@@ -107,12 +138,13 @@ function ForgotPassword() {
       }
     } catch (err) {
       setError('Server error.');
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fp-wrapper">
-      {/* Left decorative panel */}
       <div className="fp-left">
         <div className="fp-left-overlay"></div>
         <div className="fp-left-content">
@@ -122,37 +154,43 @@ function ForgotPassword() {
             </svg>
           </div>
           <h2 className="fp-left-title">Reset Your Password</h2>
-          <p className="fp-left-text">Don't worry! It happens to the best of us. We'll help you get back to booking flights in no time.</p>
+          <p className="fp-left-text">Do not worry! It happens to the best of us. We will help you get back to booking flights in no time.</p>
           <div className="fp-left-features">
-            <div className="fp-feature"><span className="fp-feature-icon">🔒</span><span>Secure OTP verification</span></div>
-            <div className="fp-feature"><span className="fp-feature-icon">⚡</span><span>Quick 3-step process</span></div>
-            <div className="fp-feature"><span className="fp-feature-icon">✈️</span><span>Back to flying in minutes</span></div>
+            <div className="fp-feature">
+              <span className="fp-feature-icon">🔒</span>
+              <span>Secure OTP verification</span>
+            </div>
+            <div className="fp-feature">
+              <span className="fp-feature-icon">⚡</span>
+              <span>Quick 3-step process</span>
+            </div>
+            <div className="fp-feature">
+              <span className="fp-feature-icon">✈️</span>
+              <span>Back to flying in minutes</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Right form panel */}
       <div className="fp-right">
         <div className="fp-card">
-          {/* Logo */}
           <div className="fp-logo">
             <span className="fp-logo-icon">✈</span>
             <span className="fp-logo-text">BlueWing</span>
           </div>
 
-          {/* Step Indicator */}
           <div className="fp-steps">
-            <div className={`fp-step ${currentStep >= 1 ? 'active' : ''} ${currentStep > 1 ? 'done' : ''}`}>
+            <div className={'fp-step ' + (currentStep >= 1 ? 'active' : '') + ' ' + (currentStep > 1 ? 'done' : '')}>
               <div className="fp-step-circle">{currentStep > 1 ? '✓' : '1'}</div>
               <span className="fp-step-label">Email</span>
             </div>
-            <div className={`fp-step-line ${currentStep >= 2 ? 'active' : ''}`}></div>
-            <div className={`fp-step ${currentStep >= 2 ? 'active' : ''} ${currentStep > 2 ? 'done' : ''}`}>
+            <div className={'fp-step-line ' + (currentStep >= 2 ? 'active' : '')}></div>
+            <div className={'fp-step ' + (currentStep >= 2 ? 'active' : '') + ' ' + (currentStep > 2 ? 'done' : '')}>
               <div className="fp-step-circle">{currentStep > 2 ? '✓' : '2'}</div>
               <span className="fp-step-label">Verify</span>
             </div>
-            <div className={`fp-step-line ${currentStep >= 3 ? 'active' : ''}`}></div>
-            <div className={`fp-step ${currentStep >= 3 ? 'active' : ''}`}>
+            <div className={'fp-step-line ' + (currentStep >= 3 ? 'active' : '')}></div>
+            <div className={'fp-step ' + (currentStep >= 3 ? 'active' : '')}>
               <div className="fp-step-circle">3</div>
               <span className="fp-step-label">Reset</span>
             </div>
@@ -164,12 +202,11 @@ function ForgotPassword() {
             {currentStep === 3 && 'Set New Password'}
           </h1>
           <p className="fp-subtitle">
-            {currentStep === 1 && 'Enter your registered email address and we\'ll send you a verification code.'}
-            {currentStep === 2 && `We've sent a 6-digit code to ${email}. Enter it below.`}
+            {currentStep === 1 && 'Enter your registered email address and we will send you a verification code.'}
+            {currentStep === 2 && 'We have sent a 6-digit code to ' + email + '. Enter it below.'}
             {currentStep === 3 && 'Create a strong password to secure your account.'}
           </p>
 
-          {/* Messages */}
           {error && (
             <div className="fp-alert fp-alert-error">
               <span className="fp-alert-icon">⚠️</span>
@@ -185,60 +222,101 @@ function ForgotPassword() {
           {devOtp && (
             <div className="fp-otp-display">
               <div className="fp-otp-label">Your Verification Code</div>
-              <div className="fp-otp-code">{devOtp.split('').map((d, i) => (
-                <span key={i} className="fp-otp-digit">{d}</span>
-              ))}</div>
+              <div className="fp-otp-code">
+                {devOtp.split('').map((d, i) => (
+                  <span key={i} className="fp-otp-digit">{d}</span>
+                ))}
+              </div>
               <p className="fp-otp-note">Email delivery unavailable on this network</p>
             </div>
           )}
 
-          {/* Step 1: Email */}
           {!otpSent && (
             <form className="fp-form" onSubmit={handleSendOtp}>
               <div className="fp-field">
                 <label className="fp-label" htmlFor="email">Email Address</label>
                 <div className="fp-input-wrapper">
                   <span className="fp-input-icon">📧</span>
-                  <input id="email" type="email" className="fp-input" value={email}
-                    onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoFocus />
+                  <input
+                    id="email"
+                    type="email"
+                    className="fp-input"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    autoFocus
+                  />
                 </div>
               </div>
               <button type="submit" className="fp-button fp-btn-primary" disabled={loading}>
-                {loading ? (<><span className="fp-spinner"></span> Sending...</>) : (<>Send Verification Code <span className="fp-btn-arrow">→</span></>)}
+                {loading ? (
+                  <>
+                    <span className="fp-spinner"></span> Sending...
+                  </>
+                ) : (
+                  <>
+                    Send Verification Code <span className="fp-btn-arrow">→</span>
+                  </>
+                )}
               </button>
             </form>
           )}
 
-          {/* Step 2: OTP */}
           {otpSent && !otpVerified && (
             <form className="fp-form" onSubmit={handleVerifyOtp}>
               <div className="fp-field">
                 <label className="fp-label" htmlFor="otp">Verification Code</label>
                 <div className="fp-input-wrapper">
                   <span className="fp-input-icon">🔑</span>
-                  <input id="otp" type="text" className="fp-input" value={otp} maxLength="6"
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} placeholder="Enter 6-digit code" autoFocus />
+                  <input
+                    id="otp"
+                    type="text"
+                    className="fp-input"
+                    value={otp}
+                    maxLength="6"
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Enter 6-digit code"
+                    autoFocus
+                  />
                 </div>
               </div>
               <button type="submit" className="fp-button fp-btn-primary" disabled={loading}>
-                {loading ? (<><span className="fp-spinner"></span> Verifying...</>) : (<>Verify Code <span className="fp-btn-arrow">→</span></>)}
+                {loading ? (
+                  <>
+                    <span className="fp-spinner"></span> Verifying...
+                  </>
+                ) : (
+                  <>
+                    Verify Code <span className="fp-btn-arrow">→</span>
+                  </>
+                )}
               </button>
               <button type="button" className="fp-resend-btn" onClick={handleResendOtp} disabled={loading}>
-                Didn't receive the code? <strong>Resend</strong>
+                Did not receive the code? <strong>Resend</strong>
               </button>
             </form>
           )}
 
-          {/* Step 3: New Password */}
           {otpVerified && (
             <form className="fp-form" onSubmit={handleSubmit}>
               <div className="fp-field">
                 <label className="fp-label" htmlFor="newPassword">New Password</label>
                 <div className="fp-input-wrapper">
                   <span className="fp-input-icon">🔒</span>
-                  <input id="newPassword" type={showPassword ? 'text' : 'password'} className="fp-input" value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)} placeholder="Min. 6 characters" autoFocus />
-                  <button type="button" className="fp-toggle-pw" onClick={() => setShowPassword(!showPassword)}>
+                  <input
+                    id="newPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    className="fp-input"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Min. 6 characters"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    className="fp-toggle-pw"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
                     {showPassword ? '🙈' : '👁️'}
                   </button>
                 </div>
@@ -246,18 +324,32 @@ function ForgotPassword() {
               <div className="fp-field">
                 <label className="fp-label" htmlFor="confirmPassword">Confirm Password</label>
                 <div className="fp-input-wrapper">
-                  <span className="fp-input-icon">🔒</span>
-                  <input id="confirmPassword" type={showPassword ? 'text' : 'password'} className="fp-input" value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Re-enter password" />
+                  <span className="fp-input-icon">��</span>
+                  <input
+                    id="confirmPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    className="fp-input"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter password"
+                  />
                 </div>
                 {confirmPassword && newPassword && (
-                  <div className={`fp-match-indicator ${newPassword === confirmPassword ? 'match' : 'no-match'}`}>
+                  <div className={'fp-match-indicator ' + (newPassword === confirmPassword ? 'match' : 'no-match')}>
                     {newPassword === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
                   </div>
                 )}
               </div>
               <button type="submit" className="fp-button fp-btn-primary" disabled={loading}>
-                {loading ? (<><span className="fp-spinner"></span> Resetting...</>) : (<>Reset Password <span className="fp-btn-arrow">→</span></>)}
+                {loading ? (
+                  <>
+                    <span className="fp-spinner"></span> Resetting...
+                  </>
+                ) : (
+                  <>
+                    Reset Password <span className="fp-btn-arrow">→</span>
+                  </>
+                )}
               </button>
             </form>
           )}
@@ -272,5 +364,3 @@ function ForgotPassword() {
     </div>
   );
 }
-
-export default ForgotPassword;
