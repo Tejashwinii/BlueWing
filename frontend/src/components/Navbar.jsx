@@ -1,5 +1,5 @@
-import React, { useState, useContext, useLocation } from 'react';
-import { Link, useNavigate, useLocation as useRouterLocation } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/Navbar.css';
 
@@ -8,7 +8,7 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useRouterLocation();
+  const location = useLocation();
 
   // Check if navbar should be hidden based on route
   const hiddenRoutes = ['/payment', '/payment-success', '/ticket-summary'];
