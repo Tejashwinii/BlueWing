@@ -179,6 +179,19 @@ const TicketSummary = () => {
     navigate('/');
   };
 
+  // Handle ticket cancellation - refresh booking data
+  const handleTicketCancelled = async (cancelledBookingId) => {
+    // Reload the booking data to get updated status
+    try {
+      const response = await bookingAPI.getById(cancelledBookingId);
+      if (response?.success && response?.data) {
+        setBackendBooking(response.data);
+      }
+    } catch (err) {
+      console.warn('Failed to refresh booking:', err?.message || err);
+    }
+  };
+
   const handleDownloadAllTickets = () => {
     const ticketCards = document.querySelectorAll('.ticket-card:not(.cancelled-ticket)');
 
@@ -273,6 +286,8 @@ const TicketSummary = () => {
                     }}
                     contactDetails={displayContactDetails}
                     bookingReference={displayBookingReference}
+                    bookingId={bookingId || backendBooking?._id}
+                    onCancelled={handleTicketCancelled}
                   />
                 ))}
               </div>

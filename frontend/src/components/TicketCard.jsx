@@ -1,10 +1,12 @@
 import React, { useMemo, useRef, useState } from 'react';
 import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
+import { bookingAPI } from '../utils/api';
 import '../styles/TicketCard.css';
 
-const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, bookingReference }) => {
+const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, bookingReference, bookingId, onCancelled }) => {
   const ticketRef = useRef(null);
   const [isCancelled, setIsCancelled] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const getRandomGate = () => {
     const gates = Array.from({ length: 50 }, (_, i) => i + 1);
@@ -59,8 +61,8 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
     html2pdf().set(opt).from(element).save();
   };
 
-  const handleCancelTicket = () => {
-    if (isCancelled) {
+  const handleCancelTicket = async () => {
+    if (isCancelled || isCancelling) {
       return;
     }
 
@@ -81,8 +83,32 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
     }
 
     if (enteredOtp.trim() === otp) {
-      setIsCancelled(true);
-      alert('Ticket cancelled successfully.');
+      // Call API to cancel booking
+      if (bookingId) {
+        try {
+          setIsCancelling(true);
+          const response = await bookingAPI.cancel(bookingId);
+          if (response.success) {
+            setIsCancelled(true);
+            alert('Ticket cancelled successfully.');
+            // Notify parent component about cancellation
+            if (onCancelled) {
+              onCancelled(bookingId);
+            }
+          } else {
+            alert(response.message || 'Failed to cancel ticket. Please try again.');
+          }
+        } catch (error) {
+          console.error('Cancel error:', error);
+          alert(error.message || 'Failed to cancel ticket. Please try again.');
+        } finally {
+          setIsCancelling(false);
+        }
+      } else {
+        // Fallback for local-only cancellation (no backend)
+        setIsCancelled(true);
+        alert('Ticket cancelled successfully.');
+      }
     } else {
       alert('Invalid OTP. Ticket cancellation failed.');
     }
@@ -271,9 +297,9 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
         <button
           className={`btn btn-cancel-ticket ${isCancelled ? 'btn-cancelled' : ''}`}
           onClick={handleCancelTicket}
-          disabled={isCancelled}
+          disabled={isCancelled || isCancelling}
         >
-          {isCancelled ? '❌ Ticket Cancelled' : '🧾 Cancellation Ticket'}
+          {isCancelling ? '⏳ Cancelling...' : isCancelled ? '❌ Ticket Cancelled' : '🧾 Cancel Ticket'}
         </button>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { authAPI, bookingAPI } from '../utils/api';
 import Navbar from '../components/Navbar';
@@ -7,6 +7,7 @@ import '../styles/UserProfile.css';
 
 const UserProfile = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
@@ -15,6 +16,7 @@ const UserProfile = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [bookings, setBookings] = useState([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   
   // Profile data state
   const [profileData, setProfileData] = useState({
@@ -64,29 +66,58 @@ const UserProfile = () => {
     }
   }, [user, navigate]);
 
-  // Fetch booking history
-  useEffect(() => {
-    const fetchBookings = async () => {
-      if (activeTab === 'history' && user) {
-        try {
-          setBookingsLoading(true);
-          const response = await bookingAPI.getUserBookings(user._id);
-          if (response.success) {
-            // Backend returns data as array directly or in data.bookings
-            const bookingsData = response.data?.bookings || response.data || [];
-            setBookings(Array.isArray(bookingsData) ? bookingsData : []);
-          }
-        } catch (error) {
-          console.error('Error fetching bookings:', error);
-          setBookings([]);
-        } finally {
-          setBookingsLoading(false);
+  // Fetch booking history - wrapped in useCallback for reuse
+  const fetchBookings = useCallback(async () => {
+    if (user) {
+      try {
+        setBookingsLoading(true);
+        const response = await bookingAPI.getUserBookings(user._id);
+        if (response.success) {
+          // Backend returns data as array directly or in data.bookings
+          const bookingsData = response.data?.bookings || response.data || [];
+          setBookings(Array.isArray(bookingsData) ? bookingsData : []);
         }
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        setBookings([]);
+      } finally {
+        setBookingsLoading(false);
+      }
+    }
+  }, [user]);
+
+  // Fetch bookings when tab changes or when returning to this page
+  useEffect(() => {
+    if (activeTab === 'history') {
+      fetchBookings();
+    }
+  }, [activeTab, fetchBookings, refreshKey]);
+
+  // Refresh bookings when page regains focus (user returns from ticket-summary)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (activeTab === 'history') {
+        fetchBookings();
       }
     };
 
-    fetchBookings();
-  }, [activeTab, user]);
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [activeTab, fetchBookings]);
+
+  // Check if user came back from ticket-summary with updated booking
+  useEffect(() => {
+    if (location.state?.refreshBookings && activeTab === 'history') {
+      fetchBookings();
+      // Clear the state to prevent re-fetching
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, activeTab, fetchBookings, navigate, location.pathname]);
+
+  // Refresh handler for manual refresh
+  const handleRefreshBookings = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -387,6 +418,14 @@ const UserProfile = () => {
             <div className="profile-card">
               <div className="card-header">
                 <h2>Booking History</h2>
+                <button 
+                  className="btn-refresh" 
+                  onClick={handleRefreshBookings}
+                  disabled={bookingsLoading}
+                  title="Refresh bookings"
+                >
+                  {bookingsLoading ? '⟳' : '🔄'} Refresh
+                </button>
               </div>
               
               {bookingsLoading ? (
