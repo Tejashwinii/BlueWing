@@ -334,5 +334,38 @@ export const paymentAPI = {
   },
 };
 
+// =====================
+// REVIEW API
+// =====================
+
+export const reviewAPI = {
+  create: async (reviewData) => {
+    try {
+      const response = await apiClient.post('/reviews', reviewData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to submit review.' };
+    }
+  },
+
+  getFlightReviews: async (flightId) => {
+    try {
+      const response = await apiClient.get(`/reviews/flight/${flightId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch reviews.' };
+    }
+  },
+
+  checkReviewExists: async (bookingId) => {
+    try {
+      const response = await apiClient.get(`/reviews/check/${bookingId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to check review status.' };
+    }
+  },
+};
+
 // Export the axios instance for custom requests
 export default apiClient;

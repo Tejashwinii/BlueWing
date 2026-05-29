@@ -1,12 +1,15 @@
 import React, { useMemo, useRef, useState } from 'react';
 import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
-import { bookingAPI } from '../utils/api';
+import { bookingAPI, reviewAPI } from '../utils/api';
 import '../styles/TicketCard.css';
 
 const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, bookingReference, bookingId, onCancelled }) => {
   const ticketRef = useRef(null);
   const [isCancelled, setIsCancelled] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [reviewData, setReviewData] = useState({ rating: 5, title: '', comment: '' });
 
   const getRandomGate = () => {
     const gates = Array.from({ length: 50 }, (_, i) => i + 1);
@@ -42,6 +45,82 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
     }
     const lastFourDigits = mobile.slice(-4);
     return `******${lastFourDigits}`;
+  };
+
+  // Helper: build a Date object from departure date + time string
+  const getFlightDateTime = (dateStr, timeStr) => {
+    if (!dateStr || !timeStr) return null;
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return null;
+      // Parse time like "06:30" or "06:30 AM"
+      let hours = 0, minutes = 0;
+      const timeParts = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+      if (timeParts) {
+        hours = parseInt(timeParts[1]);
+        minutes = parseInt(timeParts[2]);
+        if (timeParts[3]) {
+          if (timeParts[3].toUpperCase() === 'PM' && hours !== 12) hours += 12;
+          if (timeParts[3].toUpperCase() === 'AM' && hours === 12) hours = 0;
+        }
+      }
+      date.setHours(hours, minutes, 0, 0);
+      return date;
+    } catch {
+      return null;
+    }
+  };
+
+  const departureDateTime = useMemo(() => {
+    return getFlightDateTime(
+      journey?.departureDate || journey?.date,
+      selectedFare?.departureTime || journey?.departureTime
+    );
+  }, [journey, selectedFare]);
+
+  const arrivalDateTime = useMemo(() => {
+    return getFlightDateTime(
+      journey?.departureDate || journey?.date,
+      selectedFare?.arrivalTime || journey?.arrivalTime
+    );
+  }, [journey, selectedFare]);
+
+  // Cancel button visible only if >= 3 hours before departure
+  const canCancel = useMemo(() => {
+    if (!departureDateTime) return true; // fallback: show button
+    const now = new Date();
+    const threeHoursBefore = new Date(departureDateTime.getTime() - 3 * 60 * 60 * 1000);
+    return now <= threeHoursBefore;
+  }, [departureDateTime]);
+
+  // Review button visible only after arrival time has passed
+  const canReview = useMemo(() => {
+    if (!arrivalDateTime) return false;
+    return new Date() > arrivalDateTime;
+  }, [arrivalDateTime]);
+
+  const handleSubmitReview = async () => {
+    if (!reviewData.title.trim()) {
+      alert('Please enter a review title.');
+      return;
+    }
+    try {
+      const payload = {
+        flightId: selectedFare?.flightId || journey?.flightId || selectedFare?._id,
+        bookingId: bookingId,
+        rating: reviewData.rating,
+        title: reviewData.title,
+        comment: reviewData.comment,
+      };
+      const response = await reviewAPI.create(payload);
+      if (response.success) {
+        setReviewSubmitted(true);
+        setShowReviewModal(false);
+        alert('Review submitted successfully!');
+      }
+    } catch (error) {
+      alert(error.message || 'Failed to submit review.');
+    }
   };
 
   const handleDownloadTicket = () => {
@@ -188,8 +267,13 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
               </div>
 
               <div className="detail-item">
-                <label className="field-label">Time</label>
-                <p className="field-value">{selectedFare?.departureTime || 'N/A'}</p>
+                <label className="field-label">Departure</label>
+                <p className="field-value">{selectedFare?.departureTime || journey?.departureTime || 'N/A'}</p>
+              </div>
+
+              <div className="detail-item">
+                <label className="field-label">Arrival</label>
+                <p className="field-value">{selectedFare?.arrivalTime || journey?.arrivalTime || 'N/A'}</p>
               </div>
 
               <div className="detail-item">
@@ -294,14 +378,82 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
             📥 Download Ticket
           </button>
         )}
-        <button
-          className={`btn btn-cancel-ticket ${isCancelled ? 'btn-cancelled' : ''}`}
-          onClick={handleCancelTicket}
-          disabled={isCancelled || isCancelling}
-        >
-          {isCancelling ? '⏳ Cancelling...' : isCancelled ? '❌ Ticket Cancelled' : '🧾 Cancel Ticket'}
-        </button>
+        {!isCancelled && canCancel && (
+          <button
+            className="btn btn-cancel-ticket"
+            onClick={handleCancelTicket}
+            disabled={isCancelling}
+          >
+            {isCancelling ? '⏳ Cancelling...' : '🧾 Cancel Ticket'}
+          </button>
+        )}
+        {isCancelled && (
+          <button className="btn btn-cancel-ticket btn-cancelled" disabled>
+            ❌ Ticket Cancelled
+          </button>
+        )}
+        {!isCancelled && canReview && !reviewSubmitted && (
+          <button className="btn btn-review" onClick={() => setShowReviewModal(true)}>
+            ✍️ Write Review
+          </button>
+        )}
+        {reviewSubmitted && (
+          <button className="btn btn-review btn-reviewed" disabled>
+            ✅ Review Submitted
+          </button>
+        )}
       </div>
+
+      {/* Review Modal */}
+      {showReviewModal && (
+        <div className="review-modal-overlay">
+          <div className="review-modal">
+            <h3>Write a Review</h3>
+            <div className="review-form">
+              <div className="review-field">
+                <label>Rating</label>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      className={`star ${star <= reviewData.rating ? 'active' : ''}`}
+                      onClick={() => setReviewData({ ...reviewData, rating: star })}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="review-field">
+                <label>Title *</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Great flight experience!"
+                  value={reviewData.title}
+                  onChange={(e) => setReviewData({ ...reviewData, title: e.target.value })}
+                />
+              </div>
+              <div className="review-field">
+                <label>Comment</label>
+                <textarea
+                  placeholder="Share your experience..."
+                  rows={4}
+                  value={reviewData.comment}
+                  onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
+                />
+              </div>
+              <div className="review-actions">
+                <button className="btn btn-cancel-review" onClick={() => setShowReviewModal(false)}>
+                  Cancel
+                </button>
+                <button className="btn btn-submit-review" onClick={handleSubmitReview}>
+                  Submit Review
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

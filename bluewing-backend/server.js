@@ -9,6 +9,7 @@ import connectDB from './config/database.js';
 import authRoutes from './routes/authRoutes.js';
 import flightRoutes from './routes/flightRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -51,6 +52,9 @@ app.use('/api/flights', flightRoutes);
 
 // 5. Booking routes
 app.use('/api/bookings', bookingRoutes);
+
+// 6. Review routes
+app.use('/api/reviews', reviewRoutes);
 
 // =====================
 // ERROR HANDLING
