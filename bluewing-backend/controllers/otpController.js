@@ -108,8 +108,8 @@ export const resetPassword = async (req, res) => {
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    const salt = await bcrypt.genSalt(12);
-    user.password = await bcrypt.hash(newPassword, salt);
+    // Set plain text password - the pre-save hook in User model will hash it
+    user.password = newPassword;
     await user.save({ validateBeforeSave: false });
 
     delete otpStore[email.toLowerCase()];

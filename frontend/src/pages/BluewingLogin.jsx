@@ -347,35 +347,46 @@ function BluewingLogin() {
               <form onSubmit={handleLogin} className="login-form">
 
                 <div className="form-group">
-                  <label>Email Address</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={handleEmailChange}
-                    onBlur={() => validateEmail(email)}
-                  />
-                  {emailError && <p>{emailError}</p>}
+                  <label className="form-label">Email Address</label>
+                  <div className="input-wrapper">
+                    <input
+                      type="email"
+                      placeholder="Enter your email"
+                      className={`form-input ${emailError ? 'error' : ''}`}
+                      value={email}
+                      onChange={handleEmailChange}
+                      onBlur={() => validateEmail(email)}
+                    />
+                  </div>
+                  {emailError && <p className="error-message">{emailError}</p>}
                 </div>
 
                 <div className="form-group">
-                  <label>Password</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    onBlur={() => validatePassword(password)}
-                  />
-                  {passwordError && <p>{passwordError}</p>}
+                  <label className="form-label">Password</label>
+                  <div className="input-wrapper">
+                    <input
+                      type="password"
+                      placeholder="Enter your password"
+                      className={`form-input ${passwordError ? 'error' : ''}`}
+                      value={password}
+                      onChange={handlePasswordChange}
+                      onBlur={() => validatePassword(password)}
+                    />
+                  </div>
+                  {passwordError && <p className="error-message">{passwordError}</p>}
                 </div>
 
-                {error && <p>{error}</p>}
+                {error && <p className="form-error">{error}</p>}
 
-                <button disabled={!isFormValid() || isLoading}>
+                <button 
+                  type="submit" 
+                  className="submit-button"
+                  disabled={!isFormValid() || isLoading}
+                >
                   {isLoading ? 'Signing In...' : 'Sign In'}
                 </button>
 
-                {/* Forgot Password Link */}
-                <div className="forgot-password-container">
+                <div className="form-footer">
                   <Link to="/forgot-password" className="forgot-password-link">
                     Forgot your password?
                   </Link>
