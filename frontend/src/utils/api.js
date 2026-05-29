@@ -178,6 +178,34 @@ export const flightAPI = {
       throw error.response?.data || { message: 'Failed to fetch featured flights.' };
     }
   },
+
+  /**
+   * Create a new flight (Admin only)
+   * @param {Object} flightData - Flight object matching backend schema
+   * @returns {Promise} - Response with created flight
+   */
+  addFlight: async (flightData) => {
+    try {
+      const response = await apiClient.post('/flights', flightData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to add flight.' };
+    }
+  },
+
+  /**
+   * Delete a flight (Admin only)
+   * @param {string} flightId - Flight _id
+   * @returns {Promise} - Response with success message
+   */
+  deleteFlight: async (flightId) => {
+    try {
+      const response = await apiClient.delete(`/flights/${flightId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to delete flight.' };
+    }
+  },
 };
 
 // =====================

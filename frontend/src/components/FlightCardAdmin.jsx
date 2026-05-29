@@ -72,7 +72,7 @@ const FlightCardAdmin = ({ flight, onEdit, onDelete }) => {
           <button className="btn-edit" onClick={() => onEdit(flight)}>
             ✎ Edit
           </button>
-          <button className="btn-delete" onClick={() => onDelete(flight.id)}>
+          <button className="btn-delete" onClick={() => onDelete(flight._id)}>
             🗑 Delete
           </button>
         </div>

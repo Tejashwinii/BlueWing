@@ -7,8 +7,16 @@ const getEmptyFormData = () => ({
   flightNumber: '',
   from: '',
   to: '',
+  departureDate: '',
   departureTime: '',
   arrivalTime: '',
+  duration: '',
+  economyPrice: '',
+  businessPrice: '',
+  firstClassPrice: '',
+  stops: 0,
+  rating: '',
+  amenities: '',
 });
 
 const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => {
@@ -21,10 +29,18 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
       setFormData({
         airline: initialFlight.airline || '',
         flightNumber: initialFlight.flightNumber || '',
-        from: initialFlight.from || initialFlight.departure || '',
-        to: initialFlight.to || initialFlight.arrival || '',
+        from: initialFlight.from || '',
+        to: initialFlight.to || '',
+        departureDate: initialFlight.departureDate ? initialFlight.departureDate.split('T')[0] : '',
         departureTime: initialFlight.departureTime || '',
         arrivalTime: initialFlight.arrivalTime || '',
+        duration: initialFlight.duration || '',
+        economyPrice: initialFlight.economyPrice || '',
+        businessPrice: initialFlight.businessPrice || '',
+        firstClassPrice: initialFlight.firstClassPrice || '',
+        stops: initialFlight.stops || 0,
+        rating: initialFlight.rating || '',
+        amenities: Array.isArray(initialFlight.amenities) ? initialFlight.amenities.join(', ') : '',
       });
     } else {
       setFormData(getEmptyFormData());
@@ -38,7 +54,7 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
       [name]: value
     }));
 
-    // Auto-calculate arrival time when departure time or route changes
+    // Auto-calculate arrival time and duration when departure time or route changes
     if (name === 'departureTime' || name === 'from' || name === 'to') {
       updateArrivalTime({
         ...formData,
@@ -49,12 +65,16 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
 
   const updateArrivalTime = (data) => {
     if (data.from && data.to && data.departureTime) {
-      const duration = getDuration(data.from, data.to);
-      if (duration) {
-        const arrival = calculateArrivalTime(data.departureTime, duration);
+      const durationHours = getDuration(data.from, data.to);
+      if (durationHours) {
+        const arrival = calculateArrivalTime(data.departureTime, durationHours);
+        const hours = Math.floor(durationHours);
+        const minutes = Math.round((durationHours - hours) * 60);
+        const durationStr = `${hours}h ${minutes}m`;
         setFormData(prev => ({
           ...prev,
-          arrivalTime: arrival
+          arrivalTime: arrival,
+          duration: durationStr
         }));
       }
     }
@@ -64,15 +84,31 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
     e.preventDefault();
 
     if (!formData.airline || !formData.flightNumber || !formData.from || 
-        !formData.to || !formData.departureTime) {
+        !formData.to || !formData.departureTime || !formData.departureDate ||
+        !formData.economyPrice || !formData.businessPrice || !formData.firstClassPrice ||
+        !formData.rating) {
       alert('Please fill all required fields');
       return;
     }
 
-    onSave({
-      ...formData,
-      id: initialFlight?.id || Date.now(),
-    });
+    const flightPayload = {
+      airline: formData.airline,
+      flightNumber: formData.flightNumber,
+      from: formData.from,
+      to: formData.to,
+      departureDate: formData.departureDate,
+      departureTime: formData.departureTime,
+      arrivalTime: formData.arrivalTime,
+      duration: formData.duration,
+      economyPrice: Number(formData.economyPrice),
+      businessPrice: Number(formData.businessPrice),
+      firstClassPrice: Number(formData.firstClassPrice),
+      stops: Number(formData.stops),
+      rating: Number(formData.rating),
+      amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()).filter(Boolean) : [],
+    };
+
+    onSave(flightPayload);
   };
 
   return (
@@ -87,7 +123,7 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
               <input
                 type="text"
                 name="airline"
-                placeholder="e.g., Air India, Indigo"
+                placeholder="e.g., BlueWing Airlines"
                 value={formData.airline}
                 onChange={handleInputChange}
                 required
@@ -99,7 +135,7 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
               <input
                 type="text"
                 name="flightNumber"
-                placeholder="e.g., AI101"
+                placeholder="e.g., BW201"
                 value={formData.flightNumber}
                 onChange={handleInputChange}
                 required
@@ -145,6 +181,17 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
 
           <div className="form-row">
             <div className="form-group">
+              <label>Departure Date *</label>
+              <input
+                type="date"
+                name="departureDate"
+                value={formData.departureDate}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
               <label>Departure Time *</label>
               <input
                 type="time"
@@ -154,14 +201,109 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
                 required
               />
             </div>
+          </div>
 
+          <div className="form-row">
             <div className="form-group">
               <label>Arrival Time (Auto-calculated)</label>
               <input
                 type="time"
                 name="arrivalTime"
                 value={formData.arrivalTime}
-                disabled
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Duration (Auto-calculated)</label>
+              <input
+                type="text"
+                name="duration"
+                placeholder="e.g., 2h 30m"
+                value={formData.duration}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Economy Price (₹) *</label>
+              <input
+                type="number"
+                name="economyPrice"
+                placeholder="e.g., 2500"
+                value={formData.economyPrice}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Business Price (₹) *</label>
+              <input
+                type="number"
+                name="businessPrice"
+                placeholder="e.g., 5000"
+                value={formData.businessPrice}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>First Class Price (₹) *</label>
+              <input
+                type="number"
+                name="firstClassPrice"
+                placeholder="e.g., 8000"
+                value={formData.firstClassPrice}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Stops *</label>
+              <select
+                name="stops"
+                value={formData.stops}
+                onChange={handleInputChange}
+                required
+              >
+                <option value={0}>Non-stop</option>
+                <option value={1}>1 Stop</option>
+                <option value={2}>2 Stops</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Rating (0-5) *</label>
+              <input
+                type="number"
+                name="rating"
+                placeholder="e.g., 4.5"
+                min="0"
+                max="5"
+                step="0.1"
+                value={formData.rating}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Amenities (comma-separated)</label>
+              <input
+                type="text"
+                name="amenities"
+                placeholder="e.g., WiFi, Meals, Entertainment"
+                value={formData.amenities}
+                onChange={handleInputChange}
               />
             </div>
           </div>

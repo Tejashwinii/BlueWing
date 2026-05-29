@@ -1,16 +1,17 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import FlightCardAdmin from '../components/FlightCardAdmin';
 import AddFlight from '../components/AddFlight';
-import dummyFlights from '../data/dummyFlights';
+import { flightAPI } from '../utils/api';
 import '../styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [flights, setFlights] = useState(dummyFlights);
+  const [flights, setFlights] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showFlightForm, setShowFlightForm] = useState(false);
   const [formMode, setFormMode] = useState('add');
   const [selectedFlight, setSelectedFlight] = useState(null);
@@ -20,21 +21,55 @@ const AdminDashboard = () => {
     return null;
   }
 
-  const handleAddFlight = (newFlight) => {
-    setFlights([...flights, newFlight]);
-    setShowFlightForm(false);
-    setSelectedFlight(null);
+  // Fetch flights from backend
+  const fetchFlights = async () => {
+    try {
+      setLoading(true);
+      const response = await flightAPI.getAllFlights();
+      setFlights(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch flights:', error);
+      alert('Failed to load flights. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFlights();
+  }, []);
+
+  const handleAddFlight = async (newFlight) => {
+    try {
+      const response = await flightAPI.addFlight(newFlight);
+      if (response.success) {
+        setFlights([...flights, response.data]);
+        setShowFlightForm(false);
+        setSelectedFlight(null);
+      }
+    } catch (error) {
+      console.error('Failed to add flight:', error);
+      alert(error.message || 'Failed to add flight. Please try again.');
+    }
   };
 
   const handleUpdateFlight = (updatedFlight) => {
-    setFlights(flights.map(flight => flight.id === updatedFlight.id ? updatedFlight : flight));
+    setFlights(flights.map(flight => flight._id === updatedFlight._id ? updatedFlight : flight));
     setShowFlightForm(false);
     setSelectedFlight(null);
   };
 
-  const handleDeleteFlight = (flightId) => {
+  const handleDeleteFlight = async (flightId) => {
     if (window.confirm('Are you sure you want to delete this flight?')) {
-      setFlights(flights.filter(f => f.id !== flightId));
+      try {
+        const response = await flightAPI.deleteFlight(flightId);
+        if (response.success) {
+          setFlights(flights.filter(f => f._id !== flightId));
+        }
+      } catch (error) {
+        console.error('Failed to delete flight:', error);
+        alert(error.message || 'Failed to delete flight. Please try again.');
+      }
     }
   };
 
@@ -56,7 +91,7 @@ const AdminDashboard = () => {
       
       <div className="admin-content">
         <div className="admin-header">
-          <h1>Hello {user.name} 👋</h1>
+          <h1>Hello {user.firstName || user.name} 👋</h1>
           <p>Manage your flights and operations</p>
         </div>
 
@@ -96,16 +131,21 @@ const AdminDashboard = () => {
           <div className="admin-right">
             <div className="flights-section">
               <h2>Active Flights</h2>
-              <div className="flights-grid">
-                {flights.map(flight => (
-                  <FlightCardAdmin
-                    key={flight.id}
-                    flight={flight}
-                    onEdit={handleEditFlight}
-                    onDelete={handleDeleteFlight}
-                  />
-                ))}
-              </div>
+              {loading ? (
+                <p>Loading flights...</p>
+              ) : (
+                <div className="flights-grid">
+                  {flights.map(flight => (
+                    <FlightCardAdmin
+                      key={flight._id}
+                      flight={flight}
+                      onEdit={handleEditFlight}
+                      onDelete={handleDeleteFlight}
+                    />
+                  ))}
+                  {flights.length === 0 && <p>No flights found. Add your first flight!</p>}
+                </div>
+              )}
             </div>
           </div>
         </div>

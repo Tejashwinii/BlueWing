@@ -81,6 +81,33 @@ export const protect = (req, res, next) => {
 };
 
 /**
+ * Admin Only Middleware
+ * Must be used AFTER protect middleware
+ * Checks if the authenticated user has admin role
+ */
+export const adminOnly = async (req, res, next) => {
+  try {
+    const { default: User } = await import('../models/User.js');
+    const user = await User.findById(req.userId);
+
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({
+        status: 'error',
+        message: 'Access denied. Admin only.',
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error('❌ Admin check error:', error.message);
+    return res.status(500).json({
+      status: 'error',
+      message: 'Authorization check failed',
+    });
+  }
+};
+
+/**
  * Optional Middleware - Get user if token exists
  * Does not throw error if no token provided
  * Useful for public routes that allow authenticated users

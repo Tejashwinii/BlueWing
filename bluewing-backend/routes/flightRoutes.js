@@ -4,7 +4,10 @@ import {
   searchFlights,
   getFlightById,
   getFeaturedFlights,
+  createFlight,
+  deleteFlight,
 } from '../controllers/flightController.js';
+import { protect, adminOnly } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -29,6 +32,18 @@ router.get('/featured', getFeaturedFlights);
  * Body: { from, to, departureDate, cabinClass (optional) }
  */
 router.post('/search', searchFlights);
+
+/**
+ * POST /api/flights
+ * Create a new flight (Admin only)
+ */
+router.post('/', protect, adminOnly, createFlight);
+
+/**
+ * DELETE /api/flights/:id
+ * Delete a flight by ID (Admin only)
+ */
+router.delete('/:id', protect, adminOnly, deleteFlight);
 
 /**
  * GET /api/flights/:id

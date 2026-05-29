@@ -132,9 +132,59 @@ const getFeaturedFlights = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/flights
+ * Create a new flight (Admin only)
+ */
+const createFlight = async (req, res) => {
+  try {
+    const flight = await Flight.create(req.body);
+    return res.status(201).json({
+      success: true,
+      message: 'Flight created successfully',
+      data: flight,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * DELETE /api/flights/:id
+ * Delete a flight by ID (Admin only)
+ */
+const deleteFlight = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const flight = await Flight.findByIdAndDelete(id);
+
+    if (!flight) {
+      return res.status(404).json({
+        success: false,
+        message: 'Flight not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Flight deleted successfully',
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export {
   getAllFlights,
   searchFlights,
   getFlightById,
   getFeaturedFlights,
+  createFlight,
+  deleteFlight,
 };
