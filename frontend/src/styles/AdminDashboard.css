@@ -73,9 +73,87 @@
 }
 
 .btn-delete {
-  background: #f5f5f5;
-  color: #999;
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background: linear-gradient(135deg, #c82333, #a71d2a);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-delete.active {
+  background: linear-gradient(135deg, #a71d2a, #8b1a2b);
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.4);
+}
+
+.selection-bar {
+  background: white;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.2s ease;
+}
+
+.selection-bar p {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.selection-bar .selection-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.selection-bar .btn-confirm-delete {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.selection-bar .btn-confirm-delete:hover {
+  background: linear-gradient(135deg, #c82333, #a71d2a);
+}
+
+.selection-bar .btn-confirm-delete:disabled {
+  background: #ccc;
   cursor: not-allowed;
+}
+
+.selection-bar .btn-cancel-select {
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: white;
+  color: #666;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.selection-bar .btn-cancel-select:hover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .info-panel {

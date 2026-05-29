@@ -172,15 +172,17 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
                         Admin Dashboard
                       </button>
                     )}
-                    <button 
-                      className="dropdown-option"
-                      onClick={() => {
-                        navigate('/profile');
-                        setShowProfileDropdown(false);
-                      }}
-                    >
-                      My Profile
-                    </button>
+                    {user.role !== 'admin' && (
+                      <button 
+                        className="dropdown-option"
+                        onClick={() => {
+                          navigate('/profile');
+                          setShowProfileDropdown(false);
+                        }}
+                      >
+                        My Profile
+                      </button>
+                    )}
                     <button 
                       className="dropdown-option"
                       onClick={() => {

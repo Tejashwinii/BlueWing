@@ -183,6 +183,26 @@
   box-shadow: 0 2px 8px rgba(217, 83, 79, 0.2);
 }
 
+/* Selection mode styles */
+.flight-card-admin.selected {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.35);
+}
+
+.selection-checkbox {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+}
+
+.selection-checkbox input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  accent-color: #dc3545;
+}
+
 @media (max-width: 768px) {
   .flight-card-header {
     flex-direction: column;

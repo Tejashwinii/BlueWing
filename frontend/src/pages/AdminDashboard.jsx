@@ -15,6 +15,8 @@ const AdminDashboard = () => {
   const [showFlightForm, setShowFlightForm] = useState(false);
   const [formMode, setFormMode] = useState('add');
   const [selectedFlight, setSelectedFlight] = useState(null);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedFlightIds, setSelectedFlightIds] = useState([]);
 
   if (!user || user.role !== 'admin') {
     navigate('/login');
@@ -85,6 +87,34 @@ const AdminDashboard = () => {
     setShowFlightForm(true);
   };
 
+  const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedFlightIds([]);
+  };
+
+  const handleToggleSelect = (flightId) => {
+    setSelectedFlightIds(prev =>
+      prev.includes(flightId)
+        ? prev.filter(id => id !== flightId)
+        : [...prev, flightId]
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedFlightIds.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedFlightIds.length} flight(s)?`)) return;
+    try {
+      await Promise.all(selectedFlightIds.map(id => flightAPI.deleteFlight(id)));
+      setFlights(flights.filter(f => !selectedFlightIds.includes(f._id)));
+      setSelectedFlightIds([]);
+      setSelectionMode(false);
+    } catch (error) {
+      console.error('Failed to delete flights:', error);
+      alert(error.message || 'Failed to delete some flights. Please try again.');
+      fetchFlights();
+    }
+  };
+
   return (
     <div className="admin-dashboard">
       <Navbar hideLogin={true} />
@@ -107,12 +137,33 @@ const AdminDashboard = () => {
               </button>
               
               <button 
-                className="btn-action btn-delete"
-                disabled
+                className={`btn-action btn-delete ${selectionMode ? 'active' : ''}`}
+                onClick={toggleSelectionMode}
               >
-                🗑️ Delete Flight
+                {selectionMode ? '✖ Cancel Selection' : '🗑️ Delete Flight'}
               </button>
             </div>
+
+            {selectionMode && (
+              <div className="selection-bar">
+                <p>{selectedFlightIds.length} flight(s) selected</p>
+                <div className="selection-actions">
+                  <button
+                    className="btn-confirm-delete"
+                    onClick={handleBulkDelete}
+                    disabled={selectedFlightIds.length === 0}
+                  >
+                    🗑️ Delete Selected
+                  </button>
+                  <button
+                    className="btn-cancel-select"
+                    onClick={toggleSelectionMode}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="info-panel">
               <h3>Quick Stats</h3>
@@ -141,6 +192,9 @@ const AdminDashboard = () => {
                       flight={flight}
                       onEdit={handleEditFlight}
                       onDelete={handleDeleteFlight}
+                      selectionMode={selectionMode}
+                      isSelected={selectedFlightIds.includes(flight._id)}
+                      onToggleSelect={handleToggleSelect}
                     />
                   ))}
                   {flights.length === 0 && <p>No flights found. Add your first flight!</p>}

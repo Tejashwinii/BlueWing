@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import '../styles/FlightCardAdmin.css';
 
-const FlightCardAdmin = ({ flight, onEdit, onDelete }) => {
+const FlightCardAdmin = ({ flight, onEdit, onDelete, selectionMode = false, isSelected = false, onToggleSelect }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Select a random background image
@@ -32,11 +32,23 @@ const FlightCardAdmin = ({ flight, onEdit, onDelete }) => {
 
   return (
     <div 
-      className={`flight-card-admin ${isExpanded ? 'expanded' : ''}`}
+      className={`flight-card-admin ${isExpanded ? 'expanded' : ''} ${isSelected ? 'selected' : ''}`}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      onClick={() => selectionMode && onToggleSelect(flight._id)}
+      style={{ backgroundImage: `url(${backgroundImage})`, cursor: selectionMode ? 'pointer' : undefined }}
     >
+      {/* Selection checkbox overlay */}
+      {selectionMode && (
+        <div className="selection-checkbox">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onToggleSelect(flight._id)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
       {/* dark overlay layer (absolute) */}
       <div className="flight-background-overlay" />
 
