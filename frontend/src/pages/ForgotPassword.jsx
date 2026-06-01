@@ -1,6 +1,8 @@
 ﻿import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/ForgotPassword.css';
+import Navbar from '../components/Navbar';
+import AuthPage from "../components/AuthPage"
 
 const API_URL = 'http://localhost:5000/api/auth';
 
@@ -144,7 +146,10 @@ export default function ForgotPassword() {
   };
 
   return (
+    
+    <AuthPage>
     <div className="fp-wrapper">
+      <div className="fp-container">
       <div className="fp-left">
         <div className="fp-left-overlay"></div>
         <div className="fp-left-content">
@@ -362,5 +367,7 @@ export default function ForgotPassword() {
         </div>
       </div>
     </div>
+    </div>
+    </AuthPage>
   );
 }
