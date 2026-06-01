@@ -50,12 +50,29 @@ export const registerSchema = Joi.object({
 
   phone: Joi.string()
     .required()
-    .pattern(/^[6-9]\d{9}$/)
+    .pattern(/^[0-9]{10}$/)
     .messages({
       'string.empty': 'Phone number is required',
-      'string.pattern.base': 'Phone number must be a valid 10-digit Indian mobile number',
+      'string.pattern.base': 'Phone number must be exactly 10 digits',
       'any.required': 'Phone number is required'
     })
+    .label('Phone number'),
+  gender: Joi.string()
+    .required()
+    .valid('male', 'female', 'other')
+    .messages({
+      'string.empty': 'Gender is required',
+      'any.only': 'Gender is required',
+      'any.required': 'Gender is required'
+    }),
+  dateOfBirth: Joi.date()
+    .required()
+    .less('now')
+    .messages({
+      'date.base': 'Date of Birth is required',
+      'date.less': 'Date of Birth must be a past date',
+      'any.required': 'Date of Birth is required'
+    }),
 }).unknown(false);
 
 /**

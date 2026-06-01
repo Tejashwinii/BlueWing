@@ -251,20 +251,6 @@
   margin: 0;
   line-height: 1.7;
 }
-  line-height: 1.8;
-  margin: 0;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Quick Help Details Section */
 .quick-help-details {

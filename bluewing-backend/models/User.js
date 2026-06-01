@@ -60,15 +60,16 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
+      required: [true, 'Please provide gender'],
       enum: {
-        values: ['male', 'female', 'other', ''],
+        values: ['male', 'female', 'other'],
         message: 'Gender must be male, female, or other',
       },
-      default: '',
+      trim: true,
     },
     dateOfBirth: {
       type: Date,
-      default: null,
+      required: [true, 'Please provide date of birth'],
     },
     address: {
       type: String,

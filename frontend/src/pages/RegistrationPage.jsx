@@ -1,366 +1,274 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { AuthContext } from '../context/AuthContext';
 import AuthPage from '../components/AuthPage';
 import '../styles/Registration.css';
- 
+
+const registrationSchema = z
+  .object({
+    firstName: z
+      .string()
+      .trim()
+      .min(1, { message: 'First Name is required' })
+      .regex(/^[A-Za-z]+$/, { message: 'Only characters are allowed' }),
+    lastName: z
+      .string()
+      .trim()
+      .min(1, { message: 'Last Name is required' })
+      .regex(/^[A-Za-z]+$/, { message: 'Only characters are allowed' }),
+    email: z
+      .string()
+      .trim()
+      .min(1, { message: 'Email is required' })
+      .email({ message: 'Invalid email format' }),
+    dateOfBirth: z
+      .string()
+      .trim()
+      .min(1, { message: 'Date of Birth is required' })
+      .refine((value) => {
+        const date = new Date(value);
+        return value && !Number.isNaN(date.getTime()) && date < new Date();
+      }, { message: 'Date of Birth must be a past date' }),
+    phoneNumber: z
+      .string()
+      .trim()
+      .min(1, { message: 'Phone Number is required' })
+      .regex(/^[0-9]{10}$/, { message: 'Phone Number must be exactly 10 digits' }),
+    gender: z.enum(['male', 'female', 'other'], {
+      errorMap: () => ({ message: 'Gender is required' }),
+    }),
+    password: z
+      .string()
+      .min(6, { message: 'Password must be at least 6 characters' })
+      .regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)/, {
+        message: 'Password must contain uppercase, lowercase, and number',
+      }),
+    confirmPassword: z.string().min(1, { message: 'Confirm Password is required' }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['confirmPassword'],
+        message: 'Passwords do not match',
+      });
+    }
+  });
+
 const RegistrationPage = () => {
   const navigate = useNavigate();
   const { register } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    dateOfBirth: '',
-    phoneNumber: '',
-  });
- 
-  const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
- 
-  // Password validation rules (matches backend: min 6, uppercase, lowercase, number)
-  const validatePassword = (password) => {
-    const rules = {
-      length: password.length >= 6,
-      uppercase: /[A-Z]/.test(password),
-      lowercase: /[a-z]/.test(password),
-      digit: /[0-9]/.test(password),
-    };
-    return rules;
-  };
- 
-  // Email validation
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
- 
-  // Phone number validation (10 digits)
-  const validatePhoneNumber = (phone) => {
-    const phoneRegex = /^[0-9]{10}$/;
-    return phoneRegex.test(phone);
-  };
- 
-  // Date of Birth validation (must be past date)
-  const validateDateOfBirth = (dob) => {
-    const selectedDate = new Date(dob);
-    const today = new Date();
-    return selectedDate < today;
-  };
- 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: '',
-      });
-    }
-  };
- 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newErrors = {};
- 
-    // Validate First Name
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First Name is required';
-    }
- 
-    // Validate Last Name
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last Name is required';
-    }
- 
-    // Validate Email
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Invalid email format';
-    }
- 
-    // Validate Phone Number
-    if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone Number is required';
-    } else if (!validatePhoneNumber(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Phone Number must be 10 digits';
-    }
- 
-    // Validate Date of Birth
-    if (!formData.dateOfBirth) {
-      newErrors.dateOfBirth = 'Date of Birth is required';
-    } else if (!validateDateOfBirth(formData.dateOfBirth)) {
-      newErrors.dateOfBirth = 'Date of Birth must be a past date';
-    }
- 
-    // Validate Password (min 6, uppercase, lowercase, number - matches backend)
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else {
-      const passwordRules = validatePassword(formData.password);
-      if (!passwordRules.length) {
-        newErrors.password = 'Password must be at least 6 characters long';
-      } else if (!passwordRules.uppercase) {
-        newErrors.password = 'Password must contain at least one uppercase letter';
-      } else if (!passwordRules.lowercase) {
-        newErrors.password = 'Password must contain at least one lowercase letter';
-      } else if (!passwordRules.digit) {
-        newErrors.password = 'Password must contain at least one digit';
-      }
-    }
- 
-    // Validate Confirm Password
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Confirm Password is required';
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
- 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setSuccessMessage('');
-      return;
-    }
- 
-    // Call backend API for registration
+  const [apiError, setApiError] = useState('');
+
+  const {
+    register: formRegister,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registrationSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      dateOfBirth: '',
+      phoneNumber: '',
+      gender: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
+
+  const onSubmit = async (data) => {
     setIsLoading(true);
-    console.log('📝 Attempting registration for:', formData.email);
-    
+    setApiError('');
+    setSuccessMessage('');
+
     try {
       const result = await register({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phoneNumber, // Backend expects 'phone' not 'phoneNumber'
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        phone: data.phoneNumber,
+        gender: data.gender,
+        dateOfBirth: data.dateOfBirth,
       });
 
-      console.log('📦 Registration response:', result);
-
       if (result.success) {
-        console.log('✅ Registration successful!');
         setSuccessMessage('Registration successful! Redirecting to login...');
-        setErrors({});
-        
-        // Clear form
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          dateOfBirth: '',
-          phoneNumber: '',
-        });
-
-        // Redirect to login page after 2 seconds
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
+        reset();
+        setTimeout(() => navigate('/login'), 2000);
       } else {
-        console.log('❌ Registration failed:', result.message);
-        // Handle API errors
-        if (result.errors && result.errors.length > 0) {
-          setErrors({ api: result.errors.join(', ') });
-        } else {
-          setErrors({ api: result.message || 'Registration failed. Please try again.' });
-        }
+        setApiError(result.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
-      console.error('❌ Registration error:', error);
-      setErrors({ api: 'Registration failed. Please try again.' });
+      setApiError(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
- 
+
   const handleCancel = () => {
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      dateOfBirth: '',
-      phoneNumber: '',
-    });
-    setErrors({});
+    reset();
+    setApiError('');
     setSuccessMessage('');
     navigate('/login');
   };
- 
+
   return (
     <AuthPage>
       <div className="registration-page">
-        {/* HEADER OUTSIDE FORM */}
         <div className="registration-header-outside">
           <h1 className="header-title-outside">Join BlueWing Airlines</h1>
-          <p className="header-intro-outside">Create your account and start earning miles with every flight. Experience premium travel rewards with BlueWing.</p>
+          <p className="header-intro-outside">
+            Create your account and start earning miles with every flight. Experience premium travel rewards with BlueWing.
+          </p>
         </div>
 
         <div className="registration-container">
           <div className="registration-card">
             <h2 className="registration-form-title">Create Account</h2>
             <p className="subtitle">Join us for a seamless flight booking experience</p>
-            
-            {successMessage && (
-              <div className="success-message">{successMessage}</div>
-            )}
 
-            {errors.api && (
-              <div className="error-message api-error">{errors.api}</div>
-            )}
- 
-          <form onSubmit={handleSubmit} className="registration-form">
-            <div className="form-row">
+            {successMessage && <div className="success-message">{successMessage}</div>}
+            {apiError && <div className="error-message api-error">{apiError}</div>}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="registration-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="firstName">First Name *</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    {...formRegister('firstName')}
+                    placeholder="Enter your first name"
+                    className={errors.firstName ? 'input-error' : ''}
+                  />
+                  {errors.firstName && <span className="error-message">{errors.firstName.message}</span>}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="lastName">Last Name *</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    {...formRegister('lastName')}
+                    placeholder="Enter your last name"
+                    className={errors.lastName ? 'input-error' : ''}
+                  />
+                  {errors.lastName && <span className="error-message">{errors.lastName.message}</span>}
+                </div>
+              </div>
+
               <div className="form-group">
-                <label htmlFor="firstName">First Name *</label>
+                <label htmlFor="email">Email ID *</label>
                 <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  placeholder="Enter your first name"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className={errors.firstName ? 'input-error' : ''}
+                  type="email"
+                  id="email"
+                  {...formRegister('email')}
+                  placeholder="Enter your email address"
+                  className={errors.email ? 'input-error' : ''}
                 />
-                {errors.firstName && (
-                  <span className="error-message">{errors.firstName}</span>
+                {errors.email && <span className="error-message">{errors.email.message}</span>}
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="dateOfBirth">Date of Birth *</label>
+                  <input
+                    type="date"
+                    id="dateOfBirth"
+                    {...formRegister('dateOfBirth')}
+                    className={errors.dateOfBirth ? 'input-error' : ''}
+                  />
+                  {errors.dateOfBirth && <span className="error-message">{errors.dateOfBirth.message}</span>}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="phoneNumber">Phone Number *</label>
+                  <input
+                    type="text"
+                    id="phoneNumber"
+                    {...formRegister('phoneNumber')}
+                    placeholder="10-digit phone number"
+                    className={errors.phoneNumber ? 'input-error' : ''}
+                  />
+                  {errors.phoneNumber && <span className="error-message">{errors.phoneNumber.message}</span>}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="gender">Gender *</label>
+                <select
+                  id="gender"
+                  {...formRegister('gender')}
+                  className={errors.gender ? 'input-error' : ''}
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+                {errors.gender && <span className="error-message">{errors.gender.message}</span>}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password">
+                  <span className="password-icon">🔐</span> Password *
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  {...formRegister('password')}
+                  placeholder="Enter a strong password"
+                  className={errors.password ? 'input-error' : ''}
+                />
+                {errors.password && <span className="error-message">{errors.password.message}</span>}
+                <p className="password-hint">
+                  Password must contain at least 8 characters, including uppercase, lowercase, digit, and special character
+                </p>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="confirmPassword">
+                  <span className="password-icon">🔑</span> Confirm Password *
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  {...formRegister('confirmPassword')}
+                  placeholder="Confirm your password"
+                  className={errors.confirmPassword ? 'input-error' : ''}
+                />
+                {errors.confirmPassword && (
+                  <span className="error-message">{errors.confirmPassword.message}</span>
                 )}
               </div>
- 
-              <div className="form-group">
-                <label htmlFor="lastName">Last Name *</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  placeholder="Enter your last name"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className={errors.lastName ? 'input-error' : ''}
-                />
-                {errors.lastName && (
-                  <span className="error-message">{errors.lastName}</span>
-                )}
+
+              <div className="button-group">
+                <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                  {isLoading ? 'Creating Account...' : 'Sign Up'}
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={handleCancel} disabled={isLoading}>
+                  Cancel
+                </button>
               </div>
-            </div>
- 
-            <div className="form-group">
-              <label htmlFor="email">Email ID *</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Enter your email address"
-                value={formData.email}
-                onChange={handleInputChange}
-                className={errors.email ? 'input-error' : ''}
-              />
-              {errors.email && (
-                <span className="error-message">{errors.email}</span>
-              )}
-            </div>
- 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="dateOfBirth">Date of Birth *</label>
-                <input
-                  type="date"
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleInputChange}
-                  className={errors.dateOfBirth ? 'input-error' : ''}
-                />
-                {errors.dateOfBirth && (
-                  <span className="error-message">{errors.dateOfBirth}</span>
-                )}
-              </div>
- 
-              <div className="form-group">
-                <label htmlFor="phoneNumber">Phone Number *</label>
-                <input
-                  type="text"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  placeholder="10-digit phone number"
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  className={errors.phoneNumber ? 'input-error' : ''}
-                />
-                {errors.phoneNumber && (
-                  <span className="error-message">{errors.phoneNumber}</span>
-                )}
-              </div>
-            </div>
- 
-            <div className="form-group">
-              <label htmlFor="password">
-                <span className="password-icon">🔐</span> Password *
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Enter a strong password"
-                value={formData.password}
-                onChange={handleInputChange}
-                className={errors.password ? 'input-error' : ''}
-              />
-              {errors.password && (
-                <span className="error-message">{errors.password}</span>
-              )}
-              <p className="password-hint">
-                Password must contain at least 8 characters, including uppercase, lowercase, digit, and special character
-              </p>
-            </div>
- 
-            <div className="form-group">
-              <label htmlFor="confirmPassword">
-                <span className="password-icon">🔑</span> Confirm Password *
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                className={errors.confirmPassword ? 'input-error' : ''}
-              />
-              {errors.confirmPassword && (
-                <span className="error-message">{errors.confirmPassword}</span>
-              )}
-            </div>
- 
-            <div className="button-group">
-              <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                {isLoading ? 'Creating Account...' : 'Sign Up'}
-              </button>
-              <button type="button" className="btn btn-secondary" onClick={handleCancel} disabled={isLoading}>
-                Cancel
-              </button>
-            </div>
-          </form>
- 
-          <p className="login-link">
-            Already have an account? <a href="/login">Login here</a>
-          </p>
+            </form>
+
+            <p className="login-link">
+              Already have an account? <a href="/login">Login here</a>
+            </p>
+          </div>
         </div>
       </div>
-
-     
-    </div>
     </AuthPage>
   );
 };
+
 export default RegistrationPage;
