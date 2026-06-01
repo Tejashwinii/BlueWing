@@ -62,12 +62,19 @@ body {
   100% { background-position: 0% 50%; }
 }
 
-.image-overlay {
+/* .image-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.4) 100%);
   pointer-events: none;
+} */
+ 
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4); /* stronger overlay */
 }
+
 
 .image-content {
   position: relative;
@@ -89,13 +96,30 @@ body {
 }
 
 .cta-heading {
+  color:rgb(243, 243, 243);
   font-size: 42px;
   font-weight: 700;
   margin: 0 0 30px;
   line-height: 1.2;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   letter-spacing: -0.5px;
+
 }
+
+
+/* .cta-heading {
+  color: #ffffff;
+  font-size: 42px;
+  font-weight: 700;
+  margin: 0 0 30px;
+  line-height: 1.2;
+
+  /* Strong shadow for bright + dark areas 
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+
+  letter-spacing: -0.5px;
+} */
+
 
 .cta-button {
   display: inline-block;
