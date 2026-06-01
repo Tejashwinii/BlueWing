@@ -77,73 +77,86 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
         {/* Menu Items - Hidden in minimalMode */}
         {!minimalMode && (
           <div className="navbar-menu">
-            {Object.entries(navMenus).map(([key, menu]) => (
-              <div
-                key={key}
-                className="menu-item-wrapper"
-                onMouseEnter={() => setHoveredMenu(key)}
-                onMouseLeave={() => setHoveredMenu(null)}
-              >
-                <button 
-                  className={`menu-item-btn ${key === 'help' ? 'has-click' : ''}`}
-                  onClick={() => {
-                    if (key === 'help') {
-                      navigate('/help');
-                    }
-                  }}
+            {Object.entries(navMenus).map(([key, menu]) => {
+              if (key === 'whereFly') {
+                return (
+                  <div key={key} className="menu-item-wrapper">
+                    <button
+                      className="menu-item-btn"
+                      onClick={() => navigate('/where-we-fly')}
+                    >
+                      {menu.label}
+                    </button>
+                  </div>
+                );
+              }
+              // Keep dropdown for other menus as before
+              return (
+                <div
+                  key={key}
+                  className="menu-item-wrapper"
+                  onMouseEnter={() => setHoveredMenu(key)}
+                  onMouseLeave={() => setHoveredMenu(null)}
                 >
-                  {menu.label}
-                </button>
-                
-                {hoveredMenu === key && key !== 'help' && (
-                  <div className={`menu-dropdown ${key === 'experience' ? 'reviews-dropdown' : ''}`}>
-                    <div className="dropdown-content">
-                      {menu.sections[0].items.map((item, idx) => (
-                        <div key={idx} className={`dropdown-item ${key === 'experience' ? 'review-item' : ''}`}>
-                          {key === 'experience' ? (
-                            <>
-                              <div className="review-stars">
-                                {[...Array(item.stars)].map((_, i) => (
-                                  <span key={i} className="star">⭐</span>
-                                ))}
-                              </div>
-                              <div className="review-content">
-                                <div className="review-title">{item.title}</div>
-                                <div className="review-text">{item.description}</div>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <span className="item-icon">{item.icon}</span>
-                              <div className="item-info">
-                                <div className="item-title">{item.title}</div>
-                                <div className="item-description">{item.description}</div>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {hoveredMenu === key && key === 'help' && (
-                  <div className="menu-dropdown">
-                    <div className="dropdown-content">
-                      {menu.sections[0].items.map((item, idx) => (
-                        <div key={idx} className="dropdown-item" onClick={() => navigate('/help')}>
-                          <span className="item-icon">{item.icon}</span>
-                          <div className="item-info">
-                            <div className="item-title">{item.title}</div>
-                            <div className="item-description">{item.description}</div>
+                  <button 
+                    className={`menu-item-btn ${key === 'help' ? 'has-click' : ''}`}
+                    onClick={() => {
+                      if (key === 'help') {
+                        navigate('/help');
+                      }
+                    }}
+                  >
+                    {menu.label}
+                  </button>
+                  {hoveredMenu === key && key !== 'help' && (
+                    <div className={`menu-dropdown ${key === 'experience' ? 'reviews-dropdown' : ''}`}>
+                      <div className="dropdown-content">
+                        {menu.sections[0].items.map((item, idx) => (
+                          <div key={idx} className={`dropdown-item ${key === 'experience' ? 'review-item' : ''}`}>
+                            {key === 'experience' ? (
+                              <>
+                                <div className="review-stars">
+                                  {[...Array(item.stars)].map((_, i) => (
+                                    <span key={i} className="star">⭐</span>
+                                  ))}
+                                </div>
+                                <div className="review-content">
+                                  <div className="review-title">{item.title}</div>
+                                  <div className="review-text">{item.description}</div>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <span className="item-icon">{item.icon}</span>
+                                <div className="item-info">
+                                  <div className="item-title">{item.title}</div>
+                                  <div className="item-description">{item.description}</div>
+                                </div>
+                              </>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  )}
+                  {hoveredMenu === key && key === 'help' && (
+                    <div className="menu-dropdown">
+                      <div className="dropdown-content">
+                        {menu.sections[0].items.map((item, idx) => (
+                          <div key={idx} className="dropdown-item" onClick={() => navigate('/help')}>
+                            <span className="item-icon">{item.icon}</span>
+                            <div className="item-info">
+                              <div className="item-title">{item.title}</div>
+                              <div className="item-description">{item.description}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 

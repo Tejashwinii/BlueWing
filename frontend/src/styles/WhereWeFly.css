@@ -1,0 +1,138 @@
+﻿/* WhereWeFly.css - Modern responsive city grid with background images */
+.where-we-fly-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 6rem 1rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.wwf-title {
+  text-align: center;
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #1a237e;
+  letter-spacing: 1px;
+}
+
+.wwf-subtitle {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #5a6c7d;
+  margin-bottom: 2.5rem;
+  font-weight: 400;
+}
+
+.city-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+}
+
+.city-card {
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px rgba(30, 60, 120, 0.12);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  height: 100%;
+}
+
+.city-card:hover {
+  transform: translateY(-12px) scale(1.05);
+  box-shadow: 0 16px 48px rgba(30, 60, 120, 0.2);
+}
+
+.city-image {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  transition: all 0.3s ease;
+}
+
+.city-card:hover .city-image {
+  filter: brightness(1.15);
+}
+
+.city-overlay {
+  background: linear-gradient(180deg, rgba(26, 35, 126, 0.2) 0%, rgba(26, 35, 126, 0.95) 100%);
+  color: #fff;
+  width: 100%;
+  padding: 0.8rem 0.8rem;
+  text-align: left;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  backdrop-filter: blur(4px);
+}
+
+.city-name {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .where-we-fly-container {
+    padding: 2rem 1rem;
+  }
+
+  .wwf-title {
+    font-size: 2.2rem;
+  }
+
+  .wwf-subtitle {
+    font-size: 1rem;
+  }
+
+  .city-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .city-image {
+    height: 180px;
+  }
+
+  .city-name {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .where-we-fly-container {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .wwf-title {
+    font-size: 1.8rem;
+  }
+
+  .wwf-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .city-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .city-image {
+    height: 150px;
+  }
+
+  .city-name {
+    font-size: 0.85rem;
+  }
+}
+
