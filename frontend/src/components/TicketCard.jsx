@@ -3,13 +3,15 @@ import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
 import { bookingAPI, reviewAPI } from '../utils/api';
 import '../styles/TicketCard.css';
 
-const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, bookingReference, bookingId, onCancelled }) => {
+const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, bookingReference, bookingId, onCancelled, hasReviewed: initialHasReviewed = false }) => {
   const ticketRef = useRef(null);
   const [isCancelled, setIsCancelled] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [reviewSubmitted, setReviewSubmitted] = useState(false);
-  const [reviewData, setReviewData] = useState({ rating: 5, title: '', comment: '' });
+  const [hasReviewed, setHasReviewed] = useState(initialHasReviewed);
+  const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
+  const [userName, setUserName] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const getRandomGate = () => {
     const gates = Array.from({ length: 50 }, (_, i) => i + 1);
@@ -100,26 +102,37 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
   }, [arrivalDateTime]);
 
   const handleSubmitReview = async () => {
-    if (!reviewData.title.trim()) {
-      alert('Please enter a review title.');
+    if (!userName.trim()) {
+      alert('Please enter your name.');
       return;
     }
+    if (!reviewData.comment.trim()) {
+      alert('Please enter a comment.');
+      return;
+    }
+    
+    setIsSubmittingReview(true);
     try {
       const payload = {
-        flightId: selectedFare?.flightId || journey?.flightId || selectedFare?._id,
-        bookingId: bookingId,
+        userName: userName.trim(),
         rating: reviewData.rating,
-        title: reviewData.title,
-        comment: reviewData.comment,
+        comment: reviewData.comment.trim(),
+        bookingId: bookingId,
+        flightId: selectedFare?.flightId || journey?.flightId || selectedFare?._id,
       };
       const response = await reviewAPI.create(payload);
       if (response.success) {
-        setReviewSubmitted(true);
+        // Update state immediately without needing page refresh
+        setHasReviewed(true);
         setShowReviewModal(false);
+        setUserName('');
+        setReviewData({ rating: 5, comment: '' });
         alert('Review submitted successfully!');
       }
     } catch (error) {
       alert(error.message || 'Failed to submit review.');
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -392,13 +405,20 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
             ❌ Ticket Cancelled
           </button>
         )}
-        {!isCancelled && canReview && !reviewSubmitted && (
-          <button className="btn btn-review" onClick={() => setShowReviewModal(true)}>
+        {!isCancelled && canReview && !hasReviewed && (
+          <button 
+            className="btn btn-review btn-review-write" 
+            onClick={() => setShowReviewModal(true)}
+            disabled={isSubmittingReview}
+          >
             ✍️ Write Review
           </button>
         )}
-        {reviewSubmitted && (
-          <button className="btn btn-review btn-reviewed" disabled>
+        {!isCancelled && hasReviewed && (
+          <button 
+            className="btn btn-review btn-review-submitted" 
+            disabled
+          >
             ✅ Review Submitted
           </button>
         )}
@@ -425,16 +445,16 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
                 </div>
               </div>
               <div className="review-field">
-                <label>Title *</label>
+                <label>Your Name *</label>
                 <input
                   type="text"
-                  placeholder="e.g., Great flight experience!"
-                  value={reviewData.title}
-                  onChange={(e) => setReviewData({ ...reviewData, title: e.target.value })}
+                  placeholder="Enter your name"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
                 />
               </div>
               <div className="review-field">
-                <label>Comment</label>
+                <label>Comment *</label>
                 <textarea
                   placeholder="Share your experience..."
                   rows={4}
@@ -443,11 +463,19 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
                 />
               </div>
               <div className="review-actions">
-                <button className="btn btn-cancel-review" onClick={() => setShowReviewModal(false)}>
+                <button 
+                  className="btn btn-cancel-review" 
+                  onClick={() => setShowReviewModal(false)}
+                  disabled={isSubmittingReview}
+                >
                   Cancel
                 </button>
-                <button className="btn btn-submit-review" onClick={handleSubmitReview}>
-                  Submit Review
+                <button 
+                  className="btn btn-submit-review" 
+                  onClick={handleSubmitReview}
+                  disabled={isSubmittingReview}
+                >
+                  {isSubmittingReview ? '⏳ Submitting...' : 'Submit Review'}
                 </button>
               </div>
             </div>

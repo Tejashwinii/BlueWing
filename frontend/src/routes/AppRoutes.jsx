@@ -13,6 +13,7 @@ import TicketSummary from "../pages/TicketSummary";
 import Help from "../pages/Help";
 import UserProfile from "../pages/UserProfile";
 import WhereWeFly from "../pages/WhereWeFly";
+import Experiences from "../pages/Experiences";
 // import Confirmation from "../pages/Confirmation";
 
 function AppRoutes() {
@@ -31,6 +32,7 @@ function AppRoutes() {
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
       <Route path="/help" element={<Help />} />
       <Route path="/where-we-fly" element={<WhereWeFly />} />
+      <Route path="/experiences" element={<Experiences />} />
       <Route path="/profile" element={<UserProfile />} />
       <Route path="*" element={<Navigate to="/" replace />} />
       {/* <Route path="/confirmation" element={<Confirmation />} /> */}

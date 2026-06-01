@@ -78,12 +78,14 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
         {!minimalMode && (
           <div className="navbar-menu">
             {Object.entries(navMenus).map(([key, menu]) => {
-              if (key === 'whereFly') {
+              // whereFly and experience navigate directly, no dropdown
+              if (key === 'whereFly' || key === 'experience') {
+                const route = key === 'whereFly' ? '/where-we-fly' : '/experiences';
                 return (
                   <div key={key} className="menu-item-wrapper">
                     <button
                       className="menu-item-btn"
-                      onClick={() => navigate('/where-we-fly')}
+                      onClick={() => navigate(route)}
                     >
                       {menu.label}
                     </button>
