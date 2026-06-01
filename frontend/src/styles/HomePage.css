@@ -30,7 +30,7 @@ body {
   position: relative;
   height: 560px;
   overflow: visible;
-  background: url('../assets/homepage4.png') center/cover no-repeat;
+  background: url('../assets/homepage3.png') center/cover no-repeat;
   background-size: cover;
   background-position: center;
   padding-bottom: 0;
@@ -70,12 +70,29 @@ body {
   50% { transform: translateY(-20px); }
 }
 
+/* .hero-overlay {
+  position: absolute;
+  inset: 0;
+ /* background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(173, 216, 230, 0.2) 100%);
+ background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  opacity: 0.4 ;
+} */
+
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(173, 216, 230, 0.2) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.25) 0%,
+    rgba(0, 0, 0, 0.2) 40%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
   pointer-events: none;
 }
+
+
+
 
 .hero-content {
   position: relative;
