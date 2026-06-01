@@ -284,6 +284,7 @@ const TicketSummary = () => {
                     bookingReference={displayBookingReference}
                     bookingId={bookingId || backendBooking?._id}
                     onCancelled={handleTicketCancelled}
+                    hasReviewed={backendBooking?.hasReviewed || false}
                   />
                 ))}
               </div>

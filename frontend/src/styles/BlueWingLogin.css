@@ -18,7 +18,8 @@ body {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-  padding: 20px;
+  padding: 80px;
+  margin-top:30px;
 }
 
 .login-container {

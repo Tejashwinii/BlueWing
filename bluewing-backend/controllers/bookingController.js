@@ -2,6 +2,7 @@ import Booking from '../models/Booking.js';
 import Payment from '../models/Payment.js';
 import Flight from '../models/Flight.js';
 import User from '../models/User.js';
+import Review from '../models/Review.js';
 import { ObjectId } from 'mongodb';
 import {
 	lockSeatsAtomic,
@@ -212,7 +213,26 @@ export const getBookingById = async (req, res) => {
 			return res.status(403).json({ success: false, message: 'Not authorized to view this booking' });
 		}
 
-		return res.status(200).json({ success: true, data: booking });
+		// Check if user has already reviewed this booking
+		const existingReview = await Review.findOne({ 
+			bookingId: bookingId,
+			userId: userId 
+		});
+		const hasReviewed = !!existingReview;
+
+		// Get the first passenger's name for review display
+		const firstPassengerName = booking.passengers && booking.passengers.length > 0 
+			? `${booking.passengers[0].firstName} ${booking.passengers[0].lastName}`
+			: '';
+
+		return res.status(200).json({ 
+			success: true, 
+			data: {
+				...booking.toObject(),
+				hasReviewed,
+				firstPassengerName
+			}
+		});
 	} catch (error) {
 		return res.status(500).json({ success: false, message: 'Error fetching booking: ' + error.message });
 	}
@@ -239,7 +259,21 @@ export const getUserBookings = async (req, res) => {
 
 		const total = await Booking.countDocuments(query);
 
-		return res.status(200).json({ success: true, count: bookings.length, total, data: bookings });
+		// Add hasReviewed flag to each booking
+		const bookingsWithReviewStatus = await Promise.all(
+			bookings.map(async (booking) => {
+				const existingReview = await Review.findOne({
+					bookingId: booking._id,
+					userId: authUserId
+				});
+				return {
+					...booking.toObject(),
+					hasReviewed: !!existingReview
+				};
+			})
+		);
+
+		return res.status(200).json({ success: true, count: bookings.length, total, data: bookingsWithReviewStatus });
 	} catch (error) {
 		return res.status(500).json({ success: false, message: 'Error fetching bookings: ' + error.message });
 	}

@@ -1,0 +1,230 @@
+.experiences-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 40px 20px;
+}
+
+.experiences-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.experiences-header {
+  text-align: center;
+  margin-bottom: 50px;
+  margin-top: 40px;
+  animation: slideDown 0.6s ease;
+}
+
+.experiences-header h1 {
+  font-size: 42px;
+  color: #1976d2;
+  margin: 0 0 12px 0;
+  font-weight: 700;
+}
+
+.experiences-header p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.reviews-section {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.reviews-list {
+  animation: fadeIn 0.5s ease;
+}
+
+.reviews-count {
+  font-size: 14px;
+  color: #999;
+  margin: 0 0 20px 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-state p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Error State */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 20px;
+  background: #fff3cd;
+  border-radius: 8px;
+  border-left: 4px solid #ffc107;
+}
+
+.error-state p {
+  color: #856404;
+  font-size: 16px;
+  margin: 0;
+}
+
+.btn-retry {
+  padding: 10px 24px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-retry:hover {
+  background: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 12px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin: 0;
+  opacity: 0.6;
+}
+
+.empty-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.empty-subtext {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .experiences-page {
+    padding: 20px 16px;
+  }
+
+  .experiences-container {
+    max-width: 100%;
+  }
+
+  .experiences-header h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .experiences-header p {
+    font-size: 14px;
+  }
+
+  .reviews-section {
+    padding: 24px 16px;
+  }
+
+  .loading-state,
+  .error-state,
+  .empty-state {
+    padding: 40px 16px;
+  }
+
+  .empty-icon {
+    font-size: 40px;
+  }
+
+  .empty-text {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .experiences-page {
+    padding: 16px 12px;
+  }
+
+  .experiences-header h1 {
+    font-size: 24px;
+  }
+
+  .experiences-header p {
+    font-size: 13px;
+  }
+
+  .reviews-section {
+    padding: 16px 12px;
+    border-radius: 8px;
+  }
+}
