@@ -1,6 +1,8 @@
 .ticket-card-wrapper {
   margin: 14px auto;
-  max-width: 1400px;
+  width: 95%;
+  max-width: 1000px;
+  padding: 0;
   animation: slideIn 0.5s ease-out;
 }
 
@@ -20,11 +22,16 @@
   background: white;
   border-radius: 10px;
   box-shadow: 0 6px 20px rgba(25, 118, 210, 0.15);
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.3s ease;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
-  max-height: 220px;
+  min-height: 200px;
+  width: 100%;
+  max-width: 1000px;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: stretch;
 }
 
 .ticket-card:hover {
@@ -77,7 +84,9 @@
   align-items: center;
   justify-content: center;
   min-width: 100px;
-  max-width: 110px;
+  width: 150px;
+  flex: 0 0 150px;
+  flex-shrink: 0;
   color: white;
   position: relative;
   gap: 8px;
@@ -151,6 +160,8 @@
   justify-content: center;
   border-left: 1px solid #e0e0e0;
   border-right: 1px solid #e0e0e0;
+  min-width: 0;
+  flex: 3 1 0;
 }
 
 .ticket-header {
@@ -188,7 +199,7 @@
 .ticket-main-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .passenger-section {
@@ -221,7 +232,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin: 4px 0;
+  margin: 4px 0 8px;
 }
 
 .route-part {
@@ -239,7 +250,7 @@
 
 .details-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin-top: 6px;
 }
@@ -252,7 +263,7 @@
 
 /* Dashed Divider */
 .ticket-divider {
-  width: 2px;
+  width: 1px;
   background: repeating-linear-gradient(
     180deg,
     #1976d2 0px,
@@ -261,18 +272,19 @@
     transparent 16px
   );
   margin: 0;
+  align-self: stretch;
 }
 
 /* Right Section - Mini Duplicate */
 .ticket-right-section {
   background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-  padding: 12px;
+  padding: 4px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-width: 170px;
-  max-width: 180px;
+  flex: 0 0 auto;
+  min-width: 220px;
   position: relative;
 }
 
@@ -281,11 +293,13 @@
   border: 2px solid #1976d2;
   border-radius: 6px;
   padding: 10px;
-  width: 100%;
-  max-width: 160px;
+  width: auto;
+  min-width: 220px;
+  max-width: 260px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin: 4px;
 }
 
 .mini-header {
@@ -334,7 +348,7 @@
 
 .mini-details {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   font-size: 9px;
 }
