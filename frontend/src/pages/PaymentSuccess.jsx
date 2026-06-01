@@ -7,6 +7,11 @@ const PaymentSuccess = () => {
   const location = useLocation();
   const bookingData = location.state || {};
 
+  const formatCurrency = (value) => {
+    const amount = Number(String(value).replace(/[^0-9.-]+/g, ''));
+    return Number.isFinite(amount) ? `₹${amount.toLocaleString('en-IN')}` : '₹ --';
+  };
+
   const handleViewTickets = () => {
     navigate('/ticket-summary', { state: bookingData });
   };
@@ -63,7 +68,7 @@ const PaymentSuccess = () => {
             </div>
             <div className="summary-item">
               <span className="summary-label">Total Amount:</span>
-              <span className="summary-value">{bookingData.selectedFare?.price}</span>
+                <span className="summary-value">{formatCurrency(bookingData.selectedFare?.totalFare || bookingData.selectedFare?.price)}</span>
             </div>
           </div>
         )}

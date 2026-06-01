@@ -146,15 +146,29 @@ const TicketSummary = () => {
     return backendBooking?.bookingReference || bookingReference || `BW${Date.now().toString().slice(-6)}`;
   }, [backendBooking, bookingReference]);
 
+  const formatCurrency = (value) => {
+    const amount = Number(String(value).replace(/[^0-9.-]+/g, ''));
+    return Number.isFinite(amount) ? `₹${amount.toLocaleString('en-IN')}` : '₹ --';
+  };
+
   // Format total fare for display
   const totalFareDisplay = useMemo(() => {
-    if (backendBooking?.pricing?.totalAmount) {
-      return `₹${backendBooking.pricing.totalAmount.toLocaleString('en-IN')}`;
+    if (selectedFare?.totalFare != null) {
+      return formatCurrency(selectedFare.totalFare);
     }
-    if (selectedFare.totalFare) {
-      return `₹${typeof selectedFare.totalFare === 'number' ? selectedFare.totalFare.toLocaleString('en-IN') : selectedFare.totalFare}`;
+    if (location.state?.totalFare != null) {
+      return formatCurrency(location.state.totalFare);
     }
-    return selectedFare.price || '₹ --';
+    if (selectedFare?.price != null) {
+      return formatCurrency(selectedFare.price);
+    }
+    if (backendBooking?.paymentId?.amount != null) {
+      return formatCurrency(backendBooking.paymentId.amount);
+    }
+    if (backendBooking?.pricing?.totalAmount != null) {
+      return formatCurrency(backendBooking.pricing.totalAmount);
+    }
+    return '₹ --';
   }, [selectedFare, backendBooking]);
 
   // Get fare type details
@@ -190,24 +204,6 @@ const TicketSummary = () => {
     } catch (err) {
       console.warn('Failed to refresh booking:', err?.message || err);
     }
-  };
-
-  const handleDownloadAllTickets = () => {
-    const ticketCards = document.querySelectorAll('.ticket-card:not(.cancelled-ticket)');
-
-    if (ticketCards.length === 0) {
-      alert('No tickets available for download.');
-      return;
-    }
-
-    ticketCards.forEach((card, index) => {
-      setTimeout(() => {
-        const printWindow = window.open('', '', 'height=600,width=800');
-        printWindow.document.write('<pre>' + card.innerHTML + '</pre>');
-        printWindow.document.close();
-        printWindow.print();
-      }, index * 500);
-    });
   };
 
   if (loading) {
@@ -300,9 +296,6 @@ const TicketSummary = () => {
         </div>
 
         <div className="ticket-summary-actions">
-          <button className="btn btn-primary" onClick={handleDownloadAllTickets}>
-            📥 Download All Tickets
-          </button>
           <button className="btn btn-secondary" onClick={handleGoHome}>
             🏠 Go to Home
           </button>
