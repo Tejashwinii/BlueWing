@@ -13,7 +13,8 @@
 
 .flight-card {
   font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  background: white;
+   background-image:url('../assets/flight-card3.png');
+  background-size: cover; 
   border: 1px solid #e0e8f5;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 26, 77, 0.08);
