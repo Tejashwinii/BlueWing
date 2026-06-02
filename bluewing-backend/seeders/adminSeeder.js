@@ -31,6 +31,8 @@ const seedAdmin = async () => {
         email: 'admin@gmail.com',
         password: 'admin@BlueWing', // will be hashed by pre-save hook
         phone: '9999999999',
+        dateOfBirth: new Date('2000-01-01'),
+        gender: 'male',
         role: 'admin',
         isEmailVerified: true,
         status: 'active',
