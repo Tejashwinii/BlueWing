@@ -1,60 +1,141 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import AdultPassengerCard from '../components/AdultPassengerCard';
 import ChildPassengerCard from '../components/ChildPassengerCard';
 import ContactDetailsCard from '../components/ContactDetailsCard';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import '../styles/PassengerDetails.css';
+
+const passengerSchema = Yup.object().shape({
+  adults: Yup.array().of(
+    Yup.object().shape({
+      firstName: Yup.string()
+        .trim()
+        .required('First Name is required')
+        .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
+      lastName: Yup.string()
+        .trim()
+        .required('Last Name is required')
+        .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
+      gender: Yup.string().required('Gender is required'),
+      age: Yup.number()
+        .required('Age is required')
+        .positive('Age must be a positive number')
+        .integer('Age must be an integer')
+    })
+  ),
+  children: Yup.array().of(
+    Yup.object().shape({
+      firstName: Yup.string()
+        .trim()
+        .required('First Name is required')
+        .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
+      lastName: Yup.string()
+        .trim()
+        .required('Last Name is required')
+        .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
+      gender: Yup.string().required('Gender is required'),
+      dateOfBirth: Yup.date()
+        .required('Date of Birth is required')
+        .max(new Date(), 'Date of Birth must be a past date')
+        .test('is-child', 'Child age must be 12 years or below', function (value) {
+          if (!value) return true;
+          const birthDate = new Date(value);
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          return age <= 12;
+        }),
+      age: Yup.number()
+        .required('Age is required')
+        .positive('Age must be a positive number')
+        .integer('Age must be an integer')
+    })
+  ),
+  contactData: Yup.object().shape({
+    contactPerson: Yup.string().required('Contact Person is required'),
+    country: Yup.string().required('Country / Territory is required'),
+    mobileNumber: Yup.string()
+      .trim()
+      .required('Mobile Number is required')
+      .matches(/^[0-9]{10}$/, 'Mobile Number must be 10 digits'),
+    email: Yup.string()
+      .trim()
+      .required('Email is required')
+      .email('Please enter a valid email address'),
+  })
+});
 
 const PassengerDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Get journey and selected fare data from location state
   const journey = location.state?.journey || {};
   const selectedFare = location.state?.selectedFare || {};
   
-  // Get passenger counts from journey
   const adultCount = journey.passengers?.adults || 1;
   const childCount = journey.passengers?.children || 0;
   const infantCount = journey.passengers?.infants || 0;
 
-  // Initialize passenger data for adults and children
-  const [adultPassengers, setAdultPassengers] = useState(
-    Array(adultCount).fill(null).map(() => ({
-      firstName: '',
-      lastName: '',
-      gender: '',
-      age: '',
-    }))
-  );
-
-  const [childPassengers, setChildPassengers] = useState(
-    Array(childCount).fill(null).map(() => ({
-      firstName: '',
-      lastName: '',
-      gender: '',
-      dateOfBirth: '',
-      age: '',
-    }))
-  );
-
-  // Contact details
-  const [contactData, setContactData] = useState({
-    contactPerson: '',
-    country: 'India',
-    mobileNumber: '',
-    email: '',
-  });
-
-  // Expanded state for cards
   const [expandedCards, setExpandedCards] = useState({
     adults: Array(adultCount).fill(false).map((_, i) => i === 0),
     children: Array(childCount).fill(false).map((_, i) => i === 0),
   });
 
+  const formik = useFormik({
+    initialValues: {
+      adults: Array(adultCount).fill(null).map(() => ({
+        firstName: '',
+        lastName: '',
+        gender: '',
+        age: '',
+      })),
+      children: Array(childCount).fill(null).map(() => ({
+        firstName: '',
+        lastName: '',
+        gender: '',
+        dateOfBirth: '',
+        age: '',
+      })),
+      contactData: {
+        contactPerson: '',
+        country: 'India',
+        mobileNumber: '',
+        email: '',
+      }
+    },
+    validationSchema: passengerSchema,
+    validateOnChange: true,
+    onSubmit: (values) => {
+      const pricePerPerson = selectedFare.rawPrice || 0;
+      const totalFareCalc = pricePerPerson * (adultCount + childCount);
+      navigate('/seat-selection', {
+        state: {
+          journey,
+          selectedFare: {
+            ...selectedFare,
+            totalFare: totalFareCalc,
+          },
+          passengers: {
+            adults: values.adults,
+            children: values.children,
+            infants: infantCount,
+          },
+          passengerDetails: {
+            adults: values.adults,
+            children: values.children,
+          },
+          contactDetails: values.contactData,
+        },
+      });
+    }
+  });
 
-  // Format passenger count display
   const passengerCountDisplay = useMemo(() => {
     const counts = [];
     if (adultCount > 0) counts.push(`${adultCount} Adult${adultCount !== 1 ? 's' : ''}`);
@@ -63,44 +144,27 @@ const PassengerDetails = () => {
     return counts.join(', ');
   }, [adultCount, childCount, infantCount]);
 
-  // Calculate total passengers (adults + children, infants typically travel free)
-  const totalPassengers = useMemo(() => {
-    return adultCount + childCount;
-  }, [adultCount, childCount]);
+  const totalPassengers = useMemo(() => adultCount + childCount, [adultCount, childCount]);
 
-  // Calculate total fare = price per person × total passengers
   const totalFare = useMemo(() => {
     const pricePerPerson = selectedFare.rawPrice || 0;
     const total = pricePerPerson * totalPassengers;
-    
     if (typeof total === 'number') {
       return `₹${total.toLocaleString('en-IN')}`;
     }
     return selectedFare.price || '₹ --';
   }, [selectedFare, totalPassengers]);
 
-  // Handle adult passenger data change
-  const handleAdultDataChange = (index, field, value) => {
-    const updated = [...adultPassengers];
-    updated[index] = { ...updated[index], [field]: value };
-    setAdultPassengers(updated);
-  };
-
-  // Handle child passenger data change
-  const handleChildDataChange = (index, field, value) => {
-    const updated = [...childPassengers];
-    updated[index] = { ...updated[index], [field]: value };
-    setChildPassengers(updated);
-  };
-
-  // Handle contact data change
-  const handleContactDataChange = (field, value) => {
-    setContactData(prev => ({ ...prev, [field]: value }));
-  };
-
-  // Handle save for adult passenger
-  const handleAdultSave = (index) => {
-    // Collapse current, expand next if available
+  const handleAdultSave = async (index) => {
+    const errors = await formik.validateForm();
+    if (errors.adults && errors.adults[index]) {
+      const fields = ['firstName', 'lastName', 'gender', 'age'];
+      fields.forEach(field => {
+        formik.setFieldTouched(`adults[${index}].${field}`, true, true);
+      });
+      return;
+    }
+    
     const newExpanded = { ...expandedCards };
     newExpanded.adults[index] = false;
     if (index + 1 < adultCount) {
@@ -111,9 +175,16 @@ const PassengerDetails = () => {
     setExpandedCards(newExpanded);
   };
 
-  // Handle save for child passenger
-  const handleChildSave = (index) => {
-    // Collapse current, expand next if available
+  const handleChildSave = async (index) => {
+    const errors = await formik.validateForm();
+    if (errors.children && errors.children[index]) {
+      const fields = ['firstName', 'lastName', 'gender', 'dateOfBirth', 'age'];
+      fields.forEach(field => {
+        formik.setFieldTouched(`children[${index}].${field}`, true, true);
+      });
+      return;
+    }
+
     const newExpanded = { ...expandedCards };
     newExpanded.children[index] = false;
     if (index + 1 < childCount) {
@@ -122,7 +193,6 @@ const PassengerDetails = () => {
     setExpandedCards(newExpanded);
   };
 
-  // Toggle card expand/collapse
   const toggleCardExpand = (type, index) => {
     setExpandedCards(prev => ({
       ...prev,
@@ -130,45 +200,10 @@ const PassengerDetails = () => {
     }));
   };
 
-  // Check if all required data is filled
-  const isFormComplete = useMemo(() => {
-    const allAdultsFilled = adultPassengers.every(p => p.firstName && p.lastName && p.gender && p.age);
-    const allChildrenFilled = childPassengers.every(p => p.firstName && p.lastName && p.gender && p.dateOfBirth && p.age);
-    const contactFilled = contactData.mobileNumber && contactData.email && contactData.contactPerson !== '';
-    
-    return allAdultsFilled && allChildrenFilled && contactFilled;
-  }, [adultPassengers, childPassengers, contactData]);
-
-  // Handle form submission
-  const handleSubmit = () => {
-    if (isFormComplete) {
-      navigate('/seat-selection', {
-        state: {
-          journey,
-          selectedFare: {
-            ...selectedFare,
-            totalFare: selectedFare.rawPrice ? selectedFare.rawPrice * totalPassengers : 0,
-          },
-          passengers: {
-            adults: adultPassengers,
-            children: childPassengers,
-            infants: infantCount,
-          },
-          passengerDetails: {
-            adults: adultPassengers,
-            children: childPassengers,
-          },
-          contactDetails: contactData,
-        },
-      });
-    }
-  };
-
   return (
     <>
       <Navbar minimalMode={true} />
       <div className="passenger-details-page">
-        {/* Compact Route Card Below Navbar */}
         <div className="compact-route-card">
           <div className="route-display">
             <span className="route-from">{journey.departure || 'FROM'}</span>
@@ -178,58 +213,48 @@ const PassengerDetails = () => {
         </div>
 
         <div className="passenger-container">
-          {/* Left Section - Passenger Cards */}
           <div className="form-section-wrapper">
-            {/* Page Title */}
             <h1 className="page-title">Passenger Details</h1>
 
-            {/* Adult Passenger Cards */}
-            <div className="passengers-section">
-              <h2 className="section-heading">Adults</h2>
-              <div className="passengers-list">
-                {adultPassengers.map((passenger, index) => (
-                  <AdultPassengerCard
-                    key={`adult-${index}`}
-                    passengerIndex={index}
-                    passengerData={passenger}
-                    onSave={handleAdultSave}
-                    onDataChange={handleAdultDataChange}
-                    isExpanded={expandedCards.adults[index]}
-                    onToggleExpand={() => toggleCardExpand('adults', index)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Child Passenger Cards */}
-            {childCount > 0 && (
+            <form onSubmit={formik.handleSubmit}>
               <div className="passengers-section">
-                <h2 className="section-heading">Children</h2>
+                <h2 className="section-heading">Adults</h2>
                 <div className="passengers-list">
-                  {childPassengers.map((passenger, index) => (
-                    <ChildPassengerCard
-                      key={`child-${index}`}
+                  {formik.values.adults.map((passenger, index) => (
+                    <AdultPassengerCard
+                      key={`adult-${index}`}
+                      formik={formik}
                       passengerIndex={index}
-                      passengerData={passenger}
-                      onSave={handleChildSave}
-                      onDataChange={handleChildDataChange}
-                      isExpanded={expandedCards.children[index]}
-                      onToggleExpand={() => toggleCardExpand('children', index)}
+                      onSave={handleAdultSave}
+                      isExpanded={expandedCards.adults[index]}
+                      onToggleExpand={() => toggleCardExpand('adults', index)}
                     />
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* Contact Details Card */}
-            <ContactDetailsCard
-              adultPassengers={adultPassengers}
-              contactData={contactData}
-              onDataChange={handleContactDataChange}
-            />
+              {childCount > 0 && (
+                <div className="passengers-section">
+                  <h2 className="section-heading">Children</h2>
+                  <div className="passengers-list">
+                    {formik.values.children.map((passenger, index) => (
+                      <ChildPassengerCard
+                        key={`child-${index}`}
+                        formik={formik}
+                        passengerIndex={index}
+                        onSave={handleChildSave}
+                        isExpanded={expandedCards.children[index]}
+                        onToggleExpand={() => toggleCardExpand('children', index)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <ContactDetailsCard formik={formik} />
+            </form>
           </div>
 
-          {/* Right Section - Trip Summary Card */}
           <div className="trip-summary-wrapper">
             <div className="trip-summary-card">
               <div className="trip-summary-header">
@@ -238,12 +263,10 @@ const PassengerDetails = () => {
               </div>
               
               <div className="trip-summary-content">
-                {/* Passenger Count */}
                 <div className="trip-summary-section">
                   <p className="summary-text">{passengerCountDisplay || '1 Adult'}</p>
                 </div>
 
-                {/* Cabin Class / Fare Type */}
                 {journey.cabinClass && (
                   <div className="trip-summary-section">
                     <p className="summary-text">
@@ -252,14 +275,12 @@ const PassengerDetails = () => {
                   </div>
                 )}
 
-                {/* Departure Date */}
                 {journey.date && (
                   <div className="trip-summary-section">
                     <p className="summary-text">{journey.date}</p>
                   </div>
                 )}
 
-                {/* Journey Duration */}
                 {selectedFare.duration && (
                   <div className="trip-summary-section">
                     <p className="summary-text">
@@ -268,35 +289,28 @@ const PassengerDetails = () => {
                   </div>
                 )}
 
-                {/* Flight Details Section */}
                 <div className="flight-summary-section">
                   <h3 className="summary-section-title">Flight Details</h3>
                   
-                  {/* Flight Route */}
                   <div className="flight-route-display">
                     <div className="flight-route-item">
                       <p className="flight-location-value">{journey.departure || 'FROM'}</p>
                     </div>
-                    
                     <div className="flight-route-arrow">→</div>
-                    
                     <div className="flight-route-item">
                       <p className="flight-location-value">{journey.arrival || 'TO'}</p>
                     </div>
                   </div>
 
-                  {/* Flight Number and Airline */}
                   <div className="flight-leg-details">
                     <p className="flight-number">{selectedFare.flightNumber || 'Flight --'}</p>
                     <p className="airline-name">{selectedFare.airlineName || 'Airline'}</p>
                   </div>
 
-                  {/* Check-in Details */}
                   <div className="checkin-details">
                     <p><strong>Check-in:</strong> {selectedFare.checkinBaggage || '15 KG'} | Hand bag: Up to 7KG</p>
                   </div>
 
-                  {/* Total Fare */}
                   <div className="total-fare-section">
                     <p className="total-fare-label">TOTAL FARE</p>
                     <p className="total-fare-amount">{totalFare}</p>
@@ -307,13 +321,11 @@ const PassengerDetails = () => {
           </div>
         </div>
 
-        {/* Bottom Fixed Next Button */}
         <div className="passenger-actions">
           <button 
             type="button" 
             className="btn btn-next"
-            onClick={handleSubmit}
-            disabled={!isFormComplete}
+            onClick={formik.handleSubmit}
           >
             Next
           </button>

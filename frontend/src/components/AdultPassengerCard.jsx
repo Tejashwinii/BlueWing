@@ -1,57 +1,19 @@
-import React, { useState } from 'react';
+﻿import React from 'react';
 
 const AdultPassengerCard = ({ 
+  formik,
   passengerIndex, 
-  passengerData, 
   onSave, 
-  onDataChange,
   isExpanded,
   onToggleExpand
 }) => {
-  const [errors, setErrors] = useState({});
+  const basePath = `adults[${passengerIndex}]`;
+  const passengerData = formik.values.adults[passengerIndex] || {};
+  const passengerErrors = formik.errors.adults?.[passengerIndex] || {};
+  const passengerTouched = formik.touched.adults?.[passengerIndex] || {};
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    // For radio buttons with unique names like "gender-adult-0", extract the field name
-    const fieldName = name.includes('gender') ? 'gender' : name;
-    onDataChange(passengerIndex, fieldName, value);
-    if (errors[fieldName]) {
-      setErrors(prev => ({ ...prev, [fieldName]: '' }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!passengerData.firstName?.trim()) {
-      newErrors.firstName = 'First Name is required';
-    }
-    
-    if (!passengerData.lastName?.trim()) {
-      newErrors.lastName = 'Last Name is required';
-    }
-    
-    if (!passengerData.gender) {
-      newErrors.gender = 'Gender is required';
-    }
-
-    if (!passengerData.age) {
-      newErrors.age = 'Age is required';
-    } else if (Number(passengerData.age) <= 0) {
-      newErrors.age = 'Age must be a positive number';
-    }
-    
-    return newErrors;
-  };
-
-  const handleSave = () => {
-    const formErrors = validateForm();
-    if (Object.keys(formErrors).length === 0) {
-      onSave(passengerIndex);
-      setErrors({});
-    } else {
-      setErrors(formErrors);
-    }
+  const hasError = (field) => {
+    return passengerErrors[field] && (passengerTouched[field] || String(passengerData[field] || '').length > 0);
   };
 
   return (
@@ -75,37 +37,36 @@ const AdultPassengerCard = ({
 
       {isExpanded && (
         <div className="passenger-card-content">
-          {/* First Name */}
           <div className="form-group">
             <input
               type="text"
-              name="firstName"
+              name={`${basePath}.firstName`}
               placeholder="First Name *"
-              value={passengerData.firstName || ''}
-              onChange={handleInputChange}
-              className={errors.firstName ? 'input-error' : ''}
+              value={passengerData.firstName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={hasError('firstName') ? 'input-error' : ''}
             />
-            {errors.firstName && (
-              <span className="error-message">{errors.firstName}</span>
+            {hasError('firstName') && (
+              <span className="error-message">{passengerErrors.firstName}</span>
             )}
           </div>
 
-          {/* Last Name */}
           <div className="form-group">
             <input
               type="text"
-              name="lastName"
+              name={`${basePath}.lastName`}
               placeholder="Last Name *"
-              value={passengerData.lastName || ''}
-              onChange={handleInputChange}
-              className={errors.lastName ? 'input-error' : ''}
+              value={passengerData.lastName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={hasError('lastName') ? 'input-error' : ''}
             />
-            {errors.lastName && (
-              <span className="error-message">{errors.lastName}</span>
+            {hasError('lastName') && (
+              <span className="error-message">{passengerErrors.lastName}</span>
             )}
           </div>
 
-          {/* Gender */}
           <div className="form-group">
             <label className="form-label">Gender *</label>
             <div className="gender-selection">
@@ -113,15 +74,13 @@ const AdultPassengerCard = ({
                 <input
                   type="radio"
                   id={`gender-adult-${passengerIndex}-male`}
-                  name={`gender-adult-${passengerIndex}`}
+                  name={`${basePath}.gender`}
                   value="Male"
                   checked={passengerData.gender === 'Male'}
-                  onChange={handleInputChange}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                 />
-                <label 
-                  htmlFor={`gender-adult-${passengerIndex}-male`} 
-                  className="radio-label-text"
-                >
+                <label htmlFor={`gender-adult-${passengerIndex}-male`} className="radio-label-text">
                   Male
                 </label>
               </div>
@@ -129,45 +88,42 @@ const AdultPassengerCard = ({
                 <input
                   type="radio"
                   id={`gender-adult-${passengerIndex}-female`}
-                  name={`gender-adult-${passengerIndex}`}
+                  name={`${basePath}.gender`}
                   value="Female"
                   checked={passengerData.gender === 'Female'}
-                  onChange={handleInputChange}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                 />
-                <label 
-                  htmlFor={`gender-adult-${passengerIndex}-female`} 
-                  className="radio-label-text"
-                >
+                <label htmlFor={`gender-adult-${passengerIndex}-female`} className="radio-label-text">
                   Female
                 </label>
               </div>
             </div>
-            {errors.gender && (
-              <span className="error-message">{errors.gender}</span>
+            {hasError('gender') && (
+              <span className="error-message">{passengerErrors.gender}</span>
             )}
           </div>
 
-          {/* Age */}
           <div className="form-group">
             <input
               type="number"
-              name="age"
+              name={`${basePath}.age`}
               placeholder="Age *"
-              value={passengerData.age || ''}
-              onChange={handleInputChange}
+              value={passengerData.age}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               min="1"
-              className={errors.age ? 'input-error' : ''}
+              className={hasError('age') ? 'input-error' : ''}
             />
-            {errors.age && (
-              <span className="error-message">{errors.age}</span>
+            {hasError('age') && (
+              <span className="error-message">{passengerErrors.age}</span>
             )}
           </div>
 
-          {/* Save Button */}
           <button
             type="button"
             className="btn btn-save-passenger"
-            onClick={handleSave}
+            onClick={() => onSave(passengerIndex)}
           >
             Save & Next
           </button>
