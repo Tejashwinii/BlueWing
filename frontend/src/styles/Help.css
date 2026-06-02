@@ -16,7 +16,8 @@
 
 /* Header Section */
 .help-header {
-  background: linear-gradient(135deg, #001a4d 0%, #003d99 50%, #0066ff 100%);
+  background-image:url('../assets/help3.png');
+  background-size: cover;
   color: white;
   padding: 100px 20px;
   text-align: center;
@@ -63,6 +64,7 @@
 .help-title {
   font-size: 48px;
   font-weight: 800;
+  margin-left:300px;
   margin-bottom: 12px;
   letter-spacing: -1px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -74,6 +76,7 @@
   margin-bottom: 0;
   opacity: 0.95;
   letter-spacing: 0.3px;
+  margin-left:300px;
 }
 
 /* Quick Help Section */
