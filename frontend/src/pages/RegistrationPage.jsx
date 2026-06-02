@@ -1,62 +1,46 @@
-import React, { useState, useContext } from 'react';
+﻿import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
 import AuthPage from '../components/AuthPage';
 import '../styles/Registration.css';
 
-const registrationSchema = z
-  .object({
-    firstName: z
-      .string()
-      .trim()
-      .min(1, { message: 'First Name is required' })
-      .regex(/^[A-Za-z]+$/, { message: 'Only characters are allowed' }),
-    lastName: z
-      .string()
-      .trim()
-      .min(1, { message: 'Last Name is required' })
-      .regex(/^[A-Za-z]+$/, { message: 'Only characters are allowed' }),
-    email: z
-      .string()
-      .trim()
-      .min(1, { message: 'Email is required' })
-      .email({ message: 'Invalid email format' }),
-    dateOfBirth: z
-      .string()
-      .trim()
-      .min(1, { message: 'Date of Birth is required' })
-      .refine((value) => {
-        const date = new Date(value);
-        return value && !Number.isNaN(date.getTime()) && date < new Date();
-      }, { message: 'Date of Birth must be a past date' }),
-    phoneNumber: z
-      .string()
-      .trim()
-      .min(1, { message: 'Phone Number is required' })
-      .regex(/^[0-9]{10}$/, { message: 'Phone Number must be exactly 10 digits' }),
-    gender: z.enum(['male', 'female', 'other'], {
-      errorMap: () => ({ message: 'Gender is required' }),
-    }),
-    password: z
-      .string()
-      .min(6, { message: 'Password must be at least 6 characters' })
-      .regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)/, {
-        message: 'Password must contain uppercase, lowercase, and number',
-      }),
-    confirmPassword: z.string().min(1, { message: 'Confirm Password is required' }),
-  })
-  .superRefine((data, ctx) => {
-    if (data.password !== data.confirmPassword) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['confirmPassword'],
-        message: 'Passwords do not match',
-      });
-    }
-  });
+const registrationSchema = Yup.object().shape({
+  firstName: Yup.string()
+    .trim()
+    .required('First Name is required')
+    .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
+  lastName: Yup.string()
+    .trim()
+    .required('Last Name is required')
+    .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
+  email: Yup.string()
+    .trim()
+    .required('Email is required')
+    .email('Invalid email format'),
+  dateOfBirth: Yup.date()
+    .required('Date of Birth is required')
+    .max(new Date(), 'Date of Birth must be a past date')
+    .typeError('Invalid date format'),
+  phoneNumber: Yup.string()
+    .trim()
+    .required('Phone Number is required')
+    .matches(/^[0-9]{10}$/, 'Phone Number must be exactly 10 digits'),
+  gender: Yup.string()
+    .required('Gender is required')
+    .oneOf(['male', 'female', 'other'], 'Gender is required'),
+  password: Yup.string()
+    .required('Password is required')
+    .min(8, 'Password must be at least 8 characters')
+    .matches(
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])/,
+      'Password must contain uppercase, lowercase, digit, and special character'
+    ),
+  confirmPassword: Yup.string()
+    .required('Confirm Password is required')
+    .oneOf([Yup.ref('password'), null], 'Passwords do not match'),
+});
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -65,14 +49,8 @@ const RegistrationPage = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [apiError, setApiError] = useState('');
 
-  const {
-    register: formRegister,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(registrationSchema),
-    defaultValues: {
+  const formik = useFormik({
+    initialValues: {
       firstName: '',
       lastName: '',
       email: '',
@@ -82,43 +60,48 @@ const RegistrationPage = () => {
       password: '',
       confirmPassword: '',
     },
+    validationSchema: registrationSchema,
+    validateOnChange: true,
+    onSubmit: async (values, { resetForm }) => {
+      setIsLoading(true);
+      setApiError('');
+      setSuccessMessage('');
+
+      try {
+        const result = await register({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          password: values.password,
+          phone: values.phoneNumber,
+          gender: values.gender,
+          dateOfBirth: values.dateOfBirth,
+        });
+
+        if (result.success) {
+          setSuccessMessage('Registration successful! Redirecting to login...');
+          resetForm();
+          setTimeout(() => navigate('/login'), 2000);
+        } else {
+          setApiError(result.message || 'Registration failed. Please try again.');
+        }
+      } catch (error) {
+        setApiError(error.message || 'Registration failed. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    },
   });
 
-  const onSubmit = async (data) => {
-    setIsLoading(true);
-    setApiError('');
-    setSuccessMessage('');
-
-    try {
-      const result = await register({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        password: data.password,
-        phone: data.phoneNumber,
-        gender: data.gender,
-        dateOfBirth: data.dateOfBirth,
-      });
-
-      if (result.success) {
-        setSuccessMessage('Registration successful! Redirecting to login...');
-        reset();
-        setTimeout(() => navigate('/login'), 2000);
-      } else {
-        setApiError(result.message || 'Registration failed. Please try again.');
-      }
-    } catch (error) {
-      setApiError(error.message || 'Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleCancel = () => {
-    reset();
+    formik.resetForm();
     setApiError('');
     setSuccessMessage('');
     navigate('/login');
+  };
+
+  const hasError = (field) => {
+    return formik.errors[field] && (formik.touched[field] || String(formik.values[field]).length > 0);
   };
 
   return (
@@ -139,18 +122,23 @@ const RegistrationPage = () => {
             {successMessage && <div className="success-message">{successMessage}</div>}
             {apiError && <div className="error-message api-error">{apiError}</div>}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="registration-form">
+            <form onSubmit={formik.handleSubmit} className="registration-form">
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="firstName">First Name *</label>
                   <input
                     type="text"
                     id="firstName"
-                    {...formRegister('firstName')}
+                    name="firstName"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.firstName}
                     placeholder="Enter your first name"
-                    className={errors.firstName ? 'input-error' : ''}
+                    className={hasError('firstName') ? 'input-error' : ''}
                   />
-                  {errors.firstName && <span className="error-message">{errors.firstName.message}</span>}
+                  {hasError('firstName') && (
+                    <span className="error-message">{formik.errors.firstName}</span>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -158,11 +146,16 @@ const RegistrationPage = () => {
                   <input
                     type="text"
                     id="lastName"
-                    {...formRegister('lastName')}
+                    name="lastName"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.lastName}
                     placeholder="Enter your last name"
-                    className={errors.lastName ? 'input-error' : ''}
+                    className={hasError('lastName') ? 'input-error' : ''}
                   />
-                  {errors.lastName && <span className="error-message">{errors.lastName.message}</span>}
+                  {hasError('lastName') && (
+                    <span className="error-message">{formik.errors.lastName}</span>
+                  )}
                 </div>
               </div>
 
@@ -171,11 +164,16 @@ const RegistrationPage = () => {
                 <input
                   type="email"
                   id="email"
-                  {...formRegister('email')}
+                  name="email"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.email}
                   placeholder="Enter your email address"
-                  className={errors.email ? 'input-error' : ''}
+                  className={hasError('email') ? 'input-error' : ''}
                 />
-                {errors.email && <span className="error-message">{errors.email.message}</span>}
+                {hasError('email') && (
+                  <span className="error-message">{formik.errors.email}</span>
+                )}
               </div>
 
               <div className="form-row">
@@ -184,10 +182,15 @@ const RegistrationPage = () => {
                   <input
                     type="date"
                     id="dateOfBirth"
-                    {...formRegister('dateOfBirth')}
-                    className={errors.dateOfBirth ? 'input-error' : ''}
+                    name="dateOfBirth"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.dateOfBirth}
+                    className={hasError('dateOfBirth') ? 'input-error' : ''}
                   />
-                  {errors.dateOfBirth && <span className="error-message">{errors.dateOfBirth.message}</span>}
+                  {hasError('dateOfBirth') && (
+                    <span className="error-message">{formik.errors.dateOfBirth}</span>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -195,11 +198,16 @@ const RegistrationPage = () => {
                   <input
                     type="text"
                     id="phoneNumber"
-                    {...formRegister('phoneNumber')}
+                    name="phoneNumber"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.phoneNumber}
                     placeholder="10-digit phone number"
-                    className={errors.phoneNumber ? 'input-error' : ''}
+                    className={hasError('phoneNumber') ? 'input-error' : ''}
                   />
-                  {errors.phoneNumber && <span className="error-message">{errors.phoneNumber.message}</span>}
+                  {hasError('phoneNumber') && (
+                    <span className="error-message">{formik.errors.phoneNumber}</span>
+                  )}
                 </div>
               </div>
 
@@ -207,15 +215,20 @@ const RegistrationPage = () => {
                 <label htmlFor="gender">Gender *</label>
                 <select
                   id="gender"
-                  {...formRegister('gender')}
-                  className={errors.gender ? 'input-error' : ''}
+                  name="gender"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.gender}
+                  className={hasError('gender') ? 'input-error' : ''}
                 >
                   <option value="">Select gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
                 </select>
-                {errors.gender && <span className="error-message">{errors.gender.message}</span>}
+                {hasError('gender') && (
+                  <span className="error-message">{formik.errors.gender}</span>
+                )}
               </div>
 
               <div className="form-group">
@@ -225,11 +238,16 @@ const RegistrationPage = () => {
                 <input
                   type="password"
                   id="password"
-                  {...formRegister('password')}
+                  name="password"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.password}
                   placeholder="Enter a strong password"
-                  className={errors.password ? 'input-error' : ''}
+                  className={hasError('password') ? 'input-error' : ''}
                 />
-                {errors.password && <span className="error-message">{errors.password.message}</span>}
+                {hasError('password') && (
+                  <span className="error-message">{formik.errors.password}</span>
+                )}
                 <p className="password-hint">
                   Password must contain at least 8 characters, including uppercase, lowercase, digit, and special character
                 </p>
@@ -242,12 +260,15 @@ const RegistrationPage = () => {
                 <input
                   type="password"
                   id="confirmPassword"
-                  {...formRegister('confirmPassword')}
+                  name="confirmPassword"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.confirmPassword}
                   placeholder="Confirm your password"
-                  className={errors.confirmPassword ? 'input-error' : ''}
+                  className={hasError('confirmPassword') ? 'input-error' : ''}
                 />
-                {errors.confirmPassword && (
-                  <span className="error-message">{errors.confirmPassword.message}</span>
+                {hasError('confirmPassword') && (
+                  <span className="error-message">{formik.errors.confirmPassword}</span>
                 )}
               </div>
 
