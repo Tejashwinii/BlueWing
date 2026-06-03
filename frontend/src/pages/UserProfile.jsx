@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { authAPI, bookingAPI } from '../utils/api';
 import Navbar from '../components/Navbar';
+import airplaneImg from '../assets/profile_airplane.png';
 import '../styles/UserProfile.css';
 
 const UserProfile = () => {
@@ -197,60 +198,46 @@ const UserProfile = () => {
     });
   };
 
-  const formatTime = (dateString) => {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   return (
     <div className="user-profile-page">
       <Navbar />
       
-      {/* Header Section */}
-      <div className="profile-page-header">
-        <div className="header-content">
-          <div className="user-avatar-large">
-            <span className="avatar-icon-large">👤</span>
-          </div>
-          <div className="header-info">
-            <h1>{profileData.firstName} {profileData.lastName}</h1>
-            <p className="header-email">{profileData.email}</p>
-          </div>
-        </div>
-        <button className="btn-back-home" onClick={() => navigate('/')}>
+      <div className="profile-container">
+        <div className="back-button-container" onClick={() => navigate('/')}>
           ← Back to Home
-        </button>
-      </div>
-
-      {/* Main Content */}
-      <div className="profile-layout">
-        {/* Left Sidebar */}
-        <div className="profile-sidebar">
-          <div className="sidebar-menu">
-            <button 
-              className={`sidebar-menu-item ${activeTab === 'profile' ? 'active' : ''}`}
-              onClick={() => setActiveTab('profile')}
-            >
-              <span className="menu-icon">👤</span>
-              <span className="menu-text">Profile</span>
-            </button>
-            <button 
-              className={`sidebar-menu-item ${activeTab === 'history' ? 'active' : ''}`}
-              onClick={() => setActiveTab('history')}
-            >
-              <span className="menu-icon">📋</span>
-              <span className="menu-text">History</span>
-            </button>
-          </div>
         </div>
 
-        {/* Right Content Container */}
-        <div className="profile-content-container">
+        {/* Hero Background Section */}
+        <div className="profile-hero">
+          <img src={airplaneImg} className="hero-airplane" alt="Airplane" />
+        </div>
+
+        {/* Floating Profile Card */}
+        <div className="profile-card">
+          <div className="profile-name">{profileData.firstName} {profileData.lastName}</div>
+          <div className="profile-email">{profileData.email}</div>
+        </div>
+
+        {/* Top Tabs */}
+        <div className="profile-tabs">
+          <button 
+            className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
+            onClick={() => setActiveTab('profile')}
+          >
+            Profile
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+            onClick={() => setActiveTab('history')}
+          >
+            History
+          </button>
+        </div>
+
+        {/* Main Content */}
+        <div className="profile-content">
           {activeTab === 'profile' && (
-            <div className="profile-card">
+            <div className="content-card">
               <div className="card-header">
                 <h2>Personal Information</h2>
               </div>
@@ -269,126 +256,113 @@ const UserProfile = () => {
                   )}
                   
                   <div className="form-grid">
-                    <div className="form-row">
-                      <div className="form-field">
-                        <label>First Name</label>
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={profileData.firstName}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="Enter first name"
-                        />
-                      </div>
-                      <div className="form-field">
-                        <label>Last Name</label>
-                        <input
-                          type="text"
-                          name="lastName"
-                          value={profileData.lastName}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="Enter last name"
-                        />
-                      </div>
+                    <div className="form-field">
+                      <label>First Name</label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={profileData.firstName}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                        placeholder="Enter first name"
+                      />
                     </div>
-
-                    <div className="form-row">
-                      <div className="form-field">
-                        <label>Email Address</label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={profileData.email}
-                          disabled={true}
-                          placeholder="Email address"
-                        />
-                      </div>
-                      <div className="form-field">
-                        <label>Phone Number</label>
-                        <input
-                          type="text"
-                          name="phone"
-                          value={profileData.phone}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="Enter phone number"
-                        />
-                      </div>
+                    <div className="form-field">
+                      <label>Last Name</label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={profileData.lastName}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                        placeholder="Enter last name"
+                      />
                     </div>
-
-                    <div className="form-row">
-                      <div className="form-field">
-                        <label>Gender</label>
-                        <select
-                          name="gender"
-                          value={profileData.gender}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                        >
-                          <option value="">Select Gender</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-                      <div className="form-field">
-                        <label>Date of Birth</label>
-                        <input
-                          type="date"
-                          name="dateOfBirth"
-                          value={profileData.dateOfBirth}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                        />
-                      </div>
+                    <div className="form-field">
+                      <label>Email Address</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={profileData.email}
+                        disabled={true}
+                        placeholder="Email address"
+                      />
                     </div>
-
-                    <div className="form-row single">
-                      <div className="form-field full-width">
-                        <label>Address</label>
-                        <input
-                          type="text"
-                          name="address"
-                          value={profileData.address}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="Enter your address"
-                        />
-                      </div>
+                    <div className="form-field">
+                      <label>Phone Number</label>
+                      <input
+                        type="text"
+                        name="phone"
+                        value={profileData.phone}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                        placeholder="Enter phone number"
+                      />
                     </div>
-
-                    <div className="form-row">
-                      <div className="form-field">
-                        <label>City</label>
-                        <input
-                          type="text"
-                          name="city"
-                          value={profileData.city}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="Enter city"
-                        />
-                      </div>
-                      <div className="form-field">
-                        <label>Country</label>
-                        <input
-                          type="text"
-                          name="country"
-                          value={profileData.country}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="Enter country"
-                        />
-                      </div>
+                    <div className="form-field">
+                      <label>Gender</label>
+                      <select
+                        name="gender"
+                        value={profileData.gender}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div className="form-field">
+                      <label>Date of Birth</label>
+                      <input
+                        type="date"
+                        name="dateOfBirth"
+                        value={profileData.dateOfBirth}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                      />
+                    </div>
+                    
+                    <div className="form-field full-width">
+                      <label>Address</label>
+                      <input
+                        type="text"
+                        name="address"
+                        value={profileData.address}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                        placeholder="Enter your address"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <label>City</label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={profileData.city}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                        placeholder="Enter city"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <label>Country</label>
+                      <input
+                        type="text"
+                        name="country"
+                        value={profileData.country}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                        placeholder="Enter country"
+                      />
                     </div>
                   </div>
 
                   <div className="form-actions">
                     {!isEditing ? (
                       <button className="btn-edit" onClick={() => setIsEditing(true)}>
-                        ✏️ Edit Profile
+                        Edit Profile
                       </button>
                     ) : (
                       <>
@@ -397,7 +371,7 @@ const UserProfile = () => {
                           onClick={handleSave}
                           disabled={isSaving}
                         >
-                          {isSaving ? 'Saving...' : '💾 Save Changes'}
+                          {isSaving ? 'Saving...' : 'Save Changes'}
                         </button>
                         <button 
                           className="btn-cancel" 
@@ -415,8 +389,8 @@ const UserProfile = () => {
           )}
 
           {activeTab === 'history' && (
-            <div className="profile-card">
-              <div className="card-header">
+            <div className="content-card">
+              <div className="card-header history-header">
                 <h2>Booking History</h2>
                 <button 
                   className="btn-refresh" 
