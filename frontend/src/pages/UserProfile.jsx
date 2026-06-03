@@ -40,13 +40,20 @@ const UserProfile = () => {
         const response = await authAPI.getProfile();
         if (response.success && response.data.user) {
           const userData = response.data.user;
+          const rawDob = userData.dateOfBirth || userData.dob || userData.birthDate;
+          let parsedDob = '';
+          if (rawDob) {
+            const d = new Date(rawDob);
+            if (!isNaN(d.getTime())) parsedDob = d.toISOString().split('T')[0];
+          }
+
           setProfileData({
             firstName: userData.firstName || '',
             lastName: userData.lastName || '',
             email: userData.email || '',
             phone: userData.phone || '',
-            gender: userData.gender || '',
-            dateOfBirth: userData.dateOfBirth ? userData.dateOfBirth.split('T')[0] : '',
+            gender: userData.gender || userData.Gender || userData.sex || '',
+            dateOfBirth: parsedDob,
             address: userData.address || '',
             city: userData.city || '',
             country: userData.country || '',
@@ -189,13 +196,11 @@ const UserProfile = () => {
     });
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '—';
+    return date.toLocaleDateString('en-GB'); // dd/mm/yyyy
   };
 
   return (
@@ -207,15 +212,15 @@ const UserProfile = () => {
           ← Back to Home
         </div>
 
-        {/* Hero Background Section */}
-        <div className="profile-hero">
-          <img src={airplaneImg} className="hero-airplane" alt="Airplane" />
-        </div>
-
-        {/* Floating Profile Card */}
-        <div className="profile-card">
-          <div className="profile-name">{profileData.firstName} {profileData.lastName}</div>
-          <div className="profile-email">{profileData.email}</div>
+        {/* Profile Header */}
+        <div className="profile-header">
+          <div className="profile-header-content">
+            <div className="profile-header-left">
+              <div className="profile-name">{profileData.firstName} {profileData.lastName}</div>
+              <div className="profile-email">{profileData.email}</div>
+            </div>
+          </div>
+          <img src={airplaneImg} className="airplane-bg" alt="Airplane" />
         </div>
 
         {/* Top Tabs */}

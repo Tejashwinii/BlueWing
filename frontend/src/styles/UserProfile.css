@@ -31,42 +31,65 @@
   cursor: pointer;
 }
 
-.profile-hero {
+.profile-header {
   position: relative;
-  height: 180px;
+  height: 140px;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
   background: linear-gradient(135deg, #0f4fa8, #1565c0);
   border-radius: 20px;
   overflow: hidden;
-}
-
-.hero-airplane {
-  position: absolute;
-  right: 40px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 420px;
-  opacity: 0.18;
-  pointer-events: none;
-}
-
-.profile-card {
-  position: relative;
-  margin-top: -60px;
-  margin-left: 24px;
   margin-bottom: 32px;
-  width: fit-content;
-  min-width: 280px;
-  padding: 20px 24px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.profile-header::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 60%;
+  background: linear-gradient(
+    to right,
+    rgba(15, 79, 168, 0.95),
+    rgba(15, 79, 168, 0)
+  );
+  z-index: 1;
+}
+
+.profile-header-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.profile-header-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.airplane-bg {
+  position: absolute;
+  right:50px;
+  top: 60%;
+  transform: translateY(-50%);
+  height: 190%;
+  width: auto;
+  max-height: 190%;
+  opacity: 0.22;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .profile-name {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
-  color: #ffffff;
+  color: white;
 }
 
 .profile-email {
@@ -545,13 +568,8 @@
    RESPONSIVE DESIGN
    ============================================ */
 @media (max-width: 768px) {
-  .hero-airplane {
-    width: 260px;
+  .airplane-bg {
     opacity: 0.12;
-  }
-
-  .profile-card {
-    margin-left: 16px;
   }
 
   .form-grid {
