@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { authAPI, bookingAPI } from '../utils/api';
+import { authAPI, bookingAPI, flightAPI } from '../utils/api';
 import Navbar from '../components/Navbar';
 import airplaneImg from '../assets/profile_airplane.png';
 import '../styles/UserProfile.css';
@@ -81,9 +81,35 @@ const UserProfile = () => {
         setBookingsLoading(true);
         const response = await bookingAPI.getUserBookings(user._id);
         if (response.success) {
-          // Backend returns data as array directly or in data.bookings
           const bookingsData = response.data?.bookings || response.data || [];
-          setBookings(Array.isArray(bookingsData) ? bookingsData : []);
+          const bookingsArray = Array.isArray(bookingsData) ? bookingsData : [];
+          
+          const flightMap = {};
+          const enrichedBookings = await Promise.all(bookingsArray.map(async (booking) => {
+            const flightId = booking.flightId?._id || booking.flightId || booking.flight;
+            
+            if (flightId && !flightMap[flightId]) {
+              try {
+                const flightResponse = await flightAPI.getFlightById(flightId);
+                flightMap[flightId] = flightResponse.data?.flight || flightResponse.data || {};
+              } catch (e) {
+                // If it fails, keep empty obj so we don't crash
+                flightMap[flightId] = {}; 
+              }
+            }
+            
+            const flightData = (typeof booking.flightId === 'object' && booking.flightId !== null) 
+              ? booking.flightId 
+              : (flightMap[flightId] || {});
+            
+            return {
+              ...booking,
+              flightData,
+              travelDate: flightData.date || flightData.departureDate || flightData.travelDate || flightData.departureTime
+            };
+          }));
+          
+          setBookings(enrichedBookings);
         }
       } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -442,12 +468,12 @@ const UserProfile = () => {
                           </td>
                           <td>
                             <div className="route-cell">
-                              <span className="route-from">{booking.flightId?.from || booking.flight?.from || 'N/A'}</span>
+                              <span className="route-from">{booking.flightData?.from || booking.flightId?.from || booking.flight?.from || 'N/A'}</span>
                               <span className="route-arrow">→</span>
-                              <span className="route-to">{booking.flightId?.to || booking.flight?.to || 'N/A'}</span>
+                              <span className="route-to">{booking.flightData?.to || booking.flightId?.to || booking.flight?.to || 'N/A'}</span>
                             </div>
                           </td>
-                          <td>{formatDate(booking.flightId?.departureTime || booking.flightId?.departureDate || booking.flight?.departureTime)}</td>
+                          <td>{formatDate(booking.travelDate)}</td>
                           <td className="amount-cell">₹{(booking.pricing?.totalAmount || booking.totalAmount || 0).toLocaleString()}</td>
                           <td>
                             <span className={`status-badge status-${booking.bookingStatus || booking.status}`}>
