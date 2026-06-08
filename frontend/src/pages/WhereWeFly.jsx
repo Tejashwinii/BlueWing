@@ -32,7 +32,7 @@ export default function WhereWeFly() {
         setFlightsLoading(true);
         const response = await flightAPI.getAllFlights(1000, 0);
         if (response.success && response.data) {
-          setFlights(response.data);
+          setFlights(response.data);1
         }
       } catch (error) {
         console.error("Failed to fetch flights from API, using fallback data:", error);
