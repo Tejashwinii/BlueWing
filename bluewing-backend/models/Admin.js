@@ -424,7 +424,7 @@ adminSchema.pre('save', function (next) {
 
     this.permissions = rolePermissions[this.adminRole] || [];
   }
-
+ 
   next();
 });
 
