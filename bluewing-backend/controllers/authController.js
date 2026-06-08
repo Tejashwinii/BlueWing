@@ -9,7 +9,7 @@ import { generateToken } from '../middleware/auth.js';
 export const register = async (req, res) => {
   try {
     // Extract user data from request body
-    const { firstName, lastName, email, password, phone, gender, dateOfBirth } = req.body;
+    const { firstName, lastName, email, password, phone, gender, dateOfBirth, address, city, country } = req.body;
 
     // Check if user already exists by email
     const existingUser = await User.findOne({ email: email.toLowerCase() });
@@ -30,6 +30,9 @@ export const register = async (req, res) => {
       phone,
       gender,
       dateOfBirth,
+      address,
+      city,
+      country,
     });
 
     // Generate JWT token
