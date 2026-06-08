@@ -10,6 +10,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeView, setActiveView] = useState('home');
+  const today = new Date().toISOString().split('T')[0];
 
   const handleNavClick = (menuItem) => {
     setActiveView(menuItem);
@@ -454,22 +455,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-
-
-
-
-Designed with ✈️ for better travel experience.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-};
-
-export default HomePage;
-
-
-
-
-
