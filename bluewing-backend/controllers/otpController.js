@@ -143,6 +143,7 @@ export const sendOtp = async (req, res) => {
         purpose: 'booking-cancel',
       };
       console.log(`Cancellation OTP generated for booking ${bookingId}: ${otp}`);
+      console.log(`Email value extracted for OTP: ${destinationEmail}`);
 
       const result = await attemptEmailDelivery({
         toEmail: destinationEmail,
@@ -152,13 +153,14 @@ export const sendOtp = async (req, res) => {
         purposeText: 'ticket cancellation',
       });
 
-      // For cancellation flow we allow fallback behaviour in restricted environments
+      console.log(`sendMail triggered for cancel ticket. Result:`, result);
+
       if (result.sent) {
         return res.status(200).json({ success: true, message: 'OTP sent successfully' });
       }
 
-      // If email sending failed for cancellation flow, return fallback OTP to the client so they can proceed
-      return res.status(200).json({ success: true, fallbackOtp: otp, message: 'Email failed, using fallback OTP' });
+      console.error(`Failed to send cancellation OTP to ${destinationEmail}. Delivery result:`, result);
+      return res.status(502).json({ success: false, message: 'Failed to send OTP email. Please try again later.' });
     }
 
     // Forgot-password flow (email-based)
