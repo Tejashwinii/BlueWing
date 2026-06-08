@@ -302,6 +302,29 @@ export const bookingAPI = {
 };
 
 // =====================
+// OTP API
+// =====================
+
+export const otpAPI = {
+  sendCancellationOtp: async (bookingId) => {
+    try {
+      const response = await apiClient.post('/send-otp', { bookingId });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to send OTP.' };
+    }
+  },
+  verifyCancellationOtp: async (bookingId, otp) => {
+    try {
+      const response = await apiClient.post('/verify-otp', { bookingId, otp });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to verify OTP.' };
+    }
+  },
+};
+
+// =====================
 // PAYMENT API (for future use)
 // =====================
 

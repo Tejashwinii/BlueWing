@@ -10,6 +10,7 @@ import authRoutes from './routes/authRoutes.js';
 import flightRoutes from './routes/flightRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
+import otpRoutes from './routes/otpRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -55,6 +56,9 @@ app.use('/api/bookings', bookingRoutes);
 
 // 6. Review routes
 app.use('/api/reviews', reviewRoutes);
+
+// 7. OTP routes (send & verify)
+app.use('/api', otpRoutes);
 
 // =====================
 // ERROR HANDLING

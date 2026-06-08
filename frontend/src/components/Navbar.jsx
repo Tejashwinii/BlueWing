@@ -164,15 +164,17 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
                         My Profile
                       </button>
                     )}
-                    <button 
-                      className="dropdown-option"
-                      onClick={() => {
-                        navigate('/');
-                        setShowProfileDropdown(false);
-                      }}
-                    >
-                      Home
-                    </button>
+                    {location.pathname === '/profile' && (
+                      <button 
+                        className="dropdown-option"
+                        onClick={() => {
+                          navigate('/');
+                          setShowProfileDropdown(false);
+                        }}
+                      >
+                        Home
+                      </button>
+                    )}
                     <button 
                       className="dropdown-option logout"
                       onClick={() => {

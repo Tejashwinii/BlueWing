@@ -60,7 +60,18 @@ export const register = async (req, res) => {
     console.log(`✅ New user registered: ${user.email}`);
 
   } catch (error) {
-    console.error('❌ Registration error:', error.message);
+    console.error('❌ Registration error:', error);
+    // Handle Mongoose validation errors specifically to return useful messages to the client
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({ success: false, message: 'Validation failed', errors: messages });
+    }
+    // Duplicate key (e.g., email) - more friendly response
+    if (error.code === 11000) {
+      const dupKey = Object.keys(error.keyValue || {}).join(', ') || 'field';
+      return res.status(400).json({ success: false, message: `${dupKey} already exists` });
+    }
+
     res.status(500).json({
       success: false,
       message: 'Registration failed. Please try again.',

@@ -2,7 +2,7 @@ export const FARE_TYPES = {
 	SAVER: {
 		type: 'Saver',
 		priceMultiplier: 1.0,
-		cancellation: false,
+		cancellation: true,
 		meals: false,
 		priorityBoarding: false,
 		baggage: '15kg',

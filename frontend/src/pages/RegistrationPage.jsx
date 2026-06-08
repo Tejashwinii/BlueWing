@@ -57,6 +57,7 @@ const RegistrationPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [apiError, setApiError] = useState('');
+  const [apiErrorsList, setApiErrorsList] = useState([]);
 
   const formik = useFormik({
     initialValues: {
@@ -99,9 +100,11 @@ const RegistrationPage = () => {
           setTimeout(() => navigate('/login'), 2000);
         } else {
           setApiError(result.message || 'Registration failed. Please try again.');
+          setApiErrorsList(result.errors || []);
         }
       } catch (error) {
         setApiError(error.message || 'Registration failed. Please try again.');
+        setApiErrorsList(error.errors || []);
       } finally {
         setIsLoading(false);
       }
@@ -136,6 +139,13 @@ const RegistrationPage = () => {
 
             {successMessage && <div className="success-message">{successMessage}</div>}
             {apiError && <div className="error-message api-error">{apiError}</div>}
+            {apiErrorsList.length > 0 && (
+              <ul className="error-list">
+                {apiErrorsList.map((err, idx) => (
+                  <li key={idx} className="error-message">{err}</li>
+                ))}
+              </ul>
+            )}
 
             <form onSubmit={formik.handleSubmit} className="registration-form">
               <div className="form-row">

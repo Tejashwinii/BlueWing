@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
-import { bookingAPI, reviewAPI } from '../utils/api';
+import { otpAPI, reviewAPI } from '../utils/api';
+import OtpCancelModal from './OtpCancelModal';
 import '../styles/TicketCard.css';
 
 const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, bookingReference, bookingId, onCancelled, hasReviewed: initialHasReviewed = false }) => {
@@ -12,6 +13,8 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
   const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
   const [userName, setUserName] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [cancelRequestId, setCancelRequestId] = useState(null);
 
   const getRandomGate = () => {
     const gates = Array.from({ length: 50 }, (_, i) => i + 1);
@@ -157,53 +160,23 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
     if (isCancelled || isCancelling) {
       return;
     }
+    setIsCancelling(true);
+    setCancelRequestId(bookingId);
+    setShowOtpModal(true);
+  };
 
-    const isConfirmed = window.confirm('Are you sure you want to cancel this ticket?');
-    if (!isConfirmed) {
-      return;
+  const handleOtpSuccess = () => {
+    setShowOtpModal(false);
+    setIsCancelling(false);
+    setIsCancelled(true);
+    if (onCancelled) {
+      onCancelled(cancelRequestId);
     }
+  };
 
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
-    const maskedMobile = getMaskedMobile();
-
-    alert(`OTP has been sent to ${maskedMobile}.\nDemo OTP: ${otp}`);
-    const enteredOtp = window.prompt('Enter OTP to confirm ticket cancellation:');
-
-    if (!enteredOtp) {
-      alert('Cancellation aborted. OTP not entered.');
-      return;
-    }
-
-    if (enteredOtp.trim() === otp) {
-      // Call API to cancel booking
-      if (bookingId) {
-        try {
-          setIsCancelling(true);
-          const response = await bookingAPI.cancel(bookingId);
-          if (response.success) {
-            setIsCancelled(true);
-            alert('Ticket cancelled successfully.');
-            // Notify parent component about cancellation
-            if (onCancelled) {
-              onCancelled(bookingId);
-            }
-          } else {
-            alert(response.message || 'Failed to cancel ticket. Please try again.');
-          }
-        } catch (error) {
-          console.error('Cancel error:', error);
-          alert(error.message || 'Failed to cancel ticket. Please try again.');
-        } finally {
-          setIsCancelling(false);
-        }
-      } else {
-        // Fallback for local-only cancellation (no backend)
-        setIsCancelled(true);
-        alert('Ticket cancelled successfully.');
-      }
-    } else {
-      alert('Invalid OTP. Ticket cancellation failed.');
-    }
+  const handleOtpClose = () => {
+    setShowOtpModal(false);
+    setIsCancelling(false);
   };
 
   return (
@@ -399,6 +372,16 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
           >
             {isCancelling ? '⏳ Cancelling...' : '🧾 Cancel Ticket'}
           </button>
+        )}
+        {showOtpModal && (
+          <OtpCancelModal
+            isOpen={showOtpModal}
+            bookingId={cancelRequestId}
+            contactEmail={contactDetails?.email}
+            onClose={handleOtpClose}
+            onSuccess={handleOtpSuccess}
+            otpAPI={otpAPI}
+          />
         )}
         {isCancelled && (
           <button className="btn btn-cancel-ticket btn-cancelled" disabled>

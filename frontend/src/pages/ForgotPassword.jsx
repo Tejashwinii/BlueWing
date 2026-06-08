@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/ForgotPassword.css';
 import Navbar from '../components/Navbar';
@@ -22,6 +22,11 @@ export default function ForgotPassword() {
 
   const currentStep = otpVerified ? 3 : otpSent ? 2 : 1;
 
+  // Clear transient error messages whenever the user progresses between steps
+  useEffect(() => {
+    setError('');
+  }, [otpSent, otpVerified]);
+
   const handleSendOtp = async (e) => {
     e.preventDefault();
     if (!email) {
@@ -42,7 +47,9 @@ export default function ForgotPassword() {
       if (data.success) {
         setOtpSent(true);
         setSuccess(data.message);
+        // backend may return `devOtp` or `fallbackOtp` when email delivery isn't available
         if (data.devOtp) setDevOtp(data.devOtp);
+        else if (data.fallbackOtp) setDevOtp(data.fallbackOtp);
       } else {
         setError(data.message || 'Failed to send OTP.');
       }
@@ -73,6 +80,7 @@ export default function ForgotPassword() {
         setOtpVerified(true);
         setSuccess('OTP verified! Now set your new password.');
         setDevOtp('');
+        setError('');
       } else {
         setError(data.message || 'Invalid OTP.');
       }
@@ -135,6 +143,7 @@ export default function ForgotPassword() {
       if (data.success) {
         setSuccess('New OTP sent!');
         if (data.devOtp) setDevOtp(data.devOtp);
+        else if (data.fallbackOtp) setDevOtp(data.fallbackOtp);
       } else {
         setError(data.message || 'Failed to resend.');
       }
@@ -371,3 +380,5 @@ export default function ForgotPassword() {
     </AuthPage>
   );
 }
+
+
