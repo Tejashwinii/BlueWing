@@ -96,18 +96,62 @@
 
 .quick-help-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 28px;
+  max-width: 748px;
+  margin: 0 auto;
+  justify-items: center;
 }
 
 .quick-help-card {
   background: white;
   border-radius: 16px;
-  padding: 40px 30px;
+  padding: 32px 24px;
   text-align: center;
   box-shadow: 0 4px 16px rgba(0, 26, 77, 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(0, 102, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 440px;
+  max-width: 360px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.quick-help-card-header {
+  flex-shrink: 0;
+}
+
+.card-scrollable-area {
+  flex: 1;
+  overflow-y: auto;
+  margin: 10px 0;
+  padding-right: 5px;
+}
+
+.card-scrollable-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.card-scrollable-area::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.card-scrollable-area::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.card-scrollable-area::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.card-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 10px;
 }
 
 .quick-help-card:hover {
@@ -118,8 +162,8 @@
 }
 
 .card-icon {
-  font-size: 56px;
-  margin-bottom: 18px;
+  font-size: 52px;
+  margin-bottom: 16px;
   display: inline-block;
   transition: transform 0.3s ease;
 }
@@ -132,14 +176,14 @@
   font-size: 20px;
   font-weight: 700;
   color: #001a4d;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   letter-spacing: -0.3px;
 }
 
 .card-description {
   font-size: 14px;
   color: #666;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   line-height: 1.6;
 }
 
@@ -467,6 +511,10 @@
 
   .quick-help-section {
     padding: 50px 20px;
+  }
+
+  .quick-help-grid {
+    grid-template-columns: 1fr;
   }
 
   .quick-help-card {

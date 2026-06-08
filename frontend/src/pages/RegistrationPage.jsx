@@ -30,6 +30,15 @@ const registrationSchema = Yup.object().shape({
   gender: Yup.string()
     .required('Gender is required')
     .oneOf(['male', 'female', 'other'], 'Gender is required'),
+  address: Yup.string()
+    .trim()
+    .max(200, 'Address cannot be more than 200 characters'),
+  city: Yup.string()
+    .trim()
+    .max(50, 'City cannot be more than 50 characters'),
+  country: Yup.string()
+    .trim()
+    .max(50, 'Country cannot be more than 50 characters'),
   password: Yup.string()
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters')
@@ -57,6 +66,9 @@ const RegistrationPage = () => {
       dateOfBirth: '',
       phoneNumber: '',
       gender: '',
+      address: '',
+      city: '',
+      country: '',
       password: '',
       confirmPassword: '',
     },
@@ -76,6 +88,9 @@ const RegistrationPage = () => {
           phone: values.phoneNumber,
           gender: values.gender,
           dateOfBirth: values.dateOfBirth,
+          address: values.address,
+          city: values.city,
+          country: values.country,
         });
 
         if (result.success) {
@@ -229,6 +244,59 @@ const RegistrationPage = () => {
                 {hasError('gender') && (
                   <span className="error-message">{formik.errors.gender}</span>
                 )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="address">Address (Optional)</label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.address}
+                  placeholder="Enter your address"
+                  className={hasError('address') ? 'input-error' : ''}
+                />
+                {hasError('address') && (
+                  <span className="error-message">{formik.errors.address}</span>
+                )}
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="city">City (Optional)</label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.city}
+                    placeholder="Enter city"
+                    className={hasError('city') ? 'input-error' : ''}
+                  />
+                  {hasError('city') && (
+                    <span className="error-message">{formik.errors.city}</span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="country">Country (Optional)</label>
+                  <input
+                    type="text"
+                    id="country"
+                    name="country"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.country}
+                    placeholder="Enter country"
+                    className={hasError('country') ? 'input-error' : ''}
+                  />
+                  {hasError('country') && (
+                    <span className="error-message">{formik.errors.country}</span>
+                  )}
+                </div>
               </div>
 
               <div className="form-group">

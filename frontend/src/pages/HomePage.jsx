@@ -10,6 +10,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeView, setActiveView] = useState('home');
+  const today = new Date().toISOString().split('T')[0];
 
   const handleNavClick = (menuItem) => {
     setActiveView(menuItem);
@@ -256,6 +257,7 @@ const HomePage = () => {
                     name="date"
                     value={formData.date}
                     onChange={handleInputChange}
+                    min={today}
                   />
                 </div>
               </div>
@@ -453,8 +455,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-
-
-
-
