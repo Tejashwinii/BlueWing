@@ -256,6 +256,7 @@ const HomePage = () => {
                     name="date"
                     value={formData.date}
                     onChange={handleInputChange}
+                    min={today}
                   />
                 </div>
               </div>
@@ -445,6 +446,20 @@ const HomePage = () => {
           </div>
           <div className="footer-bottom">
             <p>&copy; 2026 BlueWing Airlines. All rights reserved. | Designed with ✈️ for better travel experience.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default HomePage;
+
+
+
+
+
+Designed with ✈️ for better travel experience.</p>
           </div>
         </div>
       </footer>
