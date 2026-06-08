@@ -32,12 +32,18 @@ const registrationSchema = Yup.object().shape({
     .oneOf(['male', 'female', 'other'], 'Gender is required'),
   address: Yup.string()
     .trim()
+    .notRequired()
+    .nullable()
     .max(200, 'Address cannot be more than 200 characters'),
   city: Yup.string()
     .trim()
+    .notRequired()
+    .nullable()
     .max(50, 'City cannot be more than 50 characters'),
   country: Yup.string()
     .trim()
+    .notRequired()
+    .nullable()
     .max(50, 'Country cannot be more than 50 characters'),
   password: Yup.string()
     .required('Password is required')
