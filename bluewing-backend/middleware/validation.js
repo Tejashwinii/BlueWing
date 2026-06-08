@@ -73,6 +73,18 @@ export const registerSchema = Joi.object({
       'date.less': 'Date of Birth must be a past date',
       'any.required': 'Date of Birth is required'
     }),
+  address: Joi.string()
+    .allow('', null)
+    .max(200)
+    .optional(),
+  city: Joi.string()
+    .allow('', null)
+    .max(50)
+    .optional(),
+  country: Joi.string()
+    .allow('', null)
+    .max(50)
+    .optional()
 }).unknown(false);
 
 /**
