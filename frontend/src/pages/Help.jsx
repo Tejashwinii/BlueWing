@@ -156,41 +156,36 @@ const Help = () => {
           <div className="quick-help-grid">
             {quickHelpCards.map((card) => (
               <div key={card.id} className="quick-help-card">
-                <div className="card-icon">{card.icon}</div>
-                <h3 className="card-title">{card.title}</h3>
-                <p className="card-description">{card.description}</p>
-                <button 
-                  className="card-link"
-                  onClick={() => setExpandedCard(expandedCard === card.id ? null : card.id)}
-                >
-                  {expandedCard === card.id ? 'Show less ↑' : 'Learn more →'}
-                </button>
+                <div className="quick-help-card-header">
+                  <div className="card-icon">{card.icon}</div>
+                  <h3 className="card-title">{card.title}</h3>
+                  <p className="card-description">{card.description}</p>
+                </div>
+                
+                <div className="card-scrollable-area">
+                  {expandedCard === card.id && (
+                    <div className="card-expanded-content">
+                      <h4 className="expanded-subtitle">{card.content.subtitle}</h4>
+                      <ul className="expanded-list">
+                        {card.content.details.map((detail, idx) => (
+                          <li key={idx}>{detail}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div className="card-footer">
+                  <button 
+                    className="card-link"
+                    onClick={() => setExpandedCard(expandedCard === card.id ? null : card.id)}
+                  >
+                    {expandedCard === card.id ? 'Show less ↑' : 'Learn more →'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
-
-          {expandedCard && (
-            <div className="quick-help-details">
-              {quickHelpCards.map((card) => (
-                expandedCard === card.id && (
-                  <div key={card.id} className="detail-box">
-                    <button 
-                      className="close-details-btn"
-                      onClick={() => setExpandedCard(null)}
-                    >
-                      ✕
-                    </button>
-                    <h3 className="detail-title">{card.content.subtitle}</h3>
-                    <ul className="detail-list">
-                      {card.content.details.map((detail, idx) => (
-                        <li key={idx}>{detail}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )
-              ))}
-            </div>
-          )}
         </div>
       </section>
 
