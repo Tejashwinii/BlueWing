@@ -129,7 +129,7 @@ export const sendOtp = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Booking is already cancelled' });
       }
 
-      const destinationEmail = booking.contactDetails?.email || booking.userId?.email;
+      const destinationEmail = email || booking.contactDetails?.email || booking.userId?.email;
       if (!destinationEmail) {
         return res.status(400).json({ success: false, message: 'No email address found for this booking' });
       }

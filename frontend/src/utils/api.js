@@ -306,9 +306,9 @@ export const bookingAPI = {
 // =====================
 
 export const otpAPI = {
-  sendCancellationOtp: async (bookingId) => {
+  sendCancellationOtp: async (bookingId, email) => {
     try {
-      const response = await apiClient.post('/send-otp', { bookingId });
+      const response = await apiClient.post('/send-otp', { bookingId, email });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to send OTP.' };

@@ -127,17 +127,30 @@ const TicketSummary = () => {
 
   // Get contact details - prefer backend data
   const displayContactDetails = useMemo(() => {
-    if (backendBooking?.contactDetails) {
+    if (backendBooking?.contactDetails?.email) {
       return {
         email: backendBooking.contactDetails.email,
         phone: backendBooking.contactDetails.phone,
         country: backendBooking.contactDetails.country,
       };
+    } else if (backendBooking?.userId?.email) {
+       return {
+         email: backendBooking.userId.email,
+         phone: backendBooking.userId.phone || '',
+         country: 'India',
+       };
     }
+    
+    let fallbackEmail = '';
+    try {
+      const userStr = localStorage.getItem('bluewing_user');
+      if (userStr) fallbackEmail = JSON.parse(userStr).email;
+    } catch (e) {}
+
     return {
-      email: contactDetails.email,
-      phone: contactDetails.mobileNumber || contactDetails.phone,
-      country: contactDetails.country || 'India',
+      email: contactDetails?.email || fallbackEmail,
+      phone: contactDetails?.mobileNumber || contactDetails?.phone || '',
+      country: contactDetails?.country || 'India',
     };
   }, [backendBooking, contactDetails]);
 

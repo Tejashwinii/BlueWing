@@ -76,7 +76,7 @@ const OtpCancelModal = ({
     setInfoMessage('Sending OTP...');
     setIsSending(true);
     try {
-      const response = await otpAPI.sendCancellationOtp(bookingId);
+      const response = await otpAPI.sendCancellationOtp(bookingId, contactEmail);
       setInfoMessage(response.message || 'OTP sent to your registered email.');
       if (response.fallbackOtp) {
         setFallbackOtp(response.fallbackOtp);
