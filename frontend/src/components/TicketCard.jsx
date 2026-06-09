@@ -4,9 +4,10 @@ import { otpAPI, reviewAPI } from '../utils/api';
 import OtpCancelModal from './OtpCancelModal';
 import '../styles/TicketCard.css';
 
-const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, bookingReference, bookingId, onCancelled, hasReviewed: initialHasReviewed = false }) => {
+const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, bookingReference, bookingId, onCancelled, hasReviewed: initialHasReviewed = false, bookingStatus, hideCancel = false, hideDownload = false }) => {
   const ticketRef = useRef(null);
-  const [isCancelled, setIsCancelled] = useState(false);
+  const isStatusCancelled = String(bookingStatus).toLowerCase() === 'cancelled';
+  const [isCancelled, setIsCancelled] = useState(isStatusCancelled);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [hasReviewed, setHasReviewed] = useState(initialHasReviewed);
@@ -15,6 +16,10 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [cancelRequestId, setCancelRequestId] = useState(null);
+
+  useEffect(() => {
+    setIsCancelled(String(bookingStatus).toLowerCase() === 'cancelled');
+  }, [bookingStatus]);
 
   const getRandomGate = () => {
     const gates = Array.from({ length: 50 }, (_, i) => i + 1);
@@ -359,12 +364,12 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
 
       {/* Action Buttons */}
       <div className="ticket-actions">
-        {!isCancelled && (
+        {!isCancelled && !hideDownload && (
           <button className="btn btn-download" onClick={handleDownloadTicket}>
             📥 Download Ticket
           </button>
         )}
-        {!isCancelled && canCancel && (
+        {!isCancelled && canCancel && !hideCancel && (
           <button
             className="btn btn-cancel-ticket"
             onClick={handleCancelTicket}
@@ -373,17 +378,7 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
             {isCancelling ? '⏳ Cancelling...' : '🧾 Cancel Ticket'}
           </button>
         )}
-        {showOtpModal && (
-          <OtpCancelModal
-            isOpen={showOtpModal}
-            bookingId={cancelRequestId}
-            contactEmail={contactDetails?.email}
-            onClose={handleOtpClose}
-            onSuccess={handleOtpSuccess}
-            otpAPI={otpAPI}
-          />
-        )}
-        {isCancelled && (
+        {isCancelled && !hideCancel && (
           <button className="btn btn-cancel-ticket btn-cancelled" disabled>
             ❌ Ticket Cancelled
           </button>

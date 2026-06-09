@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
 import TicketCard from '../components/TicketCard';
 import Navbar from '../components/Navbar';
-import { bookingAPI } from '../utils/api';
+import OtpCancelModal from '../components/OtpCancelModal';
+import { bookingAPI, otpAPI } from '../utils/api';
 import '../styles/TicketSummary.css';
 
 const TicketSummary = () => {
@@ -12,6 +14,9 @@ const TicketSummary = () => {
   const [backendBooking, setBackendBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [cancelRequestId, setCancelRequestId] = useState(null);
   
   // Get data from navigation state (fallback)
   const journey = location.state?.journey || {};
@@ -219,6 +224,46 @@ const TicketSummary = () => {
     }
   };
 
+  const handleDownloadAllTickets = () => {
+    const elements = document.querySelectorAll('.ticket-card');
+    if (elements.length === 0) return;
+
+    const opt = {
+      margin: 10,
+      filename: `all_tickets_${displayBookingReference}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' },
+    };
+
+    let pdf = html2pdf().set(opt).from(elements[0]);
+    for (let i = 1; i < elements.length; i++) {
+        pdf = pdf.toPdf().get('pdf').then((pdfInstance) => {
+             pdfInstance.addPage();
+        }).from(elements[i]).toContainer().toCanvas().toPdf();
+    }
+    pdf.save();
+  };
+
+  const handleCancelTicket = () => {
+    if (isCancelling) return;
+    if (backendBooking && String(backendBooking.bookingStatus).toLowerCase() === 'cancelled') return;
+    setIsCancelling(true);
+    setCancelRequestId(bookingId || backendBooking?._id);
+    setShowOtpModal(true);
+  };
+
+  const handleOtpSuccess = () => {
+    setShowOtpModal(false);
+    setIsCancelling(false);
+    handleTicketCancelled(cancelRequestId);
+  };
+
+  const handleOtpClose = () => {
+    setShowOtpModal(false);
+    setIsCancelling(false);
+  };
+
   if (loading) {
     return (
       <>
@@ -298,6 +343,9 @@ const TicketSummary = () => {
                     bookingId={bookingId || backendBooking?._id}
                     onCancelled={handleTicketCancelled}
                     hasReviewed={backendBooking?.hasReviewed || false}
+                    bookingStatus={backendBooking?.bookingStatus}
+                    hideCancel={allPassengers.length > 1}
+                    hideDownload={allPassengers.length > 1}
                   />
                 ))}
               </div>
@@ -309,11 +357,42 @@ const TicketSummary = () => {
           </div>
         </div>
 
+        {/* Action Buttons specific to multi-passenger or general summary actions */}
         <div className="ticket-summary-actions">
+          {allPassengers.length > 1 && String(backendBooking?.bookingStatus).toLowerCase() !== 'cancelled' && (
+            <>
+              <button className="btn btn-primary" onClick={handleDownloadAllTickets}>
+                📥 Download All Tickets
+              </button>
+              <button 
+                className="btn btn-cancel-ticket" 
+                onClick={handleCancelTicket}
+                disabled={isCancelling}
+              >
+                {isCancelling ? '⏳ Cancelling...' : '🧾 Cancel Booking'}
+              </button>
+            </>
+          )}
+          {allPassengers.length > 1 && String(backendBooking?.bookingStatus).toLowerCase() === 'cancelled' && (
+             <button className="btn btn-cancel-ticket btn-cancelled" disabled>
+                ❌ Booking Cancelled
+             </button>
+          )}
           <button className="btn btn-secondary" onClick={handleGoHome}>
             🏠 Go to Home
           </button>
         </div>
+
+        {showOtpModal && (
+          <OtpCancelModal
+            isOpen={showOtpModal}
+            bookingId={cancelRequestId}
+            contactEmail={displayContactDetails?.email}
+            onClose={handleOtpClose}
+            onSuccess={handleOtpSuccess}
+            otpAPI={otpAPI}
+          />
+        )}
       </div>
     </>
   );
