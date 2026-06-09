@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import html2pdf from 'html2pdf.js/dist/html2pdf.min.js';
 import { otpAPI, reviewAPI } from '../utils/api';
 import OtpCancelModal from './OtpCancelModal';
