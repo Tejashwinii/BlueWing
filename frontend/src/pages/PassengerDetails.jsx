@@ -9,8 +9,9 @@ import * as Yup from 'yup';
 import '../styles/PassengerDetails.css';
 
 const passengerSchema = Yup.object().shape({
-  adults: Yup.array().of(
+  passengers: Yup.array().of(
     Yup.object().shape({
+      type: Yup.string().required(),
       firstName: Yup.string()
         .trim()
         .required('First Name is required')
@@ -20,37 +21,24 @@ const passengerSchema = Yup.object().shape({
         .required('Last Name is required')
         .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
       gender: Yup.string().required('Gender is required'),
-      age: Yup.number()
-        .required('Age is required')
-        .positive('Age must be a positive number')
-        .integer('Age must be an integer')
-    })
-  ),
-  children: Yup.array().of(
-    Yup.object().shape({
-      firstName: Yup.string()
-        .trim()
-        .required('First Name is required')
-        .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
-      lastName: Yup.string()
-        .trim()
-        .required('Last Name is required')
-        .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
-      gender: Yup.string().required('Gender is required'),
-      dateOfBirth: Yup.date()
-        .required('Date of Birth is required')
-        .max(new Date(), 'Date of Birth must be a past date')
-        .test('is-child', 'Child age must be 12 years or below', function (value) {
-          if (!value) return true;
-          const birthDate = new Date(value);
-          const today = new Date();
-          let age = today.getFullYear() - birthDate.getFullYear();
-          const monthDiff = today.getMonth() - birthDate.getMonth();
-          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-          }
-          return age <= 12;
-        }),
+      dateOfBirth: Yup.date().when('type', {
+        is: 'child',
+        then: () => Yup.date()
+          .required('Date of Birth is required')
+          .max(new Date(), 'Date of Birth must be a past date')
+          .test('is-child', 'Child age must be 12 years or below', function (value) {
+            if (!value) return true;
+            const birthDate = new Date(value);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+            }
+            return age <= 12;
+          }),
+        otherwise: () => Yup.date().notRequired()
+      }),
       age: Yup.number()
         .required('Age is required')
         .positive('Age must be a positive number')
@@ -82,26 +70,21 @@ const PassengerDetails = () => {
   const childCount = journey.passengers?.children || 0;
   const infantCount = journey.passengers?.infants || 0;
 
-  const [expandedCards, setExpandedCards] = useState({
-    adults: Array(adultCount).fill(false).map((_, i) => i === 0),
-    children: Array(childCount).fill(false).map((_, i) => i === 0),
-  });
+  const initialPassengers = [];
+  for (let i = 0; i < adultCount; i++) {
+    initialPassengers.push({ type: 'adult', firstName: '', lastName: '', gender: '', age: '' });
+  }
+  for (let i = 0; i < childCount; i++) {
+    initialPassengers.push({ type: 'child', firstName: '', lastName: '', gender: '', dateOfBirth: '', age: '' });
+  }
+
+  const [expandedCards, setExpandedCards] = useState(
+    Array(initialPassengers.length).fill(false).map((_, i) => i === 0)
+  );
 
   const formik = useFormik({
     initialValues: {
-      adults: Array(adultCount).fill(null).map(() => ({
-        firstName: '',
-        lastName: '',
-        gender: '',
-        age: '',
-      })),
-      children: Array(childCount).fill(null).map(() => ({
-        firstName: '',
-        lastName: '',
-        gender: '',
-        dateOfBirth: '',
-        age: '',
-      })),
+      passengers: initialPassengers,
       contactData: {
         contactPerson: '',
         country: 'India',
@@ -122,13 +105,12 @@ const PassengerDetails = () => {
             totalFare: totalFareCalc,
           },
           passengers: {
-            adults: values.adults,
-            children: values.children,
+            adults: values.passengers.filter(p => p.type === 'adult'),
+            children: values.passengers.filter(p => p.type === 'child'),
             infants: infantCount,
           },
           passengerDetails: {
-            adults: values.adults,
-            children: values.children,
+            passengers: values.passengers,
           },
           contactDetails: values.contactData,
         },
@@ -157,47 +139,42 @@ const PassengerDetails = () => {
 
   const handleAdultSave = async (index) => {
     const errors = await formik.validateForm();
-    if (errors.adults && errors.adults[index]) {
+    if (errors.passengers && errors.passengers[index]) {
       const fields = ['firstName', 'lastName', 'gender', 'age'];
       fields.forEach(field => {
-        formik.setFieldTouched(`adults[${index}].${field}`, true, true);
+        formik.setFieldTouched(`passengers[${index}].${field}`, true, true);
       });
       return;
     }
     
-    const newExpanded = { ...expandedCards };
-    newExpanded.adults[index] = false;
-    if (index + 1 < adultCount) {
-      newExpanded.adults[index + 1] = true;
-    } else if (childCount > 0) {
-      newExpanded.children[0] = true;
+    const newExpanded = [...expandedCards];
+    newExpanded[index] = false;
+    if (index + 1 < newExpanded.length) {
+      newExpanded[index + 1] = true;
     }
     setExpandedCards(newExpanded);
   };
 
   const handleChildSave = async (index) => {
     const errors = await formik.validateForm();
-    if (errors.children && errors.children[index]) {
+    if (errors.passengers && errors.passengers[index]) {
       const fields = ['firstName', 'lastName', 'gender', 'dateOfBirth', 'age'];
       fields.forEach(field => {
-        formik.setFieldTouched(`children[${index}].${field}`, true, true);
+        formik.setFieldTouched(`passengers[${index}].${field}`, true, true);
       });
       return;
     }
 
-    const newExpanded = { ...expandedCards };
-    newExpanded.children[index] = false;
-    if (index + 1 < childCount) {
-      newExpanded.children[index + 1] = true;
+    const newExpanded = [...expandedCards];
+    newExpanded[index] = false;
+    if (index + 1 < newExpanded.length) {
+      newExpanded[index + 1] = true;
     }
     setExpandedCards(newExpanded);
   };
 
-  const toggleCardExpand = (type, index) => {
-    setExpandedCards(prev => ({
-      ...prev,
-      [type]: prev[type].map((exp, i) => i === index ? !exp : exp)
-    }));
+  const toggleCardExpand = (index) => {
+    setExpandedCards(prev => prev.map((exp, i) => i === index ? !exp : exp));
   };
 
   return (
@@ -220,16 +197,18 @@ const PassengerDetails = () => {
               <div className="passengers-section">
                 <h2 className="section-heading">Adults</h2>
                 <div className="passengers-list">
-                  {formik.values.adults.map((passenger, index) => (
+                  {formik.values.passengers.filter(p => p.type === 'adult').map((passenger, index) => {
+                    const originalIndex = formik.values.passengers.findIndex(p => p === passenger);
+                    return (
                     <AdultPassengerCard
                       key={`adult-${index}`}
                       formik={formik}
-                      passengerIndex={index}
-                      onSave={handleAdultSave}
-                      isExpanded={expandedCards.adults[index]}
-                      onToggleExpand={() => toggleCardExpand('adults', index)}
+                      passengerIndex={originalIndex}
+                      onSave={() => handleAdultSave(originalIndex)}
+                      isExpanded={expandedCards[originalIndex]}
+                      onToggleExpand={() => toggleCardExpand(originalIndex)}
                     />
-                  ))}
+                  )})}
                 </div>
               </div>
 
@@ -237,16 +216,18 @@ const PassengerDetails = () => {
                 <div className="passengers-section">
                   <h2 className="section-heading">Children</h2>
                   <div className="passengers-list">
-                    {formik.values.children.map((passenger, index) => (
+                    {formik.values.passengers.filter(p => p.type === 'child').map((passenger, index) => {
+                      const originalIndex = formik.values.passengers.findIndex(p => p === passenger);
+                      return (
                       <ChildPassengerCard
                         key={`child-${index}`}
                         formik={formik}
-                        passengerIndex={index}
-                        onSave={handleChildSave}
-                        isExpanded={expandedCards.children[index]}
-                        onToggleExpand={() => toggleCardExpand('children', index)}
+                        passengerIndex={originalIndex}
+                        onSave={() => handleChildSave(originalIndex)}
+                        isExpanded={expandedCards[originalIndex]}
+                        onToggleExpand={() => toggleCardExpand(originalIndex)}
                       />
-                    ))}
+                    )})}
                   </div>
                 </div>
               )}

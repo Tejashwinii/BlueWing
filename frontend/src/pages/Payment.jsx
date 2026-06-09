@@ -176,6 +176,7 @@ const Payment = () => {
             lastName: p.lastName,
             gender: p.gender,
             age: parseInt(p.age) || 25,
+            type: 'adult',
           });
         });
       }
@@ -187,6 +188,7 @@ const Payment = () => {
             lastName: p.lastName,
             gender: p.gender,
             age: parseInt(p.age) || 10,
+            type: 'child',
           });
         });
       }

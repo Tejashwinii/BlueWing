@@ -9,8 +9,8 @@ const ContactDetailsCard = ({ formik }) => {
     return contactErrors[field] && (contactTouched[field] || String(contactData[field] || '').length > 0);
   };
 
-  const adultOptions = formik.values.adults
-    .filter(p => p.firstName && p.lastName)
+  const adultOptions = formik.values.passengers
+    .filter(p => p.type === 'adult' && p.firstName && p.lastName)
     .map((p, idx) => ({
       value: idx,
       label: `${p.firstName} ${p.lastName} (Adult)`,

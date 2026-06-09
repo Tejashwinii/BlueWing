@@ -7,6 +7,11 @@ const passengerSchema = new mongoose.Schema(
 			required: true,
 			auto: true,
 		},
+		type: {
+			type: String,
+			enum: ['adult', 'child', 'infant'],
+			default: 'adult'
+		},
 		firstName: {
 			type: String,
 			required: true,

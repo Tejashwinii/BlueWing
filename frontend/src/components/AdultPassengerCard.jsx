@@ -7,10 +7,10 @@ const AdultPassengerCard = ({
   isExpanded,
   onToggleExpand
 }) => {
-  const basePath = `adults[${passengerIndex}]`;
-  const passengerData = formik.values.adults[passengerIndex] || {};
-  const passengerErrors = formik.errors.adults?.[passengerIndex] || {};
-  const passengerTouched = formik.touched.adults?.[passengerIndex] || {};
+  const basePath = `passengers[${passengerIndex}]`;
+  const passengerData = formik.values.passengers[passengerIndex] || {};
+  const passengerErrors = formik.errors.passengers?.[passengerIndex] || {};
+  const passengerTouched = formik.touched.passengers?.[passengerIndex] || {};
 
   const hasError = (field) => {
     return passengerErrors[field] && (passengerTouched[field] || String(passengerData[field] || '').length > 0);

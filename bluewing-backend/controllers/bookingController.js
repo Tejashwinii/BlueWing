@@ -134,6 +134,7 @@ export const createBooking = async (req, res) => {
 
 		const passengersWithSeats = passengers.map((passenger, index) => ({
 			passengerId: new ObjectId(),
+			type: passenger.type || 'adult',
 			firstName: passenger.firstName,
 			lastName: passenger.lastName,
 			gender: passenger.gender,
