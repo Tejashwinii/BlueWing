@@ -56,31 +56,31 @@ const TicketSummary = () => {
     let passengerList = [];
     
     // Try to use backend booking data first
-    if (backendBooking?.passengers?.length) {
+    if (backendBooking?.passengers && Array.isArray(backendBooking.passengers) && backendBooking.passengers.length > 0) {
       passengerList = backendBooking.passengers.map((p, i) => ({
         ...p,
-        name: `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Passenger',
+        name: `${p?.firstName || ''} ${p?.lastName || ''}`.trim() || 'Passenger',
         passengerNumber: i + 1,
-        seatNumber: p.seatNumber || backendBooking.selectedSeats?.[i] || 'N/A',
-        ticketNumber: p.ticketNumber || `BW-TK-${Date.now()}-${i + 1}`,
+        seatNumber: p?.seatNumber || backendBooking?.selectedSeats?.[i] || 'N/A',
+        ticketNumber: p?.ticketNumber || `BW-TK-${Date.now()}-${i + 1}`,
       }));
     } else {
       // Fallback to navigation state data
-      if (Array.isArray(passengers.adults)) {
+      if (Array.isArray(passengers?.adults)) {
         passengerList = [...passengerList, ...passengers.adults.map((p, i) => ({
           ...p,
-          name: `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Passenger',
+          name: `${p?.firstName || ''} ${p?.lastName || ''}`.trim() || 'Passenger',
           type: 'adult',
           passengerNumber: i + 1,
           seatNumber: location.state?.selectedSeats?.[i] || 'N/A',
           ticketNumber: `BW-TK-${Date.now()}-${i + 1}`,
         }))];
       }
-      if (Array.isArray(passengers.children)) {
+      if (Array.isArray(passengers?.children)) {
         const offset = passengerList.length;
         passengerList = [...passengerList, ...passengers.children.map((p, i) => ({
           ...p,
-          name: `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Passenger',
+          name: `${p?.firstName || ''} ${p?.lastName || ''}`.trim() || 'Passenger',
           type: 'child',
           passengerNumber: offset + i + 1,
           seatNumber: location.state?.selectedSeats?.[offset + i] || 'N/A',
@@ -108,24 +108,24 @@ const TicketSummary = () => {
     if (backendBooking?.flightId) {
       const flight = backendBooking.flightId;
       return {
-        flightNumber: flight.flightNumber || selectedFare.flightNumber,
-        from: flight.from || journey.departure,
-        to: flight.to || journey.arrival,
-        departureDate: flight.departureDate || journey.date,
-        departureTime: flight.departureTime || selectedFare.departureTime,
-        arrivalTime: flight.arrivalTime || selectedFare.arrivalTime,
-        duration: flight.duration || selectedFare.duration,
-        airline: flight.airline || 'BlueWing Airlines',
+        flightNumber: flight?.flightNumber || selectedFare?.flightNumber,
+        from: flight?.from || journey?.departure,
+        to: flight?.to || journey?.arrival,
+        departureDate: flight?.departureDate || journey?.date,
+        departureTime: flight?.departureTime || selectedFare?.departureTime,
+        arrivalTime: flight?.arrivalTime || selectedFare?.arrivalTime,
+        duration: flight?.duration || selectedFare?.duration,
+        airline: flight?.airline || 'BlueWing Airlines',
       };
     }
     return {
-      flightNumber: selectedFare.flightNumber || 'BW---',
-      from: journey.departure || 'FROM',
-      to: journey.arrival || 'TO',
-      departureDate: journey.date,
-      departureTime: selectedFare.departureTime,
-      arrivalTime: selectedFare.arrivalTime,
-      duration: selectedFare.duration,
+      flightNumber: selectedFare?.flightNumber || 'BW---',
+      from: journey?.departure || 'FROM',
+      to: journey?.arrival || 'TO',
+      departureDate: journey?.date,
+      departureTime: selectedFare?.departureTime,
+      arrivalTime: selectedFare?.arrivalTime,
+      duration: selectedFare?.duration,
       airline: 'BlueWing Airlines',
     };
   }, [backendBooking, journey, selectedFare]);
@@ -135,8 +135,8 @@ const TicketSummary = () => {
     if (backendBooking?.contactDetails?.email) {
       return {
         email: backendBooking.contactDetails.email,
-        phone: backendBooking.contactDetails.phone,
-        country: backendBooking.contactDetails.country,
+        phone: backendBooking.contactDetails.phone || '',
+        country: backendBooking.contactDetails.country || 'India',
       };
     } else if (backendBooking?.userId?.email) {
        return {
@@ -149,7 +149,7 @@ const TicketSummary = () => {
     let fallbackEmail = '';
     try {
       const userStr = localStorage.getItem('bluewing_user');
-      if (userStr) fallbackEmail = JSON.parse(userStr).email;
+      if (userStr) fallbackEmail = JSON.parse(userStr)?.email || '';
     } catch (e) {}
 
     return {
@@ -187,20 +187,20 @@ const TicketSummary = () => {
       return formatCurrency(backendBooking.pricing.totalAmount);
     }
     return '₹ --';
-  }, [selectedFare, backendBooking]);
+  }, [selectedFare, backendBooking, location.state]);
 
   // Get fare type details
   const fareTypeDetails = useMemo(() => {
     if (backendBooking?.fareType) {
       return {
-        name: backendBooking.fareType.name,
-        baggage: backendBooking.fareType.baggage,
-        meals: backendBooking.fareType.meals,
-        cancellation: backendBooking.fareType.cancellation,
+        name: backendBooking.fareType.name || 'Standard',
+        baggage: backendBooking.fareType.baggage || '15kg',
+        meals: backendBooking.fareType.meals || false,
+        cancellation: backendBooking.fareType.cancellation || false,
       };
     }
     return {
-      name: selectedFare.fareTypeTitle || 'Standard',
+      name: selectedFare?.fareTypeTitle || 'Standard',
       baggage: '15kg',
       meals: false,
       cancellation: false,
@@ -245,9 +245,12 @@ const TicketSummary = () => {
     pdf.save();
   };
 
+  const currentStatus = String(backendBooking?.bookingStatus || backendBooking?.status || '').toLowerCase();
+  const isMultiPassenger = (allPassengers?.length || 0) > 1;
+
   const handleCancelTicket = () => {
     if (isCancelling) return;
-    if (backendBooking && String(backendBooking.bookingStatus).toLowerCase() === 'cancelled') return;
+    if (currentStatus === 'cancelled') return;
     setIsCancelling(true);
     setCancelRequestId(bookingId || backendBooking?._id);
     setShowOtpModal(true);
@@ -277,6 +280,20 @@ const TicketSummary = () => {
     );
   }
 
+  // Use optional chaining for booking references in case data is incomplete
+  if (!backendBooking && !allPassengers?.length && !bookingId) {
+    return (
+      <>
+        <Navbar minimalMode={true} />
+        <div className="ticket-summary-page">
+          <div className="error-banner">
+            <p>Loading ticket...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar minimalMode={true} />
@@ -286,9 +303,9 @@ const TicketSummary = () => {
           <h1>Booking Confirmed!</h1>
           <p className="booking-reference">Booking Reference: <strong>{displayBookingReference}</strong></p>
           <p className="transaction-id">Transaction ID: {transactionId || backendBooking?.paymentId?.transactionId || 'N/A'}</p>
-          {backendBooking?.bookingStatus && (
-            <span className={`booking-status-badge status-${backendBooking.bookingStatus}`}>
-              {backendBooking.bookingStatus.toUpperCase()}
+          {(backendBooking?.bookingStatus || backendBooking?.status) && (
+            <span className={`booking-status-badge status-${backendBooking?.bookingStatus || backendBooking?.status}`}>
+              {String(backendBooking?.bookingStatus || backendBooking?.status || '').toUpperCase()}
             </span>
           )}
         </div>
@@ -304,15 +321,15 @@ const TicketSummary = () => {
           <div className="fare-summary-card">
             <div className="fare-summary-item">
               <span className="fare-label">Passengers</span>
-              <span className="fare-value">{allPassengers.length}</span>
+              <span className="fare-value">{allPassengers?.length || 0}</span>
             </div>
             <div className="fare-summary-item">
               <span className="fare-label">Fare Type</span>
-              <span className="fare-value">{fareTypeDetails.name}</span>
+              <span className="fare-value">{fareTypeDetails?.name || 'Standard'}</span>
             </div>
             <div className="fare-summary-item">
               <span className="fare-label">Baggage</span>
-              <span className="fare-value">{fareTypeDetails.baggage}</span>
+              <span className="fare-value">{fareTypeDetails?.baggage || '15kg'}</span>
             </div>
             <div className="fare-summary-item">
               <span className="fare-label">Total Amount</span>
@@ -334,18 +351,18 @@ const TicketSummary = () => {
                     journey={flightDetails}
                     selectedFare={{
                       ...selectedFare,
-                      flightNumber: flightDetails.flightNumber,
-                      departureTime: flightDetails.departureTime,
-                      arrivalTime: flightDetails.arrivalTime,
+                      flightNumber: flightDetails?.flightNumber,
+                      departureTime: flightDetails?.departureTime,
+                      arrivalTime: flightDetails?.arrivalTime,
                     }}
                     contactDetails={displayContactDetails}
                     bookingReference={displayBookingReference}
                     bookingId={bookingId || backendBooking?._id}
                     onCancelled={handleTicketCancelled}
                     hasReviewed={backendBooking?.hasReviewed || false}
-                    bookingStatus={backendBooking?.bookingStatus}
-                    hideCancel={allPassengers.length > 1}
-                    hideDownload={allPassengers.length > 1}
+                    bookingStatus={backendBooking?.bookingStatus || backendBooking?.status}
+                    hideCancel={isMultiPassenger}
+                    hideDownload={isMultiPassenger}
                   />
                 ))}
               </div>
@@ -359,7 +376,7 @@ const TicketSummary = () => {
 
         {/* Action Buttons specific to multi-passenger or general summary actions */}
         <div className="ticket-summary-actions">
-          {allPassengers.length > 1 && String(backendBooking?.bookingStatus).toLowerCase() !== 'cancelled' && (
+          {isMultiPassenger && currentStatus !== 'cancelled' && (
             <>
               <button className="btn btn-primary" onClick={handleDownloadAllTickets}>
                 📥 Download All Tickets
@@ -373,7 +390,7 @@ const TicketSummary = () => {
               </button>
             </>
           )}
-          {allPassengers.length > 1 && String(backendBooking?.bookingStatus).toLowerCase() === 'cancelled' && (
+          {isMultiPassenger && currentStatus === 'cancelled' && (
              <button className="btn btn-cancel-ticket btn-cancelled" disabled>
                 ❌ Booking Cancelled
              </button>
@@ -387,7 +404,7 @@ const TicketSummary = () => {
           <OtpCancelModal
             isOpen={showOtpModal}
             bookingId={cancelRequestId}
-            contactEmail={displayContactDetails?.email}
+            contactEmail={displayContactDetails?.email || ""}
             onClose={handleOtpClose}
             onSuccess={handleOtpSuccess}
             otpAPI={otpAPI}
