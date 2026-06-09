@@ -28,7 +28,8 @@ const TicketSummary = () => {
   const bookingReference = location.state?.bookingReference || '';
 
   useEffect(() => {
-    const loadBooking = async () => {
+    const fetchBooking = async () => {
+      console.log("Booking ID:", bookingId);
       if (!bookingId) {
         setLoading(false);
         return;
@@ -37,18 +38,21 @@ const TicketSummary = () => {
       try {
         setLoading(true);
         const response = await bookingAPI.getById(bookingId);
+        console.log("API response:", response);
         if (response?.success && response?.data) {
+          setBackendBooking(response.data);
+        } else if (response?.data) {
           setBackendBooking(response.data);
         }
       } catch (err) {
-        console.warn('Failed to fetch booking:', err?.message || err);
-        setError('Could not load booking details from server. Showing local data.');
+        console.error("Fetch error:", err);
+        setError(true);
       } finally {
         setLoading(false);
       }
     };
 
-    loadBooking();
+    fetchBooking();
   }, [bookingId]);
 
   // Safely handle passengers data - prefer backend data
@@ -267,26 +271,38 @@ const TicketSummary = () => {
     setIsCancelling(false);
   };
 
-  if (loading) {
+  if (error) {
     return (
       <>
         <Navbar minimalMode={true} />
         <div className="ticket-summary-page">
-          <div className="loading-container">
-            <p>Loading your booking details...</p>
+          <div className="error-banner">
+            <p>Failed to load ticket</p>
           </div>
         </div>
       </>
     );
   }
 
-  // Use optional chaining for booking references in case data is incomplete
-  if (!backendBooking && !allPassengers?.length && !bookingId) {
+  if (!bookingId) {
     return (
       <>
         <Navbar minimalMode={true} />
         <div className="ticket-summary-page">
           <div className="error-banner">
+            <p>No ticket found</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!backendBooking) {
+    return (
+      <>
+        <Navbar minimalMode={true} />
+        <div className="ticket-summary-page">
+          <div className="loading-container">
             <p>Loading ticket...</p>
           </div>
         </div>
