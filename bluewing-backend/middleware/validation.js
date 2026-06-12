@@ -8,32 +8,34 @@ export const registerSchema = Joi.object({
   firstName: Joi.string()
     .required()
     .min(2)
-    .max(50)
+    .max(25)
     .messages({
       'string.empty': 'First name is required',
       'string.min': 'First name must be at least 2 characters',
-      'string.max': 'First name must not exceed 50 characters',
+      'string.max': 'First name must not exceed 25 characters',
       'any.required': 'First name is required'
     }),
 
   lastName: Joi.string()
     .required()
     .min(2)
-    .max(50)
+    .max(25)
     .messages({
       'string.empty': 'Last name is required',
       'string.min': 'Last name must be at least 2 characters',
-      'string.max': 'Last name must not exceed 50 characters',
+      'string.max': 'Last name must not exceed 25 characters',
       'any.required': 'Last name is required'
     }),
 
   email: Joi.string()
     .required()
     .email()
+    .max(50)
     .lowercase()
     .messages({
       'string.empty': 'Email is required',
       'string.email': 'Please provide a valid email address',
+      'string.max': 'Email must not exceed 50 characters',
       'any.required': 'Email is required'
     }),
 
@@ -68,14 +70,42 @@ export const registerSchema = Joi.object({
   dateOfBirth: Joi.date()
     .required()
     .less('now')
+    .custom((value, helpers) => {
+      // Calculate age from dateOfBirth and ensure 18+
+      const today = new Date();
+      const birthDate = new Date(value);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      if (age < 18) {
+        return helpers.error('any.invalid');
+      }
+      return value;
+    })
     .messages({
       'date.base': 'Date of Birth is required',
       'date.less': 'Date of Birth must be a past date',
-      'any.required': 'Date of Birth is required'
+      'any.required': 'Date of Birth is required',
+      'any.invalid': 'User must be at least 18 years old'
     }),
   address: Joi.string()
     .allow('', null)
     .max(200)
+    .custom((value, helpers) => {
+      // If address provided, it must contain at least one hyphen '-'
+      if (value && value.trim() !== '') {
+        if (!/-/.test(value)) {
+          return helpers.error('any.invalid');
+        }
+      }
+      return value;
+    })
+    .messages({
+      'string.max': 'Address cannot be more than 200 characters',
+      'any.invalid': 'Address must contain at least one hyphen (-)'
+    })
     .optional(),
   city: Joi.string()
     .allow('', null)

@@ -13,6 +13,9 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
   },
   timeout: 10000, // 10 second timeout
 });
@@ -20,6 +23,7 @@ const apiClient = axios.create({
 /**
  * Request Interceptor
  * Adds JWT token to requests if available
+ * Adds cache-busting parameter to GET requests
  */
 apiClient.interceptors.request.use(
   (config) => {
@@ -27,6 +31,17 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Add cache-busting timestamp for GET requests
+    if (config.method === 'get') {
+      config.params = config.params || {};
+      config.params._ = new Date().getTime();
+    }
+    
+    // Ensure cache control headers persist
+    config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+    config.headers['Pragma'] = 'no-cache';
+    
     return config;
   },
   (error) => {

@@ -28,7 +28,16 @@ app.use(cors({
   credentials: true
 }));
 
-// 2. JSON parser middleware
+// 2. Cache control middleware - disable caching for development
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+  next();
+});
+
+// 3. JSON parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

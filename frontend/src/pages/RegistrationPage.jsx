@@ -10,19 +10,37 @@ const registrationSchema = Yup.object().shape({
   firstName: Yup.string()
     .trim()
     .required('First Name is required')
+    .max(25, 'First Name must not exceed 25 characters')
     .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
   lastName: Yup.string()
     .trim()
     .required('Last Name is required')
+    .max(25, 'Last Name must not exceed 25 characters')
     .matches(/^[A-Za-z\s]+$/, 'Only characters and spaces are allowed'),
   email: Yup.string()
     .trim()
     .required('Email is required')
+    .max(50, 'Email must not exceed 50 characters')
     .email('Invalid email format'),
   dateOfBirth: Yup.date()
     .required('Date of Birth is required')
     .max(new Date(), 'Date of Birth must be a past date')
-    .typeError('Invalid date format'),
+    .typeError('Invalid date format')
+    .test('age-validation', 'User must be at least 18 years old', function(value) {
+      if (!value) return false;
+      const today = new Date();
+      const birthDate = new Date(value);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      return age >= 18;
+    }),
+    
+
   phoneNumber: Yup.string()
     .trim()
     .required('Phone Number is required')
@@ -34,7 +52,11 @@ const registrationSchema = Yup.object().shape({
     .trim()
     .notRequired()
     .nullable()
-    .max(200, 'Address cannot be more than 200 characters'),
+    .max(200, 'Address cannot be more than 200 characters')
+    .test('address-hyphen', 'Address must contain at least one hyphen (-)', function(value) {
+      if (!value || value.trim() === '') return true;
+      return /-/.test(value);
+    }),
   city: Yup.string()
     .trim()
     .notRequired()
