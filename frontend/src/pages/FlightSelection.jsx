@@ -239,13 +239,21 @@ export default function FlightSelection() {
     };
 
     const handleFareSubmit = (payload) => {
+        const updatedJourney = {
+            ...searchCriteria,
+            cabinClass: appliedCabinClass
+        };
+
+        const statePayload = {
+            journey: updatedJourney,
+            selectedFare: payload,
+            cabinClass: appliedCabinClass,
+        };
+
         // Conditional check: is user signed in?
         if (!isAuthenticated()) {
             // NOT signed in - save booking data and redirect to login
-            sessionStorage.setItem('pendingBooking', JSON.stringify({
-                journey: searchCriteria,
-                selectedFare: payload,
-            }));
+            sessionStorage.setItem('pendingBooking', JSON.stringify(statePayload));
             navigate('/login');
             return;
         }
@@ -253,10 +261,7 @@ export default function FlightSelection() {
         // User IS signed in - proceed to passenger details
         setSelectedFarePayload(payload);
         navigate("/passenger-details", {
-            state: {
-                journey: searchCriteria,
-                selectedFare: payload,
-            },
+            state: statePayload,
         });
     };
 

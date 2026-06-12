@@ -170,13 +170,15 @@ function SeatSelection({ bookingContext, flight, onBack, onContinue }) {
   const cabinOptions = useMemo(() => buildCabinOptions(aircraft), [aircraft]);
   const passengerSummary = useMemo(() => getPassengerSummary(selectionContext), [selectionContext]);
 
-  const lockedCabinClass = selectionContext.journey?.cabinClass
-    ? normalizeCabinClass(selectionContext.journey.cabinClass)
-    : selectionContext.fareTypeId
-      ? normalizeCabinClass(selectionContext.fareTypeId)
-      : selectionContext.travelClass
-        ? normalizeCabinClass(selectionContext.travelClass)
-        : null;
+  const lockedCabinClass = selectionContext.cabinClass
+    ? normalizeCabinClass(selectionContext.cabinClass)
+    : selectionContext.journey?.cabinClass
+      ? normalizeCabinClass(selectionContext.journey.cabinClass)
+      : selectionContext.fareTypeId
+        ? normalizeCabinClass(selectionContext.fareTypeId)
+        : selectionContext.travelClass
+          ? normalizeCabinClass(selectionContext.travelClass)
+          : null;
 
   const initialCabinClass = cabinOptions.some((option) => option.id === lockedCabinClass)
     ? lockedCabinClass

@@ -26,6 +26,10 @@ const TicketSummary = () => {
   const transactionId = location.state?.transactionId || '';
   const bookingId = location.state?.bookingId || '';
   const bookingReference = location.state?.bookingReference || '';
+  const cabinClass = location.state?.cabinClass || location.state?.journey?.cabinClass || location.state?.journey?.class || backendBooking?.cabinClass || 'ECONOMY';
+
+  console.log("Ticket Summary received state:", location.state);
+  console.log("Cabin Class:", cabinClass);
 
   useEffect(() => {
     const fetchBooking = async () => {
@@ -120,6 +124,7 @@ const TicketSummary = () => {
         arrivalTime: flight?.arrivalTime || selectedFare?.arrivalTime,
         duration: flight?.duration || selectedFare?.duration,
         airline: flight?.airline || 'BlueWing Airlines',
+        cabinClass: cabinClass,
       };
     }
     return {
@@ -131,8 +136,9 @@ const TicketSummary = () => {
       arrivalTime: selectedFare?.arrivalTime,
       duration: selectedFare?.duration,
       airline: 'BlueWing Airlines',
+      cabinClass: cabinClass,
     };
-  }, [backendBooking, journey, selectedFare]);
+  }, [backendBooking, journey, selectedFare, cabinClass]);
 
   // Get contact details - prefer backend data
   const displayContactDetails = useMemo(() => {

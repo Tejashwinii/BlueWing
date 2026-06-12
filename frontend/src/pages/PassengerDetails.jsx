@@ -65,6 +65,7 @@ const PassengerDetails = () => {
   
   const journey = location.state?.journey || {};
   const selectedFare = location.state?.selectedFare || {};
+  const cabinClass = location.state?.cabinClass || journey.cabinClass || 'economy';
   
   const adultCount = journey.passengers?.adults || 1;
   const childCount = journey.passengers?.children || 0;
@@ -100,6 +101,7 @@ const PassengerDetails = () => {
       navigate('/seat-selection', {
         state: {
           journey,
+          cabinClass,
           selectedFare: {
             ...selectedFare,
             totalFare: totalFareCalc,
@@ -248,10 +250,10 @@ const PassengerDetails = () => {
                   <p className="summary-text">{passengerCountDisplay || '1 Adult'}</p>
                 </div>
 
-                {journey.cabinClass && (
+                {cabinClass && (
                   <div className="trip-summary-section">
                     <p className="summary-text">
-                      <strong>{journey.cabinClass.charAt(0).toUpperCase() + journey.cabinClass.slice(1).replace('-', ' ')}</strong>
+                      <strong>{cabinClass.charAt(0).toUpperCase() + cabinClass.slice(1).replace('-', ' ')}</strong>
                     </p>
                   </div>
                 )}

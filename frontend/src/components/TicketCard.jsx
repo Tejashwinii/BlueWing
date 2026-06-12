@@ -17,6 +17,13 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [cancelRequestId, setCancelRequestId] = useState(null);
 
+  const formatCabin = (cabin) => {
+    if (!cabin) return "ECONOMY";
+    if (cabin === "firstClass" || cabin === "first-class") return "FIRST CLASS";
+    if (cabin === "business") return "BUSINESS";
+    return "ECONOMY";
+  };
+
   useEffect(() => {
     setIsCancelled(String(bookingStatus).toLowerCase() === 'cancelled');
   }, [bookingStatus]);
@@ -225,7 +232,7 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
           <div className="ticket-header">
             <div className="header-section">
               <span className="label">Boarding Pass</span>
-              <span className="class-badge">{journey?.cabinClass || 'ECONOMY'}</span>
+              <span className="class-badge">{formatCabin(journey?.cabinClass)}</span>
             </div>
           </div>
 

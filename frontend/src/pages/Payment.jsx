@@ -290,6 +290,7 @@ const Payment = () => {
                 transactionId,
                 bookingId: currentBookingId,
                 bookingReference,
+                cabinClass: location.state?.cabinClass || journey.cabinClass,
               },
             });
             setIsProcessing(false);
@@ -314,6 +315,7 @@ const Payment = () => {
                 transactionId: `TXN${Date.now()}`,
                 bookingId: currentBookingId,
                 bookingReference,
+                cabinClass: location.state?.cabinClass || journey.cabinClass,
               },
             });
             setIsProcessing(false);
@@ -391,6 +393,7 @@ const Payment = () => {
             transactionId,
             bookingId: currentBookingId,
             bookingReference,
+            cabinClass: location.state?.cabinClass || journey.cabinClass,
           },
         });
         setIsProcessing(false);
