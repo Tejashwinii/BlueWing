@@ -35,6 +35,17 @@ const HomePage = () => {
   };
 
   const [formData, setFormData] = useState(getInitialFormData);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (formData.departure && formData.arrival && formData.departure === formData.arrival) {
+      setError('Departure and Arrival locations cannot be the same.');
+    } else {
+      setError('');
+    }
+  }, [formData.departure, formData.arrival]);
+
+  
   
   // State for flights from API
   const [flights, setFlights] = useState([]);
@@ -109,6 +120,15 @@ const HomePage = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+
+    if (error) {
+      return; // prevent submission
+    }
+
+    if (formData.departure && formData.arrival && formData.departure === formData.arrival) {
+      setError('Departure and Arrival locations cannot be the same.');
+      return;
+    }
 
     // Validate that all required fields are filled
     if (!formData.departure.trim() || !formData.arrival.trim() || !formData.date) {
@@ -224,6 +244,7 @@ const HomePage = () => {
                     name="departure"
                     value={formData.departure}
                     onChange={handleInputChange}
+                    style={error ? { borderColor: 'red' } : {}}
                   >
                     <option value="">Select departure</option>
                     {departureOptions.map((airport) => (
@@ -240,6 +261,7 @@ const HomePage = () => {
                     name="arrival"
                     value={formData.arrival}
                     onChange={handleInputChange}
+                    style={error ? { borderColor: 'red' } : {}}
                   >
                     <option value="">Select arrival</option>
                     {arrivalOptions.map((airport) => (
@@ -262,7 +284,8 @@ const HomePage = () => {
                 </div>
               </div>
               
-             <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+             {error && <div className="error-message" style={{ color: 'red', marginBottom: '15px', fontWeight: 'bold' }}>{error}</div>}
+              <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
   {/* Passengers Column */}
   <div style={{ flex: 1 }}>
     <div className="form-group">
@@ -366,7 +389,7 @@ const HomePage = () => {
   </div>
 </div>
 
-              <button type="submit" className="btn-search">
+              <button type="submit" className="btn-search" disabled={!!error} style={error ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>
                 Search Flights
               </button>
             </form>
