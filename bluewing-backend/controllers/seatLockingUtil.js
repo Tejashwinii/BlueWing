@@ -1,10 +1,51 @@
+/**
+ * Seat Locking Utilities
+ *
+ * Purpose:
+ * Provides helper functions for checking, locking, releasing, and summarizing embedded Flight seats.
+ *
+ * Workflow:
+ * Booking/OTP Controller -> Seat utility -> Flight model -> flights collection embedded seats
+ *
+ * Used By:
+ * controllers/bookingController.js and controllers/otpController.js.
+ *
+ * Dependencies:
+ * models/Flight.js stores the embedded seat inventory that these utilities mutate/read.
+ *
+ * Request Lifecycle:
+ * Called during booking creation before Booking is persisted, during cancellation after ownership
+ * checks, and when the frontend requests seat availability for a flight.
+ */
 import Flight from '../models/Flight.js';
 
+/**
+ * Atomically mark selected embedded seats as booked for a booking.
+ *
+ * Workflow:
+ * Create Booking -> Seat availability check -> lockSeatsAtomic -> Booking/Payment creation
+ *
+ * Inputs:
+ * - flightId: Flight document id.
+ * - seatIds: selected embedded seat ids.
+ * - bookingId: Booking id to store on each locked seat.
+ *
+ * Returns:
+ * Updated Flight document.
+ *
+ * Collections:
+ * - flights: updates embedded seats so concurrent booking attempts cannot reuse them.
+ *
+ * Why:
+ * Seat allocation is central to airline reservations; this helper reduces double-booking risk.
+ */
 export const lockSeatsAtomic = async (flightId, seatIds, bookingId) => {
 	if (!flightId || !seatIds?.length || !bookingId) {
 		throw new Error('Invalid parameters for seat locking');
 	}
 
+	// Update the Flight document's embedded seats in the flights collection.
+	// Only seats that are currently unbooked match the array filter.
 	const result = await Flight.findByIdAndUpdate(
 		flightId,
 		{
@@ -41,11 +82,32 @@ export const lockSeatsAtomic = async (flightId, seatIds, bookingId) => {
 	return result;
 };
 
+/**
+ * Release selected embedded seats after cancellation/refund.
+ *
+ * Workflow:
+ * Cancel Booking / Verify OTP -> releaseSeats -> Payment refund -> Booking cancellation state
+ *
+ * Inputs:
+ * - flightId: Flight document id.
+ * - seatIds: seats to make available again.
+ *
+ * Returns:
+ * Updated Flight document.
+ *
+ * Collections:
+ * - flights: clears booking state from embedded seat documents.
+ *
+ * Why:
+ * Returns cancelled seats to inventory so they can be booked by another passenger.
+ */
 export const releaseSeats = async (flightId, seatIds) => {
 	if (!flightId || !seatIds?.length) {
 		throw new Error('Invalid parameters for seat release');
 	}
 
+	// Update the Flight document's embedded seats in the flights collection.
+	// Only seats that are currently unbooked match the array filter.
 	const result = await Flight.findByIdAndUpdate(
 		flightId,
 		{
@@ -67,11 +129,31 @@ export const releaseSeats = async (flightId, seatIds) => {
 	return result;
 };
 
+/**
+ * Check whether requested seats exist and are unbooked.
+ *
+ * Workflow:
+ * Create Booking -> checkSeatsAvailability -> lockSeatsAtomic -> Booking creation
+ *
+ * Inputs:
+ * - flightId: Flight document id.
+ * - seatIds: selected seats from the frontend.
+ *
+ * Returns:
+ * Availability result with optional unavailable seat ids.
+ *
+ * Collections:
+ * - flights: reads embedded seats for the selected flight.
+ *
+ * Why:
+ * Gives the API a clear conflict response before attempting to reserve seats.
+ */
 export const checkSeatsAvailability = async (flightId, seatIds) => {
 	if (!flightId || !seatIds?.length) {
 		throw new Error('Invalid parameters for availability check');
 	}
 
+	// Read the Flight document from the flights collection to inspect embedded seat state.
 	const flight = await Flight.findById(flightId);
 	if (!flight) {
 		throw new Error('Flight not found');
@@ -93,6 +175,24 @@ export const checkSeatsAvailability = async (flightId, seatIds) => {
 	return { available: true, message: 'All seats available' };
 };
 
+/**
+ * Summarize total, booked, and available seats by cabin.
+ *
+ * Workflow:
+ * Seat Selection UI -> getFlightSeats -> getSeatStatistics -> flights collection
+ *
+ * Inputs:
+ * - flightId: Flight document id.
+ *
+ * Returns:
+ * Seat counts overall and by cabin class.
+ *
+ * Collections:
+ * - flights: reads embedded seats only.
+ *
+ * Why:
+ * Lets the frontend display seat-map availability without recalculating every count itself.
+ */
 export const getSeatStatistics = async (flightId) => {
 	const flight = await Flight.findById(flightId).select('seats');
 	if (!flight) {

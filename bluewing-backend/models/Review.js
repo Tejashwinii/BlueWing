@@ -1,3 +1,22 @@
+/**
+ * Review Model
+ *
+ * Purpose:
+ * Stores public testimonials and booking/flight-linked passenger reviews.
+ *
+ * Workflow:
+ * Review UI / Ticket History -> Review Controller -> Review model -> reviews collection
+ *
+ * Used By:
+ * controllers/reviewController.js and controllers/bookingController.js.
+ *
+ * Dependencies:
+ * mongoose for schema, references to User/Flight/Booking, and uniqueness indexes.
+ *
+ * Request Lifecycle:
+ * Created when users submit feedback, read for homepage testimonials, flight reviews,
+ * and booking history review-status checks.
+ */
 import mongoose from 'mongoose';
 
 const reviewSchema = new mongoose.Schema(

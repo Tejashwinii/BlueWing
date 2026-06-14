@@ -1,3 +1,22 @@
+/**
+ * Seat Schema Module
+ *
+ * Purpose:
+ * Defines a reusable embedded seat schema for aircraft seating metadata.
+ *
+ * Workflow:
+ * Flight scheduling/seat inventory -> embedded Seat schema -> Flight document seat arrays
+ *
+ * Used By:
+ * Currently available for Flight-related modeling; Flight.js defines the active embedded seat shape used by controllers.
+ *
+ * Dependencies:
+ * mongoose for embedded schema definitions.
+ *
+ * Request Lifecycle:
+ * Runs when imported by model code. It does not create a separate MongoDB collection;
+ * seat state is stored inside Flight documents.
+ */
 import mongoose from 'mongoose';
 
 /**

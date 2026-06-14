@@ -1,3 +1,23 @@
+/**
+ * Flight Routes
+ *
+ * Purpose:
+ * Maps public flight discovery endpoints and protected admin flight management endpoints.
+ *
+ * Workflow:
+ * Search/Home/Admin UI -> /api/flights route -> Flight Controller -> Flight collection
+ *
+ * Used By:
+ * server.js mounts this router at /api/flights.
+ *
+ * Dependencies:
+ * controllers/flightController.js performs Flight collection reads/writes.
+ * middleware/auth.js validates JWTs and checks admin role for create/delete operations.
+ *
+ * Request Lifecycle:
+ * Public read routes go directly to controller functions. Admin write routes first run
+ * protect, then adminOnly, then mutate the Flight collection.
+ */
 import express from 'express';
 import {
   getAllFlights,

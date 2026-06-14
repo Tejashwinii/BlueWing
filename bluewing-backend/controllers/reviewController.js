@@ -1,9 +1,43 @@
+/**
+ * Review Controller
+ *
+ * Purpose:
+ * Handles public testimonials, booking-linked reviews, flight reviews, and review-existence checks.
+ *
+ * Workflow:
+ * Review Routes -> Review Controller -> Review model -> reviews collection
+ *
+ * Used By:
+ * routes/reviewRoutes.js and booking history flows that display review status.
+ *
+ * Dependencies:
+ * models/Review.js stores feedback; models/Booking.js is imported for booking-review context.
+ *
+ * Request Lifecycle:
+ * Public review routes run directly. Protected review routes run after JWT auth so req.userId
+ * can scope review reads/checks to the logged-in user.
+ */
 import Review from '../models/Review.js';
 import Booking from '../models/Booking.js';
 
 /**
- * POST /api/reviews
- * Create a new review (supports public reviews with userName or booking reviews with bookingId)
+ * Create a public or booking-linked review.
+ *
+ * Workflow:
+ * Review Form -> Review Controller -> duplicate check -> Review create
+ *
+ * Inputs:
+ * - userName, rating, comment, optional flightId, bookingId, title.
+ * - req.userId when route was called with authentication.
+ *
+ * Returns:
+ * Created Review document.
+ *
+ * Collections:
+ * - reviews: checks duplicates and inserts feedback.
+ *
+ * Why:
+ * Captures passenger feedback for homepage testimonials, flight pages, and booking history.
  */
 export const createReview = async (req, res) => {
   try {
@@ -39,6 +73,7 @@ export const createReview = async (req, res) => {
     if (bookingId) {
       // Check if review already exists for this user + booking combination
       // Check both userId (if provided) and userName for backward compatibility
+      // Read reviews to prevent duplicate feedback for the same booking/user combination.
       const existingReview = await Review.findOne({ 
         bookingId,
         $or: [
@@ -73,6 +108,7 @@ export const createReview = async (req, res) => {
     }
 
     // Case 2: Public review (only userName provided, no bookingId)
+    // Create a public Review document used by testimonial-style UI surfaces.
     const review = await Review.create({
       userName: userName.trim(),
       rating,
@@ -101,11 +137,26 @@ export const createReview = async (req, res) => {
 };
 
 /**
- * GET /api/reviews
- * Get all public reviews sorted by latest first
+ * Return public reviews sorted newest first.
+ *
+ * Workflow:
+ * Homepage/Reviews Page -> Review Controller -> reviews collection
+ *
+ * Inputs:
+ * - None.
+ *
+ * Returns:
+ * Review list and count.
+ *
+ * Collections:
+ * - reviews: reads public review documents.
+ *
+ * Why:
+ * Displays passenger feedback outside a single booking context.
  */
 export const getAllPublicReviews = async (req, res) => {
   try {
+    // Read public Review documents from reviews for testimonial displays.
     const reviews = await Review.find({ userName: { $exists: true, $ne: null } })
       .sort({ createdAt: -1 });
 
@@ -123,12 +174,27 @@ export const getAllPublicReviews = async (req, res) => {
 };
 
 /**
- * GET /api/reviews/flight/:flightId
- * Get all reviews for a flight
+ * Return reviews for a specific flight.
+ *
+ * Workflow:
+ * Flight Details -> Review Controller -> reviews collection
+ *
+ * Inputs:
+ * - req.params.flightId.
+ *
+ * Returns:
+ * Reviews linked to the Flight document.
+ *
+ * Collections:
+ * - reviews: reads flight-linked feedback and populates user display names.
+ *
+ * Why:
+ * Gives passengers flight-specific social proof while browsing details.
  */
 export const getFlightReviews = async (req, res) => {
   try {
     const { flightId } = req.params;
+    // Read reviews linked to this Flight id for the flight-detail workflow.
     const reviews = await Review.find({ flightId })
       .populate('userId', 'firstName lastName')
       .sort({ createdAt: -1 });
@@ -147,12 +213,27 @@ export const getFlightReviews = async (req, res) => {
 };
 
 /**
- * GET /api/reviews/user
- * Get all reviews by the logged-in user
+ * Return reviews created by the authenticated user.
+ *
+ * Workflow:
+ * User Profile/History -> protect middleware -> Review Controller -> reviews collection
+ *
+ * Inputs:
+ * - req.userId from JWT.
+ *
+ * Returns:
+ * User's Review documents populated with basic flight details.
+ *
+ * Collections:
+ * - reviews: reads user-scoped feedback.
+ *
+ * Why:
+ * Supports account history and avoids mixing another user's review data into the session.
  */
 export const getUserReviews = async (req, res) => {
   try {
     const userId = req.userId;
+    // Read Review documents belonging to the authenticated user.
     const reviews = await Review.find({ userId })
       .populate('flightId', 'flightNumber from to')
       .sort({ createdAt: -1 });
@@ -171,9 +252,23 @@ export const getUserReviews = async (req, res) => {
 };
 
 /**
- * GET /api/reviews/check/:bookingId
- * Check if the logged-in user already reviewed a booking
- * Protected endpoint
+ * Check whether the authenticated user already reviewed a booking.
+ *
+ * Workflow:
+ * Booking/Ticket UI -> protect middleware -> Review Controller -> reviews collection
+ *
+ * Inputs:
+ * - req.params.bookingId.
+ * - req.userId from JWT.
+ *
+ * Returns:
+ * hasReviewed boolean and optional Review document.
+ *
+ * Collections:
+ * - reviews: reads at most one review for booking/user pair.
+ *
+ * Why:
+ * Prevents duplicate review prompts and supports conditional UI states.
  */
 export const checkReviewExists = async (req, res) => {
   try {

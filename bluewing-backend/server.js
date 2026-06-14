@@ -2,10 +2,37 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-// Import database connection
+/**
+ * Backend Application Entry Point
+ *
+ * Purpose:
+ * Creates the Express app, connects MongoDB, registers global middleware,
+ * mounts API route modules, and starts the BlueWing backend server.
+ *
+ * Workflow:
+ * Client -> Express Middleware -> Route Module -> Controller -> Mongoose Model -> MongoDB
+ *
+ * Used By:
+ * package.json scripts (`npm start`, `npm run dev`) and test imports that need the app.
+ *
+ * Dependencies:
+ * config/database.js
+ * routes/authRoutes.js
+ * routes/flightRoutes.js
+ * routes/bookingRoutes.js
+ * routes/reviewRoutes.js
+ * routes/otpRoutes.js
+ *
+ * Request Lifecycle:
+ * Runs once at process startup. For each request, middleware executes first,
+ * then the matching route delegates to a controller, and errors fall through
+ * to the centralized error/404 handlers below.
+ */
+
+// connectDB opens the MongoDB connection before routes use Mongoose models.
 import connectDB from './config/database.js';
 
-// Import routes
+// Route modules keep URL registration separate from controller logic.
 import authRoutes from './routes/authRoutes.js';
 import flightRoutes from './routes/flightRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
@@ -47,6 +74,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  // Request flow:
+  // Receive health probe -> avoid database write -> return current server timestamp.
   res.status(200).json({
     status: 'success',
     message: 'Server running',
@@ -103,6 +132,21 @@ const PORT = process.env.PORT || 5000;
 
 /**
  * Start server and connect to database
+ *
+ * Workflow:
+ * Process startup -> MongoDB connection -> Express listen -> API requests can be served
+ *
+ * Inputs:
+ * - PORT from environment or default 5000.
+ *
+ * Returns:
+ * No response value; starts the HTTP listener as a side effect.
+ *
+ * Collections:
+ * - None directly. connectDB initializes access to all collections.
+ *
+ * Why:
+ * Centralizes startup ordering so controllers never run before MongoDB is connected.
  */
 const startServer = async () => {
   try {

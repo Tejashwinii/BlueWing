@@ -1,3 +1,22 @@
+/**
+ * Admin Model
+ *
+ * Purpose:
+ * Defines optional admin-profile metadata, permissions, lockout state, and audit activity logs.
+ *
+ * Workflow:
+ * Admin operations -> Admin permission/audit helpers -> admins collection with User references
+ *
+ * Used By:
+ * Admin tooling and future admin controllers; User.role currently gates protected flight admin routes.
+ *
+ * Dependencies:
+ * mongoose for schema, indexes, virtuals, instance methods, and static model helpers.
+ *
+ * Request Lifecycle:
+ * Executed when imported by admin workflows. Its methods support permission checks, login auditing,
+ * account lockout, and admin reporting.
+ */
 import mongoose from 'mongoose';
 
 const { Schema } = mongoose;

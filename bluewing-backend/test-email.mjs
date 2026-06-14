@@ -1,3 +1,21 @@
+/**
+ * Email Diagnostic Script - Gmail Service Mode
+ *
+ * Purpose:
+ * Verifies basic Nodemailer Gmail credentials and sends a test OTP email.
+ *
+ * Workflow:
+ * Developer CLI -> dotenv -> Nodemailer verify/send -> SMTP provider
+ *
+ * Used By:
+ * Developers troubleshooting OTP email configuration.
+ *
+ * Dependencies:
+ * dotenv and nodemailer.
+ *
+ * Request Lifecycle:
+ * Not part of HTTP request handling. Runs manually and exits after SMTP verification/send attempt.
+ */
 import dotenv from 'dotenv';
 dotenv.config();
 import nodemailer from 'nodemailer';

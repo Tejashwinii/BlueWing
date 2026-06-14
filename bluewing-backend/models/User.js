@@ -1,4 +1,23 @@
-
+/**
+ * User Model
+ *
+ * Purpose:
+ * Defines registered passenger and admin-login accounts for authentication, profiles, and ownership checks.
+ *
+ * Workflow:
+ * Auth Routes -> Auth Controller/Middleware -> User model -> users collection
+ *
+ * Used By:
+ * controllers/authController.js, controllers/bookingController.js, controllers/otpController.js,
+ * middleware/auth.js, seeders/adminSeeder.js.
+ *
+ * Dependencies:
+ * mongoose defines the schema/model, bcryptjs hashes and compares passwords.
+ *
+ * Request Lifecycle:
+ * Used during registration, login, profile reads/updates, JWT admin checks, booking ownership,
+ * and password resets.
+ */
 import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
 
@@ -123,6 +142,14 @@ userSchema.pre('save', async function () {
  * @param {String} enteredPassword - Password to compare
  * @returns {Boolean} True if password matches, false otherwise
  */
+/**
+ * Compare a login password with the stored password hash.
+ *
+ * Inputs: enteredPassword from the login request.
+ * Returns: boolean promise indicating whether credentials match.
+ * Collections: users, on the already-loaded User document with password selected.
+ * Why: isolates password verification for the authentication workflow.
+ */
 userSchema.methods.comparePassword = async function (enteredPassword) {
   try {
     return await bcryptjs.compare(enteredPassword, this.password);
@@ -134,6 +161,14 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
 /**
  * Instance method to get public user data (without password)
  * @returns {Object} User object without password
+ */
+/**
+ * Remove password from serialized user output.
+ *
+ * Inputs: none; runs when Mongoose serializes a User document.
+ * Returns: plain user object without password.
+ * Collections: users, on the current document only.
+ * Why: prevents accidental password-hash exposure in API responses.
  */
 userSchema.methods.toJSON = function () {
   const user = this.toObject();

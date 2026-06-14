@@ -1,3 +1,21 @@
+/**
+ * Email Diagnostic Script - SMTP 587 Mode
+ *
+ * Purpose:
+ * Verifies Gmail SMTP on port 587 with IPv4 preference and sends a test OTP email.
+ *
+ * Workflow:
+ * Developer CLI -> dotenv/dns -> Nodemailer verify/send -> SMTP provider
+ *
+ * Used By:
+ * Developers troubleshooting email delivery when default service mode fails.
+ *
+ * Dependencies:
+ * dotenv, nodemailer, and dns.
+ *
+ * Request Lifecycle:
+ * Not part of HTTP request handling. Runs manually and exits after SMTP verification/send attempt.
+ */
 import dotenv from 'dotenv';
 dotenv.config();
 import nodemailer from 'nodemailer';

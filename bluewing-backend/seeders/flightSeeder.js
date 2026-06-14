@@ -1,3 +1,22 @@
+/**
+ * Flight Seeder
+ *
+ * Purpose:
+ * Rebuilds the sample flight schedule and embedded seat inventory for local/demo data.
+ *
+ * Workflow:
+ * Developer CLI -> flightSeeder -> Flight model -> flights collection
+ *
+ * Used By:
+ * package.json script `npm run seed:flights` and developers resetting demo schedules.
+ *
+ * Dependencies:
+ * dotenv loads MongoDB settings, mongoose opens the database connection, Flight persists schedules/seats.
+ *
+ * Request Lifecycle:
+ * Not part of HTTP request handling. Executes as a one-off script, deletes existing flights,
+ * inserts sample flights, prints route stats, and exits.
+ */
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Flight from '../models/Flight.js';
@@ -5,11 +24,22 @@ import Flight from '../models/Flight.js';
 dotenv.config();
 
 /**
- * Generate seat objects for a flight based on seat counts
- * @param {number} economySeats - Number of economy seats
- * @param {number} businessSeats - Number of business seats
- * @param {number} firstClassSeats - Number of first class seats
- * @returns {array} Array of seat objects
+ * Generate embedded seat objects for each seeded flight.
+ *
+ * Workflow:
+ * Flight seeder -> generateSeats -> Flight.insertMany -> flights collection embedded seats
+ *
+ * Inputs:
+ * - economySeats, businessSeats, firstClassSeats are accepted for compatibility with seed data.
+ *
+ * Returns:
+ * Array of embedded seat objects using the fixed aircraft layout.
+ *
+ * Collections:
+ * - None directly. The generated seats are inserted inside Flight documents.
+ *
+ * Why:
+ * Gives every sample flight inventory for seat selection and locking workflows.
  */
 const generateSeats = (economySeats, businessSeats, firstClassSeats) => {
   const seats = [];
@@ -78,7 +108,22 @@ const generateSeats = (economySeats, businessSeats, firstClassSeats) => {
 };
 
 /**
- * Create flights from frontend dummyFlights data
+ * Convert raw sample schedules into Flight model payloads.
+ *
+ * Workflow:
+ * Flight seeder -> createFlights -> generateSeats -> Flight.insertMany
+ *
+ * Inputs:
+ * - None; uses local rawDummyFlights seed data.
+ *
+ * Returns:
+ * Array of Flight documents ready for insertion.
+ *
+ * Collections:
+ * - None directly. seedFlights persists the returned objects to flights.
+ *
+ * Why:
+ * Keeps seed data transformation separate from database connection and insert flow.
  */
 const createFlights = () => {
   const rawDummyFlights = [
@@ -801,7 +846,22 @@ const createFlights = () => {
 };
 
 /**
- * Seed database with flights
+ * Replace sample flight data in MongoDB.
+ *
+ * Workflow:
+ * npm run seed:flights -> connect MongoDB -> delete flights -> insert seeded flights -> close connection
+ *
+ * Inputs:
+ * - MONGODB_URI from environment, or local fallback URI.
+ *
+ * Returns:
+ * Exits process with 0 on success or 1 on failure.
+ *
+ * Collections:
+ * - flights: deletes all existing documents and inserts sample schedules with embedded seats.
+ *
+ * Why:
+ * Resets local/demo flight search, seat selection, and booking workflows to known data.
  */
 const seedFlights = async () => {
   try {
@@ -812,6 +872,7 @@ const seedFlights = async () => {
 
     // Drop existing flights collection
     console.log('\n🗑️  Clearing existing flights...');
+    // Clear the flights collection so the seeded schedule is deterministic.
     await Flight.deleteMany({});
     console.log('✅ Flights cleared');
 
@@ -820,6 +881,7 @@ const seedFlights = async () => {
 
     // Insert flights into database
     console.log('\n✈️  Seeding flights...');
+    // Insert Flight documents with embedded seats into the flights collection.
     const seededFlights = await Flight.insertMany(flights);
     console.log(`✅ Successfully seeded ${seededFlights.length} flights`);
 

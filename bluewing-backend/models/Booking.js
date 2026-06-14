@@ -1,3 +1,23 @@
+/**
+ * Booking Model
+ *
+ * Purpose:
+ * Stores passenger reservations, selected seats, fare snapshot, contact details, pricing,
+ * ticket numbers, payment linkage, and cancellation state.
+ *
+ * Workflow:
+ * Seat Selection -> Booking Controller -> Booking model -> bookings collection -> Payment/Flight updates
+ *
+ * Used By:
+ * controllers/bookingController.js, controllers/otpController.js, controllers/reviewController.js.
+ *
+ * Dependencies:
+ * mongoose for schema definitions, embedded passenger/fare/contact/pricing subdocuments, and indexes.
+ *
+ * Request Lifecycle:
+ * Created as pending during booking, confirmed after payment, read for tickets/history,
+ * and updated during cancellation/refund workflows.
+ */
 import mongoose from 'mongoose';
 
 const passengerSchema = new mongoose.Schema(

@@ -2,6 +2,23 @@ import mongoose from 'mongoose';
 
 /**
  * MongoDB Connection Configuration
+ *
+ * Purpose:
+ * Owns the single Mongoose connection used by the BlueWing backend.
+ *
+ * Workflow:
+ * server.js -> connectDB() -> MongoDB bluewing database -> Routes/Controllers/Models
+ *
+ * Used By:
+ * server.js
+ *
+ * Dependencies:
+ * mongoose for opening the MongoDB connection.
+ *
+ * Request Lifecycle:
+ * Runs once during server startup before Express begins accepting API requests.
+ * Controllers rely on this active connection for all User, Flight, Booking,
+ * Payment, Review, and Admin collection operations.
  * 
  * To get your MongoDB URI:
  * 1. Go to https://www.mongodb.com/cloud/atlas
@@ -17,6 +34,23 @@ import mongoose from 'mongoose';
 
 /**
  * Connect to MongoDB
+ *
+ * Workflow:
+ * App boot -> Environment config -> Mongoose connection -> Express listen
+ *
+ * Inputs:
+ * - process.env.MONGODB_URI: MongoDB connection string.
+ *
+ * Returns:
+ * Mongoose connection object when the database connection succeeds.
+ *
+ * Collections:
+ * - No collection is accessed directly here. It establishes the shared database
+ *   connection used later by all Mongoose models.
+ *
+ * Why:
+ * Guarantees the airline API does not start serving requests before MongoDB is reachable.
+ *
  * @returns {Promise} Mongoose connection object
  */
 const connectDB = async () => {

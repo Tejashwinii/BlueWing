@@ -1,3 +1,22 @@
+/**
+ * Payment Model
+ *
+ * Purpose:
+ * Tracks payment state for each booking, including gateway identifiers, paid status, and refunds.
+ *
+ * Workflow:
+ * Booking Controller -> Payment model -> payments collection -> Booking confirmation/cancellation
+ *
+ * Used By:
+ * controllers/bookingController.js and controllers/otpController.js.
+ *
+ * Dependencies:
+ * mongoose for schema, Booking references, and status indexes.
+ *
+ * Request Lifecycle:
+ * Created as pending when a booking is made, marked success when booking is confirmed,
+ * and marked refunded when cancellation succeeds.
+ */
 import mongoose from 'mongoose';
 
 const paymentSchema = new mongoose.Schema(

@@ -1,15 +1,50 @@
+/**
+ * Flight Controller
+ *
+ * Purpose:
+ * Handles flight listing, search, details, featured flights, and admin flight creation/deletion.
+ *
+ * Workflow:
+ * Flight Routes -> Flight Controller -> Flight model -> flights collection
+ *
+ * Used By:
+ * routes/flightRoutes.js.
+ *
+ * Dependencies:
+ * models/Flight.js contains the schedule, pricing, amenity, rating, and embedded-seat schema.
+ *
+ * Request Lifecycle:
+ * Triggered by public flight-search/detail requests or admin flight-management requests.
+ * Admin-only endpoints are protected before reaching this controller.
+ */
 import Flight from '../models/Flight.js';
 
 /**
- * GET /api/flights
- * Fetch all flights with pagination
- * Query params: limit (default 100), skip (default 0)
+ * Fetch all flights with pagination.
+ *
+ * Workflow:
+ * Home/Admin Flight List -> API -> Flight Controller -> flights collection
+ *
+ * Inputs:
+ * - req.query.limit: max number of flights to return.
+ * - req.query.skip: number of flights to skip for pagination.
+ *
+ * Returns:
+ * JSON list of Flight documents sorted by departure date.
+ *
+ * Collections:
+ * - flights: read all matching schedule documents for browsing/admin views.
+ *
+ * Why:
+ * Gives the frontend a paginated schedule feed without changing seat or booking state.
  */
 const getAllFlights = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 100;
     const skip = parseInt(req.query.skip) || 0;
 
+    // Read Flight documents from the flights collection for schedule browsing.
+    // These records drive the flight-selection and admin schedule workflows.
     const flights = await Flight.find()
       .limit(limit)
       .skip(skip)
@@ -29,9 +64,25 @@ const getAllFlights = async (req, res) => {
 };
 
 /**
- * POST /api/flights/search
- * Search flights by route and date
- * Body: { from, to, departureDate, cabinClass (optional) }
+ * Search flights by origin, destination, and departure date.
+ *
+ * Workflow:
+ * Home Page Search Form -> /api/flights/search -> Flight Controller -> flights collection
+ *
+ * Inputs:
+ * - from: origin city.
+ * - to: destination city.
+ * - departureDate: date selected by passenger.
+ * - cabinClass: accepted by the API payload but not used in the current query.
+ *
+ * Returns:
+ * List of matching Flight documents sorted by departure time.
+ *
+ * Collections:
+ * - flights: reads scheduled flights and embedded seat inventory for matching routes.
+ *
+ * Why:
+ * Powers the passenger's first booking step: discovering available flights for a route/date.
  */
 const searchFlights = async (req, res) => {
   try {
@@ -61,6 +112,8 @@ const searchFlights = async (req, res) => {
     };
 
     // Execute query
+    // Query the flights collection for the exact route and one-day date window.
+    // The resulting Flight documents include prices and seats needed by later booking steps.
     const flights = await Flight.find(query).sort({ departureTime: 1 });
 
     return res.status(200).json({
@@ -77,14 +130,29 @@ const searchFlights = async (req, res) => {
 };
 
 /**
- * GET /api/flights/:id
- * Get single flight by ID
- * URL param: id (flight _id)
+ * Get one flight by MongoDB id.
+ *
+ * Workflow:
+ * Flight Selection -> /api/flights/:id -> Flight Controller -> flights collection
+ *
+ * Inputs:
+ * - req.params.id: Flight _id.
+ *
+ * Returns:
+ * Single Flight document or 404 when missing.
+ *
+ * Collections:
+ * - flights: reads the selected schedule, prices, amenities, and embedded seats.
+ *
+ * Why:
+ * Lets the frontend retrieve authoritative flight details before seat selection/booking.
  */
 const getFlightById = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Read the selected Flight document from the flights collection.
+    // This document is the source for route, time, fare, and seat-selection context.
     const flight = await Flight.findById(id);
 
     if (!flight) {
@@ -107,14 +175,28 @@ const getFlightById = async (req, res) => {
 };
 
 /**
- * GET /api/flights/featured
- * Get featured flights with rating >= 4.0
- * Query params: limit (default 6)
+ * Get featured flights for promotional/homepage displays.
+ *
+ * Workflow:
+ * Homepage Featured Section -> /api/flights/featured -> Flight Controller -> flights collection
+ *
+ * Inputs:
+ * - req.query.limit: maximum featured flights to return.
+ *
+ * Returns:
+ * Highly rated Flight documents sorted by rating.
+ *
+ * Collections:
+ * - flights: reads schedule documents with rating >= 4.0.
+ *
+ * Why:
+ * Supports discovery content without requiring a user search.
  */
 const getFeaturedFlights = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 6;
 
+    // Read high-rated Flight documents from the flights collection for homepage discovery.
     const flights = await Flight.find({ rating: { $gte: 4.0 } })
       .limit(limit)
       .sort({ rating: -1 });
@@ -133,11 +215,27 @@ const getFeaturedFlights = async (req, res) => {
 };
 
 /**
- * POST /api/flights
- * Create a new flight (Admin only)
+ * Create a new flight schedule.
+ *
+ * Workflow:
+ * Admin Dashboard -> protected route -> Flight Controller -> flights collection
+ *
+ * Inputs:
+ * - req.body: Flight fields matching the Flight schema.
+ *
+ * Returns:
+ * Created Flight document.
+ *
+ * Collections:
+ * - flights: inserts a new schedule and optional embedded seat inventory.
+ *
+ * Why:
+ * Enables admin users to add flights that passengers can later search and book.
  */
 const createFlight = async (req, res) => {
   try {
+    // Create a Flight document in the flights collection.
+    // This makes the schedule available to search, seat selection, and booking workflows.
     const flight = await Flight.create(req.body);
     return res.status(201).json({
       success: true,
@@ -153,12 +251,29 @@ const createFlight = async (req, res) => {
 };
 
 /**
- * DELETE /api/flights/:id
- * Delete a flight by ID (Admin only)
+ * Delete a flight schedule by id.
+ *
+ * Workflow:
+ * Admin Dashboard -> protected route -> Flight Controller -> flights collection
+ *
+ * Inputs:
+ * - req.params.id: Flight _id to remove.
+ *
+ * Returns:
+ * Success message or 404.
+ *
+ * Collections:
+ * - flights: deletes the schedule document.
+ *
+ * Why:
+ * Allows admin cleanup of schedules that should no longer be offered.
+ * TODO: Before production use, consider checking for active bookings before deleting a flight.
  */
 const deleteFlight = async (req, res) => {
   try {
     const { id } = req.params;
+    // Delete the Flight document from the flights collection.
+    // This removes it from future search/detail workflows.
     const flight = await Flight.findByIdAndDelete(id);
 
     if (!flight) {

@@ -1,10 +1,43 @@
+/**
+ * Auth Controller
+ *
+ * Purpose:
+ * Handles registration, login, profile retrieval, and profile updates for BlueWing users.
+ *
+ * Workflow:
+ * Auth Routes -> Auth Controller -> User model -> users collection -> JWT response/profile response
+ *
+ * Used By:
+ * routes/authRoutes.js.
+ *
+ * Dependencies:
+ * models/User.js persists user accounts and hashes/compares passwords.
+ * middleware/auth.js provides generateToken for JWT creation.
+ *
+ * Request Lifecycle:
+ * Triggered after auth-route validation or JWT protection. It reads/writes users and returns
+ * frontend-friendly JSON without exposing password hashes.
+ */
 import User from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
 
 /**
- * @desc    Register a new user
- * @route   POST /api/auth/register
- * @access  Public
+ * Register a new user and issue a JWT.
+ *
+ * Workflow:
+ * Registration Form -> validateRequest(registerSchema) -> Auth Controller -> users collection -> JWT
+ *
+ * Inputs:
+ * - firstName, lastName, email, password, phone, gender, dateOfBirth, address, city, country.
+ *
+ * Returns:
+ * Created user summary and JWT token.
+ *
+ * Collections:
+ * - users: checks for duplicate email and creates a new User document.
+ *
+ * Why:
+ * Creates the passenger account needed to own bookings, payments, reviews, and profile data.
  */
 export const register = async (req, res) => {
   try {
@@ -12,6 +45,7 @@ export const register = async (req, res) => {
     const { firstName, lastName, email, password, phone, gender, dateOfBirth, address, city, country } = req.body;
 
     // Check if user already exists by email
+    // Read users to prevent duplicate passenger/admin login accounts for the same email.
     const existingUser = await User.findOne({ email: email.toLowerCase() });
 
     if (existingUser) {
@@ -22,6 +56,7 @@ export const register = async (req, res) => {
     }
 
     // Create new user (password will be hashed by pre-save hook)
+    // Create a User document in users. The User model pre-save hook hashes the password.
     const user = await User.create({
       firstName,
       lastName,
@@ -81,9 +116,22 @@ export const register = async (req, res) => {
 };
 
 /**
- * @desc    Login user
- * @route   POST /api/auth/login
- * @access  Public
+ * Authenticate a user and issue a JWT.
+ *
+ * Workflow:
+ * Login Form -> validateRequest(loginSchema) -> Auth Controller -> users collection -> password compare -> JWT
+ *
+ * Inputs:
+ * - email and password.
+ *
+ * Returns:
+ * User summary and JWT token when credentials are valid.
+ *
+ * Collections:
+ * - users: reads account including password hash for credential verification.
+ *
+ * Why:
+ * Establishes authenticated identity for protected booking, profile, admin, and review workflows.
  */
 export const login = async (req, res) => {
   try {
@@ -91,6 +139,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email (include password for comparison)
+    // Read the User document with password selected because login must compare the stored hash.
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
     // If user not found
@@ -154,9 +203,22 @@ export const login = async (req, res) => {
 };
 
 /**
- * @desc    Get current user profile
- * @route   GET /api/auth/profile
- * @access  Private (requires JWT)
+ * Return the authenticated user's profile.
+ *
+ * Workflow:
+ * Profile Page -> protect middleware -> Auth Controller -> users collection
+ *
+ * Inputs:
+ * - req.userId from JWT.
+ *
+ * Returns:
+ * User profile fields without password.
+ *
+ * Collections:
+ * - users: reads the current account document.
+ *
+ * Why:
+ * Lets the frontend display account details used across booking and contact workflows.
  */
 export const getProfile = async (req, res) => {
   try {
@@ -164,6 +226,7 @@ export const getProfile = async (req, res) => {
     const userId = req.userId;
 
     // Find user by ID (password excluded by default due to select: false)
+    // Read users by JWT subject; password remains excluded by schema default.
     const user = await User.findById(userId);
 
     if (!user) {
@@ -208,9 +271,23 @@ export const getProfile = async (req, res) => {
 };
 
 /**
- * @desc    Update user profile
- * @route   PUT /api/auth/profile
- * @access  Private (requires JWT)
+ * Update allowed profile fields for the authenticated user.
+ *
+ * Workflow:
+ * Profile Edit Form -> protect middleware -> Auth Controller -> users collection
+ *
+ * Inputs:
+ * - req.userId from JWT.
+ * - Optional firstName, lastName, phone, gender, dateOfBirth, address, city, country.
+ *
+ * Returns:
+ * Updated user profile fields.
+ *
+ * Collections:
+ * - users: updates the current account document.
+ *
+ * Why:
+ * Keeps passenger contact/profile information current without allowing email/password changes here.
  */
 export const updateProfile = async (req, res) => {
   try {
@@ -229,6 +306,7 @@ export const updateProfile = async (req, res) => {
     if (country !== undefined) updateData.country = country;
 
     // Find and update user (excluding password and email changes)
+    // Update users with only allowed profile fields; email/password are intentionally excluded here.
     const user = await User.findByIdAndUpdate(
       userId,
       updateData,

@@ -1,5 +1,26 @@
+/**
+ * Flight Model
+ *
+ * Purpose:
+ * Stores scheduled flights, fares, amenities, ratings, and embedded seat inventory.
+ *
+ * Workflow:
+ * Flight Search/Admin/Booking -> Flight model -> flights collection
+ *
+ * Used By:
+ * controllers/flightController.js, controllers/bookingController.js, controllers/seatLockingUtil.js,
+ * seeders/flightSeeder.js.
+ *
+ * Dependencies:
+ * mongoose for the Flight schema, embedded seat schema, indexes, and model methods.
+ *
+ * Request Lifecycle:
+ * Read during flight search/details and seat-map requests; updated during booking seat locks,
+ * cancellations, and admin flight management.
+ */
 import mongoose from 'mongoose';
 
+// Embedded seat documents live inside each Flight document, allowing seat-lock updates to modify inventory with the flight schedule.
 // Seat schema (embedded)
 // Format: seatId = "1a", "2a", "3a" where number is column, letter is row
 // First Class: rows a, b, c (3 seats per row)
@@ -41,6 +62,7 @@ const seatSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// Flight collection documents are the source of truth for searchable schedules and seat availability.
 // Flight schema
 const flightSchema = new mongoose.Schema(
   {
@@ -118,18 +140,50 @@ flightSchema.index({ flightNumber: 1 });
 flightSchema.index({ from: 1, to: 1, departureDate: 1 });
 
 // Helper methods
+/**
+ * Return unbooked seats for a cabin.
+ *
+ * Inputs: cabin name stored on embedded seats.
+ * Returns: array of available embedded seat documents.
+ * Collections: flights, via the already-loaded Flight document.
+ * Why: supports seat-map and availability workflows without duplicating filtering logic.
+ */
 flightSchema.methods.getAvailableSeats = function (cabin) {
   return this.seats.filter((seat) => seat.cabin === cabin && !seat.isBooked);
 };
 
+/**
+ * Count total seats for a cabin in this flight document.
+ *
+ * Inputs: cabin name.
+ * Returns: number of matching embedded seats.
+ * Collections: flights, using embedded seats on this document.
+ * Why: supports capacity reporting by cabin class.
+ */
 flightSchema.methods.getTotalSeats = function (cabin) {
   return this.seats.filter((seat) => seat.cabin === cabin).length;
 };
 
+/**
+ * Count booked seats for a cabin in this flight document.
+ *
+ * Inputs: cabin name.
+ * Returns: number of booked embedded seats.
+ * Collections: flights, using embedded seats on this document.
+ * Why: supports availability and admin reporting workflows.
+ */
 flightSchema.methods.getBookedSeats = function (cabin) {
   return this.seats.filter((seat) => seat.cabin === cabin && seat.isBooked).length;
 };
 
+/**
+ * Resolve the base fare for a selected cabin.
+ *
+ * Inputs: cabin name from a selected seat.
+ * Returns: economy, business, or first-class base price.
+ * Collections: flights, using fare fields on this document.
+ * Why: booking price calculation needs the cabin's base fare before fare-type multipliers.
+ */
 flightSchema.methods.getSeatPrice = function (cabin) {
   if (cabin === 'business') {
     return this.businessPrice;

@@ -1,3 +1,21 @@
+/**
+ * Email Diagnostic Script - SMTP 465 SSL Mode
+ *
+ * Purpose:
+ * Verifies Gmail SMTP on port 465 with SSL and IPv4 preference, then sends a test OTP email.
+ *
+ * Workflow:
+ * Developer CLI -> dotenv/dns -> Nodemailer verify/send -> SMTP provider
+ *
+ * Used By:
+ * Developers troubleshooting the same SSL SMTP path used by otpController.js.
+ *
+ * Dependencies:
+ * dotenv, nodemailer, and dns.
+ *
+ * Request Lifecycle:
+ * Not part of HTTP request handling. Runs manually and exits after SMTP verification/send attempt.
+ */
 import dotenv from 'dotenv';
 dotenv.config();
 import nodemailer from 'nodemailer';

@@ -1,8 +1,41 @@
+/**
+ * Request Validation Middleware
+ *
+ * Purpose:
+ * Defines Joi schemas and a reusable middleware factory for validating auth request bodies.
+ *
+ * Workflow:
+ * Auth Route -> validateRequest(schema) -> Controller -> User collection
+ *
+ * Used By:
+ * routes/authRoutes.js.
+ *
+ * Dependencies:
+ * Joi performs declarative payload validation and sanitization.
+ *
+ * Request Lifecycle:
+ * Runs before registration/login controllers. Invalid payloads return 400 immediately;
+ * valid payloads replace req.body with cleaned data.
+ */
 import Joi from 'joi';
 
 /**
- * Register Validation Schema
- * Validates all required fields for user registration
+ * Joi schema for registration payloads.
+ *
+ * Workflow:
+ * POST /api/auth/register -> validateRequest(registerSchema) -> register controller
+ *
+ * Inputs:
+ * - Registration request body.
+ *
+ * Returns:
+ * Validated/sanitized registration fields or Joi validation errors.
+ *
+ * Collections:
+ * - None. Valid data is later written to users by authController.register.
+ *
+ * Why:
+ * Keeps invalid account data from reaching the User model and registration workflow.
  */
 export const registerSchema = Joi.object({
   firstName: Joi.string()
@@ -118,8 +151,22 @@ export const registerSchema = Joi.object({
 }).unknown(false);
 
 /**
- * Login Validation Schema
- * Validates email and password for user login
+ * Joi schema for login payloads.
+ *
+ * Workflow:
+ * POST /api/auth/login -> validateRequest(loginSchema) -> login controller
+ *
+ * Inputs:
+ * - Login request body.
+ *
+ * Returns:
+ * Validated email/password or Joi validation errors.
+ *
+ * Collections:
+ * - None. Valid credentials are later checked against users.
+ *
+ * Why:
+ * Gives predictable error responses before password comparison begins.
  */
 export const loginSchema = Joi.object({
   email: Joi.string()
@@ -141,9 +188,23 @@ export const loginSchema = Joi.object({
 }).unknown(false);
 
 /**
- * Middleware function that validates request body against provided schema
- * @param {Joi.ObjectSchema} schema - Joi validation schema
- * @returns {Function} Middleware function
+ * Build an Express middleware that validates req.body with a Joi schema.
+ *
+ * Workflow:
+ * Route -> validateRequest(schema) -> cleaned req.body -> Controller
+ *
+ * Inputs:
+ * - schema: Joi object schema.
+ * - req.body: incoming JSON payload.
+ *
+ * Returns:
+ * Middleware that sends 400 on validation failure or calls next() on success.
+ *
+ * Collections:
+ * - None. It protects later controller/database work from malformed payloads.
+ *
+ * Why:
+ * Centralizes request validation for auth endpoints and makes controller assumptions explicit.
  */
 export const validateRequest = (schema) => {
   return (req, res, next) => {
