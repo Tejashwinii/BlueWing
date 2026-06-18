@@ -258,25 +258,14 @@ const TicketSummary = () => {
   const currentStatus = String(backendBooking?.bookingStatus || backendBooking?.status || '').toLowerCase();
   const isMultiPassenger = (allPassengers?.length || 0) > 1;
 
-  const handleCancelTicket = async () => {
+  const handleCancelTicket = () => {
     if (isCancelling) return;
     if (currentStatus === 'cancelled') return;
     
     setIsCancelling(true);
     const idToCancel = bookingId || backendBooking?._id;
     setCancelRequestId(idToCancel);
-
-    try {
-      const response = await otpAPI.sendOtp({ bookingId: idToCancel });
-      if (response && response.success === false) {
-        setIsCancelling(false);
-      } else {
-        setShowOtpModal(true);
-      }
-    } catch (error) {
-      console.error('Error initiating cancellation:', error);
-      setIsCancelling(false);
-    }
+    setShowOtpModal(true);
   };
 
   const handleOtpSuccess = () => {

@@ -168,24 +168,13 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
     html2pdf().set(opt).from(element).save();
   };
 
-  const handleCancelTicket = async () => {
+  const handleCancelTicket = () => {
     if (isCancelled || isCancelling) {
       return;
     }
     setIsCancelling(true);
     setCancelRequestId(bookingId);
-
-    try {
-      const response = await otpAPI.sendOtp({ bookingId: bookingId });
-      if (response && response.success === false) {
-        setIsCancelling(false);
-      } else {
-        setShowOtpModal(true);
-      }
-    } catch (error) {
-      console.error('Error initiating cancellation:', error);
-      setIsCancelling(false);
-    }
+    setShowOtpModal(true);
   };
 
   const handleOtpSuccess = () => {
