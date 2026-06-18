@@ -174,7 +174,18 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
     }
     setIsCancelling(true);
     setCancelRequestId(bookingId);
-    setShowOtpModal(true);
+
+    try {
+      const response = await otpAPI.sendOtp({ bookingId: bookingId });
+      if (response && response.success === false) {
+        setIsCancelling(false);
+      } else {
+        setShowOtpModal(true);
+      }
+    } catch (error) {
+      console.error('Error initiating cancellation:', error);
+      setIsCancelling(false);
+    }
   };
 
   const handleOtpSuccess = () => {
@@ -466,6 +477,17 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
             </div>
           </div>
         </div>
+      )}
+
+      {showOtpModal && (
+        <OtpCancelModal
+          isOpen={showOtpModal}
+          bookingId={cancelRequestId}
+          contactEmail={contactDetails?.email || ""}
+          onClose={handleOtpClose}
+          onSuccess={handleOtpSuccess}
+          otpAPI={otpAPI}
+        />
       )}
     </div>
   );
