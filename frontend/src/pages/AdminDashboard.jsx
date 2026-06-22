@@ -18,8 +18,13 @@ const AdminDashboard = () => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedFlightIds, setSelectedFlightIds] = useState([]);
 
+  useEffect(() => {
+    if (!user || user.role !== 'admin') {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
   if (!user || user.role !== 'admin') {
-    navigate('/login');
     return null;
   }
 

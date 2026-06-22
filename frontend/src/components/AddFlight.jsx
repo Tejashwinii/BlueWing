@@ -26,11 +26,22 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
 
   useEffect(() => {
     if (initialFlight) {
+      // If initialFlight uses airport NAMES (seeded data), convert to the corresponding code
+      const resolveCode = (value) => {
+        if (!value) return '';
+        // If it's already a code in airports list, return it
+        const asCode = airports.find(a => a.code.toLowerCase() === String(value).trim().toLowerCase());
+        if (asCode) return asCode.code;
+        // Otherwise try matching by name
+        const byName = airports.find(a => a.name.toLowerCase() === String(value).trim().toLowerCase());
+        return byName ? byName.code : '';
+      };
+
       setFormData({
         airline: initialFlight.airline || '',
         flightNumber: initialFlight.flightNumber || '',
-        from: initialFlight.from || '',
-        to: initialFlight.to || '',
+        from: resolveCode(initialFlight.from) || '',
+        to: resolveCode(initialFlight.to) || '',
         departureDate: initialFlight.departureDate ? initialFlight.departureDate.split('T')[0] : '',
         departureTime: initialFlight.departureTime || '',
         arrivalTime: initialFlight.arrivalTime || '',
@@ -65,7 +76,20 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
 
   const updateArrivalTime = (data) => {
     if (data.from && data.to && data.departureTime) {
-      const durationHours = getDuration(data.from, data.to);
+      // getDuration expects airport codes; resolve names back to codes if necessary
+      const resolveToCode = (val) => {
+        if (!val) return '';
+        const v = String(val).trim();
+        const byCode = airports.find(a => a.code.toLowerCase() === v.toLowerCase());
+        if (byCode) return byCode.code;
+        const byName = airports.find(a => a.name.toLowerCase() === v.toLowerCase());
+        return byName ? byName.code : v;
+      };
+
+      const fromCode = resolveToCode(data.from);
+      const toCode = resolveToCode(data.to);
+
+      const durationHours = getDuration(fromCode, toCode);
       if (durationHours) {
         const arrival = calculateArrivalTime(data.departureTime, durationHours);
         const hours = Math.floor(durationHours);
@@ -91,11 +115,20 @@ const AddFlight = ({ onSave, onCancel, initialFlight = null, mode = 'add' }) => 
       return;
     }
 
+    // Derive human-readable airport names to store in DB (seeded format)
+    const findAirportByCode = (code) => airports.find(a => a.code.toLowerCase() === String(code || '').trim().toLowerCase());
+    const fromAirport = findAirportByCode(formData.from);
+    const toAirport = findAirportByCode(formData.to);
+
     const flightPayload = {
       airline: formData.airline,
       flightNumber: formData.flightNumber,
-      from: formData.from,
-      to: formData.to,
+      // store names for compatibility with seeded data
+      from: fromAirport ? fromAirport.name : formData.from,
+      to: toAirport ? toAirport.name : formData.to,
+      // also keep codes so helpers and other code can use them if needed
+      fromCode: formData.from,
+      toCode: formData.to,
       departureDate: formData.departureDate,
       departureTime: formData.departureTime,
       arrivalTime: formData.arrivalTime,
