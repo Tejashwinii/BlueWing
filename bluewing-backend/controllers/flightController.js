@@ -19,6 +19,37 @@
  */
 import Flight from '../models/Flight.js';
 
+// Helper to generate default embedded seats (same layout used by seeders)
+const generateSeats = () => {
+  const seats = [];
+
+  // First Class: rows a, b, c with 3 seats each (1,2,3)
+  const firstClassRows = ['a', 'b', 'c'];
+  for (const row of firstClassRows) {
+    for (let col = 1; col <= 3; col++) {
+      seats.push({ seatId: `${col}${row}`, row, column: col, cabin: 'firstClass', isBooked: false, bookedBy: null, bookingId: null });
+    }
+  }
+
+  // Business: rows d-i with 5 seats each
+  const businessRows = ['d','e','f','g','h','i'];
+  for (const row of businessRows) {
+    for (let col = 1; col <= 5; col++) {
+      seats.push({ seatId: `${col}${row}`, row, column: col, cabin: 'business', isBooked: false, bookedBy: null, bookingId: null });
+    }
+  }
+
+  // Economy: rows j-z with 9 seats each
+  const economyRows = ['j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+  for (const row of economyRows) {
+    for (let col = 1; col <= 9; col++) {
+      seats.push({ seatId: `${col}${row}`, row, column: col, cabin: 'economy', isBooked: false, bookedBy: null, bookingId: null });
+    }
+  }
+
+  return seats;
+};
+
 /**
  * Fetch all flights with pagination.
  *
@@ -234,9 +265,15 @@ const getFeaturedFlights = async (req, res) => {
  */
 const createFlight = async (req, res) => {
   try {
+    // Ensure embedded seats exist: if admin didn't provide seats, generate default layout
+    const flightPayload = { ...req.body };
+    if (!flightPayload.seats || !Array.isArray(flightPayload.seats) || flightPayload.seats.length === 0) {
+      flightPayload.seats = generateSeats();
+    }
+
     // Create a Flight document in the flights collection.
     // This makes the schedule available to search, seat selection, and booking workflows.
-    const flight = await Flight.create(req.body);
+    const flight = await Flight.create(flightPayload);
     return res.status(201).json({
       success: true,
       message: 'Flight created successfully',
