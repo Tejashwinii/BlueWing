@@ -168,7 +168,7 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
     html2pdf().set(opt).from(element).save();
   };
 
-  const handleCancelTicket = async () => {
+  const handleCancelTicket = () => {
     if (isCancelled || isCancelling) {
       return;
     }
@@ -466,6 +466,17 @@ const TicketCard = ({ passenger, journey, selectedFare, contactDetails = {}, boo
             </div>
           </div>
         </div>
+      )}
+
+      {showOtpModal && (
+        <OtpCancelModal
+          isOpen={showOtpModal}
+          bookingId={cancelRequestId}
+          contactEmail={contactDetails?.email || ""}
+          onClose={handleOtpClose}
+          onSuccess={handleOtpSuccess}
+          otpAPI={otpAPI}
+        />
       )}
     </div>
   );

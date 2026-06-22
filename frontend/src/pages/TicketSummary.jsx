@@ -261,8 +261,10 @@ const TicketSummary = () => {
   const handleCancelTicket = () => {
     if (isCancelling) return;
     if (currentStatus === 'cancelled') return;
+    
     setIsCancelling(true);
-    setCancelRequestId(bookingId || backendBooking?._id);
+    const idToCancel = bookingId || backendBooking?._id;
+    setCancelRequestId(idToCancel);
     setShowOtpModal(true);
   };
 

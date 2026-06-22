@@ -70,9 +70,6 @@ export const register = async (req, res) => {
       country,
     });
 
-    // Generate JWT token
-    const token = generateToken(user._id);
-
     // Return success response (password excluded by toJSON method)
     res.status(201).json({
       success: true,
@@ -87,8 +84,7 @@ export const register = async (req, res) => {
           role: user.role,
           isEmailVerified: user.isEmailVerified,
           createdAt: user.createdAt
-        },
-        token
+        }
       }
     });
 
