@@ -19,6 +19,8 @@
   background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
   padding: 16px;
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .flight-seat-layout.is-compact {
@@ -69,6 +71,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  min-width: max-content;
 }
 
 .flight-row-label {
@@ -83,7 +86,8 @@
   display: flex;
   gap: 6px;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: max-content;
 }
 
 .flight-seat {

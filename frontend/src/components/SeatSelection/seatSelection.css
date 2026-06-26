@@ -431,6 +431,15 @@
     padding: 16px;
   }
 
+  .seat-flightCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .seat-flightMetaGroup {
+    grid-template-columns: 1fr;
+  }
+
   .seat-hero,
   .seat-flightCard,
   .seat-mapHeader {
@@ -442,6 +451,14 @@
   .seat-summaryGrid,
   .seat-sidebar {
     grid-template-columns: 1fr;
+  }
+
+  .seat-sidebar {
+    width: 100%;
+  }
+
+  .seat-summaryGrid {
+    gap: 12px;
   }
 
   .seat-rowGroup {
