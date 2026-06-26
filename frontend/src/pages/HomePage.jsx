@@ -285,9 +285,9 @@ const HomePage = () => {
               </div>
               
              {error && <div className="error-message" style={{ color: 'red', marginBottom: '15px', fontWeight: 'bold' }}>{error}</div>}
-              <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+              <div className="passenger-class-row">
   {/* Passengers Column */}
-  <div style={{ flex: 1 }}>
+  <div className="passenger-column">
     <div className="form-group">
       <label>Passengers</label>
       <button
@@ -372,7 +372,7 @@ const HomePage = () => {
   </div>
 
   {/* Class Column */}
-  <div style={{ flex:1 }} className='class-div'>
+  <div className="class-div passenger-column">
     <div className="form-group">
       <label htmlFor="class">Class</label>
       <select

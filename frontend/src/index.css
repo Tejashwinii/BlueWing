@@ -89,6 +89,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+img,
+picture,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* ============================================
    TYPOGRAPHY
    ============================================ */

@@ -5,6 +5,7 @@ import '../styles/Navbar.css';
 
 const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false }) => {
   const [hoveredMenu, setHoveredMenu] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -65,6 +66,11 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
     },
   };
 
+  const handleRoute = (route) => {
+    setMenuOpen(false);
+    navigate(route);
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -73,6 +79,15 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
           <div className="brand-logo">✈️</div>
           <span className="brand-text">BlueWing</span>
         </Link>
+
+        <button
+          className="navbar-toggle"
+          aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          onClick={() => setMenuOpen((prev) => !prev)}
+          type="button"
+        >
+          <span className="toggle-icon">{menuOpen ? '✕' : '☰'}</span>
+        </button>
 
         {/* Menu Items - Hidden in minimalMode */}
         {!minimalMode && (
@@ -89,7 +104,7 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
                   <div key={key} className="menu-item-wrapper">
                     <button
                       className="menu-item-btn"
-                      onClick={() => navigate(route)}
+                        onClick={() => handleRoute(route)}
                     >
                       {menu.label}
                     </button>
@@ -125,6 +140,61 @@ const Navbar = ({ onNavClick = () => {}, hideLogin = false, minimalMode = false 
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {!minimalMode && (
+          <div className={`navbar-mobile-menu ${menuOpen ? 'open' : ''}`}>
+            {Object.entries(navMenus).map(([key, menu]) => {
+              if (key === 'whereFly' || key === 'experience' || key === 'help') {
+                let route = '/';
+                if (key === 'whereFly') route = '/where-we-fly';
+                if (key === 'experience') route = '/experiences';
+                if (key === 'help') route = '/help';
+
+                return (
+                  <button
+                    key={key}
+                    className="mobile-menu-item"
+                    type="button"
+                    onClick={() => handleRoute(route)}
+                  >
+                    {menu.label}
+                  </button>
+                );
+              }
+              return null;
+            })}
+            <div className="mobile-menu-divider" />
+            {user ? (
+              <div className="mobile-profile-links">
+                {user.role === 'admin' ? (
+                  <button type="button" onClick={() => handleRoute('/admin-dashboard')} className="mobile-menu-item">
+                    Admin Dashboard
+                  </button>
+                ) : (
+                  <button type="button" onClick={() => handleRoute('/profile')} className="mobile-menu-item">
+                    My Profile
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="mobile-menu-item logout"
+                  onClick={() => {
+                    logout();
+                    handleRoute('/login');
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              !hideLogin && (
+                <button type="button" className="mobile-menu-item" onClick={() => handleRoute('/login')}>
+                  LOG IN / REGISTER
+                </button>
+              )
+            )}
           </div>
         )}
 

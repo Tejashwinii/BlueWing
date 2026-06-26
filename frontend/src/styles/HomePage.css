@@ -190,6 +190,18 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
+.passenger-class-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.passenger-column {
+  flex: 1 1 280px;
+  min-width: 240px;
+}
+
 .form-row-single {
   grid-template-columns: 1fr;
 }
@@ -500,6 +512,33 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .passenger-class-row {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .passenger-column {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .search-card-container {
+    position: relative;
+    transform: none;
+    top: auto;
+    left: auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    margin-top: 30px;
+  }
+
+  .hero-section {
+    height: auto;
+    min-height: 420px;
+    padding-bottom: 60px;
+  }
+
   .highlights-intro h2 {
     font-size: 32px;
   }
@@ -529,13 +568,20 @@ body {
   }
 
   .hero-section {
-    height: 400px;
+    height: auto;
+    min-height: 420px;
     margin-top: 60px;
+    padding-bottom: 60px;
   }
 
   .search-card-container {
-    bottom: -100px;
+    position: relative;
+    transform: none;
+    top: auto;
+    bottom: auto;
     width: 95%;
+    max-width: 95%;
+    margin: 20px auto 0;
   }
 
   .search-card {
@@ -574,6 +620,9 @@ body {
 
   .highlights-cards {
     gap: 20px;
+  }
+  .passenger-class-row {
+    gap: 16px;
   }
 }
 

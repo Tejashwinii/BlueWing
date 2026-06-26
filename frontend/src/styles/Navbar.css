@@ -24,6 +24,7 @@
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
+  position: relative;
 }
 
 /* ============================================
@@ -368,6 +369,85 @@
   border: 1px solid rgba(0, 26, 77, 0.1);
 }
 
+.navbar-toggle {
+  display: none;
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 1.35rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 12px;
+  transition: background 0.25s ease;
+}
+
+.navbar-toggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.navbar-mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(0, 26, 77, 0.98), rgba(0, 33, 102, 0.95));
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 16px 20px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+  z-index: 1001;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.25s ease, opacity 0.25s ease;
+  opacity: 0;
+}
+
+.navbar-mobile-menu.open {
+  display: flex;
+  max-height: 520px;
+  opacity: 1;
+}
+
+.mobile-menu-item {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: white;
+  padding: 14px 16px;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.mobile-menu-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.mobile-menu-item.logout {
+  border-color: rgba(255, 83, 79, 0.35);
+  color: #ffb3b0;
+}
+
+.mobile-menu-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+  margin: 6px 0;
+}
+
+.mobile-profile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .dropdown-option {
   display: block;
   width: 100%;
@@ -448,6 +528,15 @@
 
   .navbar-menu {
     display: none;
+  }
+  .navbar-right {
+    display: none;
+  }
+
+  .navbar-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .brand-text {
